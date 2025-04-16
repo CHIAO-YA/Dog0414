@@ -37,13 +37,7 @@
                         EndDate = c.DateTime(),
                         CreatedAt = c.DateTime(),
                         UpdatedAt = c.DateTime(),
-                        OrderStatus = c.Int(),
                         PaymentStatus = c.Int(),
-                        KG = c.Decimal(precision: 18, scale: 2),
-                        QRcode = c.String(),
-                        CommonIssues = c.Int(),
-                        IssueDescription = c.String(maxLength: 500),
-                        ReportedAt = c.DateTime(),
                     })
                 .PrimaryKey(t => t.OrdersID)
                 .ForeignKey("dbo.Discounts", t => t.DiscountID, cascadeDelete: true)
@@ -54,18 +48,40 @@
                 .Index(t => t.DiscountID);
             
             CreateTable(
+                "dbo.OrderDetails",
+                c => new
+                    {
+                        OrderDetailID = c.Int(nullable: false, identity: true),
+                        OrderDetailsNumber = c.String(nullable: false, maxLength: 50),
+                        OrdersID = c.Int(nullable: false),
+                        ServiceDate = c.DateTime(nullable: false),
+                        DriverID = c.String(),
+                        OrderStatus = c.Int(),
+                        KG = c.Decimal(precision: 18, scale: 2),
+                        CommonIssues = c.Int(),
+                        IssueDescription = c.String(maxLength: 500),
+                        CreatedAt = c.DateTime(),
+                        UpdatedAt = c.DateTime(),
+                        ReportedAt = c.DateTime(),
+                        QRcode = c.String(),
+                    })
+                .PrimaryKey(t => t.OrderDetailID)
+                .ForeignKey("dbo.Orders", t => t.OrdersID, cascadeDelete: true)
+                .Index(t => t.OrdersID);
+            
+            CreateTable(
                 "dbo.DriverPhotoes",
                 c => new
                     {
                         DogPhotoID = c.Int(nullable: false, identity: true),
-                        OrdersID = c.Int(nullable: false),
+                        OrderDetailID = c.Int(nullable: false),
                         DriverImageUrl = c.String(maxLength: 255),
                         CreatedAt = c.DateTime(),
                         UpdatedAt = c.DateTime(),
                     })
                 .PrimaryKey(t => t.DogPhotoID)
-                .ForeignKey("dbo.Orders", t => t.OrdersID, cascadeDelete: true)
-                .Index(t => t.OrdersID);
+                .ForeignKey("dbo.OrderDetails", t => t.OrderDetailID, cascadeDelete: true)
+                .Index(t => t.OrderDetailID);
             
             CreateTable(
                 "dbo.Photos",
@@ -130,11 +146,13 @@
             DropForeignKey("dbo.Orders", "UsersID", "dbo.Users");
             DropForeignKey("dbo.Orders", "PlanID", "dbo.Plans");
             DropForeignKey("dbo.Photos", "OrdersID", "dbo.Orders");
-            DropForeignKey("dbo.DriverPhotoes", "OrdersID", "dbo.Orders");
+            DropForeignKey("dbo.OrderDetails", "OrdersID", "dbo.Orders");
+            DropForeignKey("dbo.DriverPhotoes", "OrderDetailID", "dbo.OrderDetails");
             DropForeignKey("dbo.Orders", "DiscountID", "dbo.Discounts");
             DropIndex("dbo.Employees", new[] { "Account" });
             DropIndex("dbo.Photos", new[] { "OrdersID" });
-            DropIndex("dbo.DriverPhotoes", new[] { "OrdersID" });
+            DropIndex("dbo.DriverPhotoes", new[] { "OrderDetailID" });
+            DropIndex("dbo.OrderDetails", new[] { "OrdersID" });
             DropIndex("dbo.Orders", new[] { "DiscountID" });
             DropIndex("dbo.Orders", new[] { "PlanID" });
             DropIndex("dbo.Orders", new[] { "UsersID" });
@@ -143,6 +161,7 @@
             DropTable("dbo.Plans");
             DropTable("dbo.Photos");
             DropTable("dbo.DriverPhotoes");
+            DropTable("dbo.OrderDetails");
             DropTable("dbo.Orders");
             DropTable("dbo.Discounts");
         }

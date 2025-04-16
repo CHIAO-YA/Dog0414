@@ -112,7 +112,9 @@ namespace Dog.Models
 
         // 一對多關聯 (一個 Order 有多個 Photo)
         public virtual ICollection<OrderDetails> OrderDetails { get; set; }
-        //public virtual ICollection<Photo> Photos { get; set; }
+        public virtual ICollection<Photo> Photo { get; set; }
         //public virtual ICollection<DriverPhoto> DriverPhoto { get; set; }
+
     }
+
 }

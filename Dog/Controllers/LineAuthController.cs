@@ -11,6 +11,8 @@ using Dog.Models;
 using Dog.Migrations;
 using Newtonsoft.Json.Linq;
 using Dog.Security;
+using System.Configuration;
+using static System.Net.WebRequestMethods;
 
 namespace Dog.Controllers
 {
@@ -22,9 +24,10 @@ namespace Dog.Controllers
         [Route("auth/line-login")]//獲取 LINE 用戶資料
         public async Task<IHttpActionResult> Callback(string code, string state)
         {
+            string aa = "";
             string channelId = "2007121127";
             string channelSecret = "d7c30599e53dc2aa970728521d61d2c3";
-            string redirectUri = "https://localhost:5173/auth/line-login";
+            string redirectUri = ConfigurationManager.AppSettings["redirect_uri"];
             // Step 1: 使用授權碼換取 access token
             string tokenUrl = "https://api.line.me/oauth2/v2.1/token";
             var client = new HttpClient();
@@ -39,20 +42,21 @@ namespace Dog.Controllers
             //向 LINE API 發送 HTTP POST 請求取得回應內容
             var content = new FormUrlEncodedContent(postData);
             var response = await client.PostAsync(tokenUrl, content);//非同步請求，等待 response（回應物件）回來再繼續執行
+            aa += "01, ";
             var responseBody = await response.Content.ReadAsStringAsync();//LINE 回傳的 JSON 資料
-
+            aa += "02, ";
             if (response.IsSuccessStatusCode)
             {
                 // Step 2: 解析 access token
                 var tokenData = JsonConvert.DeserializeObject<dynamic>(responseBody);
                 string accessToken = tokenData.access_token;
-
+                aa += "03, ";
                 // Step 3: 使用 access token 請求用戶資料
                 string userProfileUrl = "https://api.line.me/v2/profile";
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                 var profileResponse = await client.GetAsync(userProfileUrl);
                 var profileData = await profileResponse.Content.ReadAsStringAsync();
-
+                aa += "04, ";
                 // Step 4: 解析用戶資料
                 var userData = JObject.Parse(profileData);
                 string lineId = (string)userData["userId"];
@@ -61,7 +65,7 @@ namespace Dog.Controllers
 
                 // 解析 state，決定角色 (1 = 使用者, 2 = 接單員)
                 int userRole = int.TryParse(state, out int role) && role == 2 ? 2 : 1;
-
+                aa += "05, ";
                 using (var dbContext = new Model1())
                 {
                     try
@@ -115,14 +119,9 @@ namespace Dog.Controllers
                 // ✅ 產生 JWT Token
                 LineJwtAuthUtil jwtAuthUtil = new LineJwtAuthUtil();
                 string jwtToken = jwtAuthUtil.GetToken(lineId, userRole.ToString());
-                //var ExpRefresh = new Dictionary<string, object>
-                //{
-                //    { "lineId", lineId },
-                //    { "userRole", userRole.ToString() }
-                //};
-                //string jwtToken2 = jwtAuthUtil.LineExpRefreshToken(ExpRefresh);
-
-
+                // 根據 userRole 決定角色名稱
+                 string roleName = userRole == 1 ? "customer" : "deliver";
+                 string redirectUrl = userRole == 1 ? "https://localhost:5173/customer" : "https://localhost:5173/deliver";
                 // Step 6: 返回成功的訊息
                 return Ok(new
                 {
@@ -130,12 +129,22 @@ namespace Dog.Controllers
                     status = true,
                     message = "成功取得並儲存用戶資料",
                     profileData,
-                    token = jwtToken
+                    token = jwtToken,
+                    role = userRole,       // 保留數字值
+                    roleName = roleName,    // 添加文字表示給前端使用
+                    redirectUrl = redirectUrl
                 });
             }
             else
             {
-                return BadRequest("交換 access token 失敗");
+                return Ok(new
+                {
+                        aa,
+                   responseBody,
+                x = "交換 access token 失敗",
+                });
+
+                //return BadRequest("交換 access token 失敗");
             }
         }
         private string GetUserNumber(int role)//根據角色自動產生唯一編號不重複

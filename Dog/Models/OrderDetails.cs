@@ -70,7 +70,7 @@ namespace Dog.Models
             // 根據訂單 ID 和日期生成編號，例如：O1234-0311
             OrderDetailsNumber = $"O{OrdersID}-{datePart}";
         }
-        public virtual ICollection<Photo> Photos { get; set; }
+        //public virtual ICollection<Photo> Photos { get; set; }
         public virtual ICollection<DriverPhoto> DriverPhoto { get; set; }
     }
 }

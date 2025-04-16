@@ -229,36 +229,28 @@
     <Compile Include="Controllers\DiscountsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LineAuthController.cs" />
+    <Compile Include="Controllers\LinePayController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\PlanController.cs" />
     <Compile Include="Controllers\TodayController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\UserfirstController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202503310349340_new.cs" />
-    <Compile Include="Migrations\202503310349340_new.Designer.cs">
-      <DependentUpon>202503310349340_new.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503310814321_driver.cs" />
-    <Compile Include="Migrations\202503310814321_driver.Designer.cs">
-      <DependentUpon>202503310814321_driver.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503310919550_OrderDetails.cs" />
-    <Compile Include="Migrations\202503310919550_OrderDetails.Designer.cs">
-      <DependentUpon>202503310919550_OrderDetails.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503310931319_qr.cs" />
-    <Compile Include="Migrations\202503310931319_qr.Designer.cs">
-      <DependentUpon>202503310931319_qr.cs</DependentUpon>
+    <Compile Include="Migrations\202504011514543_new.cs" />
+    <Compile Include="Migrations\202504011514543_new.Designer.cs">
+      <DependentUpon>202504011514543_new.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Discount.cs" />
     <Compile Include="Models\DriverPhoto.cs" />
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\EnumList.cs" />
+    <Compile Include="Security\HmacSignature.cs" />
+    <Compile Include="Security\LinePay.cs" />
     <Compile Include="Models\Model1.cs" />
     <Compile Include="Models\OrderDetails.cs" />
     <Compile Include="Models\Orders.cs" />
@@ -270,6 +262,7 @@
     <Compile Include="Security\JwtAuthFilter.cs" />
     <Compile Include="Security\JwtAuthUtil - line.cs" />
     <Compile Include="Security\JwtAuthUtil.cs" />
+    <Compile Include="Security\LinePayService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -322,6 +315,7 @@
     <Content Include="Scripts\jquery-3.7.0.slim.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Security\dog2.png" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -416,17 +410,8 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202503310349340_new.resx">
-      <DependentUpon>202503310349340_new.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503310814321_driver.resx">
-      <DependentUpon>202503310814321_driver.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503310919550_OrderDetails.resx">
-      <DependentUpon>202503310919550_OrderDetails.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503310931319_qr.resx">
-      <DependentUpon>202503310931319_qr.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202504011514543_new.resx">
+      <DependentUpon>202504011514543_new.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
