@@ -38,8 +38,7 @@ namespace Dog.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:d}")]
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; }
-
-
         public virtual ICollection<Orders> Orders { get; set; }
+        //public virtual ICollection<Orders> DriverOrders { get; set; }
     }
 }

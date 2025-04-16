@@ -13,58 +13,58 @@ namespace Dog.Controllers
         Models.Model1 db = new Models.Model1();
 
         [HttpGet]
-        [Route("Dog/Today/Driver/{Number}")]//一個接單員取得當天資料/狀態/筆數
-        public IHttpActionResult GetToday(int UsersID)
-        {
-            try
-            {
-                DateTime today = DateTime.Now.Date;
-                // 查找該接單員（Driver）的資料
-                var Driver = db.Users.FirstOrDefault(U => U.UsersID == UsersID && U.Number.StartsWith("D"));
-                // 查詢符合日期範圍的訂單
-                var orders = db.Orders.Where(o => o.StartDate <= today && o.EndDate >= today).ToList();
-                // 使用 GetTargetDates 方法來取得符合條件的所有日期
-                var targetDates = GetTargetDates(orders, today);
-                // 統計當天符合的訂單狀態
-                var orderStatusCount = new Dictionary<OrderStatus, int>
-                {
-                    { OrderStatus.未完成, 0 },
-                    { OrderStatus.前往中, 0 },
-                    { OrderStatus.已完成, 0 },
-                    { OrderStatus.異常回報, 0 },
-                    { OrderStatus.已取消, 0 }
-                };
-                // 遍歷所有符合條件的訂單
-                foreach (var order in orders)
-                {
-                    // 檢查這筆訂單的日期是否包含在 targetDates 中
-                    if (targetDates.Contains(order.StartDate.Value.Date))
-                    {
-                        // 根據訂單的狀態進行統計
-                        if (order.OrderStatus != null)
-                        {
-                            orderStatusCount[(OrderStatus)order.OrderStatus]++;
-                        }
-                    }
-                }
-                return Ok(new
-                {
-                    StatusCode = 200,
-                    status = true,
-                    message = "查詢該員工當天資料",
-                    ID = Driver.UsersID,
-                    Name = Driver.LineName,
-                    Number = Driver.Number,
-                    Todat = today,
-                    OrdersByDate = orderStatusCount
-                });
+        [Route("GET/deliver/orders/{UsersID}/today")]//一個接單員取得當天資料/狀態/筆數
+        //public IHttpActionResult GetToday(int UsersID)
+        //{
+        //    try
+        //    {
+        //        DateTime today = DateTime.Now.Date;
+        //        // 查找該接單員（Driver）的資料
+        //        var Driver = db.Users.FirstOrDefault(U => U.UsersID == UsersID && U.Number.StartsWith("D"));
+        //        // 查詢符合日期範圍的訂單
+        //        var orders = db.Orders.Where(o => o.StartDate <= today && o.EndDate >= today).ToList();
+        //        // 使用 GetTargetDates 方法來取得符合條件的所有日期
+        //        var targetDates = GetTargetDates(orders, today);
+        //        // 統計當天符合的訂單狀態
+        //        var orderStatusCount = new Dictionary<OrderStatus, int>
+        //        {
+        //            { OrderStatus.未完成, 0 },
+        //            { OrderStatus.前往中, 0 },
+        //            { OrderStatus.已完成, 0 },
+        //            { OrderStatus.異常回報, 0 },
+        //            { OrderStatus.已取消, 0 }
+        //        };
+        //        // 遍歷所有符合條件的訂單
+        //        foreach (var order in orders)
+        //        {
+        //            // 檢查這筆訂單的日期是否包含在 targetDates 中
+        //            if (targetDates.Contains(order.StartDate.Value.Date))
+        //            {
+        //                // 根據訂單的狀態進行統計
+        //                if (order.OrderStatus != null)
+        //                {
+        //                    orderStatusCount[(OrderStatus)order.OrderStatus]++;
+        //                }
+        //            }
+        //        }
+        //        return Ok(new
+        //        {
+        //            StatusCode = 200,
+        //            status = true,
+        //            message = "查詢該員工當天資料",
+        //            ID = Driver.UsersID,
+        //            Name = Driver.LineName,
+        //            Number = Driver.Number,
+        //            Todat = today,
+        //            OrdersByDate = orderStatusCount
+        //        });
 
-            }
-            catch (Exception ex)
-            {
-                return InternalServerError(ex);
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return InternalServerError(ex);
+        //    }
+        //}
         private List<DateTime> GetTargetDates(List<Orders> orders, DateTime today)
         {
             List<DateTime> targetDates = new List<DateTime>();// 建立一個清單來存放所有符合條件的日期

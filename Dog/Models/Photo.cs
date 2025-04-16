@@ -16,10 +16,10 @@ namespace Dog.Models
         public int PhotoID { get; set; }
 
         [Display(Name = "訂單ID")]
-        public int OrdersID { get; set; }
+        public int OrderDetailID { get; set; }
         [JsonIgnore]
-        [ForeignKey("OrdersID")]
-        public virtual Orders Orders { get; set; }
+        [ForeignKey("OrderDetailID")]
+        public virtual OrderDetails OrderDetails { get; set; }
 
         [Display(Name = "放置圖")]
         [MaxLength(255)]

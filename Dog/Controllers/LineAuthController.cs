@@ -19,12 +19,12 @@ namespace Dog.Controllers
         Models.Model1 db = new Models.Model1();
 
         [HttpGet]
-        [Route("api/Callback")]//獲取 LINE 用戶資料
+        [Route("auth/line-login")]//獲取 LINE 用戶資料
         public async Task<IHttpActionResult> Callback(string code, string state)
         {
             string channelId = "2007121127";
             string channelSecret = "d7c30599e53dc2aa970728521d61d2c3";
-            string redirectUri = "https://localhost:44388/api/Callback";
+            string redirectUri = "https://localhost:5173/auth/line-login";
             // Step 1: 使用授權碼換取 access token
             string tokenUrl = "https://api.line.me/oauth2/v2.1/token";
             var client = new HttpClient();
@@ -115,6 +115,14 @@ namespace Dog.Controllers
                 // ✅ 產生 JWT Token
                 LineJwtAuthUtil jwtAuthUtil = new LineJwtAuthUtil();
                 string jwtToken = jwtAuthUtil.GetToken(lineId, userRole.ToString());
+                //var ExpRefresh = new Dictionary<string, object>
+                //{
+                //    { "lineId", lineId },
+                //    { "userRole", userRole.ToString() }
+                //};
+                //string jwtToken2 = jwtAuthUtil.LineExpRefreshToken(ExpRefresh);
+
+
                 // Step 6: 返回成功的訊息
                 return Ok(new
                 {

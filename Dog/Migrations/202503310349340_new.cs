@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class _123123 : DbMigration
+    public partial class _new : DbMigration
     {
         public override void Up()
         {
@@ -22,6 +22,7 @@
                 c => new
                     {
                         OrdersID = c.Int(nullable: false, identity: true),
+                        OrderNumber = c.String(maxLength: 20),
                         UsersID = c.Int(nullable: false),
                         PlanID = c.Int(nullable: false),
                         DiscountID = c.Int(nullable: false),
@@ -40,6 +41,7 @@
                         PaymentStatus = c.Int(),
                         KG = c.Decimal(precision: 18, scale: 2),
                         QRcode = c.String(),
+                        CommonIssues = c.Int(),
                         IssueDescription = c.String(maxLength: 500),
                         ReportedAt = c.DateTime(),
                     })
@@ -50,6 +52,20 @@
                 .Index(t => t.UsersID)
                 .Index(t => t.PlanID)
                 .Index(t => t.DiscountID);
+            
+            CreateTable(
+                "dbo.DriverPhotoes",
+                c => new
+                    {
+                        DogPhotoID = c.Int(nullable: false, identity: true),
+                        OrdersID = c.Int(nullable: false),
+                        DriverImageUrl = c.String(maxLength: 255),
+                        CreatedAt = c.DateTime(),
+                        UpdatedAt = c.DateTime(),
+                    })
+                .PrimaryKey(t => t.DogPhotoID)
+                .ForeignKey("dbo.Orders", t => t.OrdersID, cascadeDelete: true)
+                .Index(t => t.OrdersID);
             
             CreateTable(
                 "dbo.Photos",
@@ -91,20 +107,6 @@
                 .PrimaryKey(t => t.UsersID);
             
             CreateTable(
-                "dbo.DogPhotoes",
-                c => new
-                    {
-                        PhotoID = c.Int(nullable: false, identity: true),
-                        OrdersID = c.Int(nullable: false),
-                        DrivermageUrl = c.String(maxLength: 255),
-                        CreatedAt = c.DateTime(),
-                        UpdatedAt = c.DateTime(),
-                    })
-                .PrimaryKey(t => t.PhotoID)
-                .ForeignKey("dbo.Orders", t => t.OrdersID, cascadeDelete: true)
-                .Index(t => t.OrdersID);
-            
-            CreateTable(
                 "dbo.Employees",
                 c => new
                     {
@@ -125,22 +127,22 @@
         
         public override void Down()
         {
-            DropForeignKey("dbo.DogPhotoes", "OrdersID", "dbo.Orders");
             DropForeignKey("dbo.Orders", "UsersID", "dbo.Users");
             DropForeignKey("dbo.Orders", "PlanID", "dbo.Plans");
             DropForeignKey("dbo.Photos", "OrdersID", "dbo.Orders");
+            DropForeignKey("dbo.DriverPhotoes", "OrdersID", "dbo.Orders");
             DropForeignKey("dbo.Orders", "DiscountID", "dbo.Discounts");
             DropIndex("dbo.Employees", new[] { "Account" });
-            DropIndex("dbo.DogPhotoes", new[] { "OrdersID" });
             DropIndex("dbo.Photos", new[] { "OrdersID" });
+            DropIndex("dbo.DriverPhotoes", new[] { "OrdersID" });
             DropIndex("dbo.Orders", new[] { "DiscountID" });
             DropIndex("dbo.Orders", new[] { "PlanID" });
             DropIndex("dbo.Orders", new[] { "UsersID" });
             DropTable("dbo.Employees");
-            DropTable("dbo.DogPhotoes");
             DropTable("dbo.Users");
             DropTable("dbo.Plans");
             DropTable("dbo.Photos");
+            DropTable("dbo.DriverPhotoes");
             DropTable("dbo.Orders");
             DropTable("dbo.Discounts");
         }

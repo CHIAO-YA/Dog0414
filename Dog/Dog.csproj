@@ -231,22 +231,36 @@
     <Compile Include="Controllers\LineAuthController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
+    <Compile Include="Controllers\PlanController.cs" />
     <Compile Include="Controllers\TodayController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202503310317119_123123.cs" />
-    <Compile Include="Migrations\202503310317119_123123.Designer.cs">
-      <DependentUpon>202503310317119_123123.cs</DependentUpon>
+    <Compile Include="Migrations\202503310349340_new.cs" />
+    <Compile Include="Migrations\202503310349340_new.Designer.cs">
+      <DependentUpon>202503310349340_new.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503310814321_driver.cs" />
+    <Compile Include="Migrations\202503310814321_driver.Designer.cs">
+      <DependentUpon>202503310814321_driver.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503310919550_OrderDetails.cs" />
+    <Compile Include="Migrations\202503310919550_OrderDetails.Designer.cs">
+      <DependentUpon>202503310919550_OrderDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503310931319_qr.cs" />
+    <Compile Include="Migrations\202503310931319_qr.Designer.cs">
+      <DependentUpon>202503310931319_qr.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Discount.cs" />
-    <Compile Include="Models\DogPhoto.cs" />
+    <Compile Include="Models\DriverPhoto.cs" />
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\EnumList.cs" />
     <Compile Include="Models\Model1.cs" />
+    <Compile Include="Models\OrderDetails.cs" />
     <Compile Include="Models\Orders.cs" />
     <Compile Include="Models\Photo.cs" />
     <Compile Include="Models\Plan.cs" />
@@ -402,8 +416,17 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202503310317119_123123.resx">
-      <DependentUpon>202503310317119_123123.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202503310349340_new.resx">
+      <DependentUpon>202503310349340_new.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503310814321_driver.resx">
+      <DependentUpon>202503310814321_driver.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503310919550_OrderDetails.resx">
+      <DependentUpon>202503310919550_OrderDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503310931319_qr.resx">
+      <DependentUpon>202503310931319_qr.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

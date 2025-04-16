@@ -1,29 +1,30 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using Newtonsoft.Json;
+
 
 namespace Dog.Models
 {
-    public class DogPhoto
+    public class DriverPhoto
     {
         [Key]
-        [Display(Name = "照片ID")]
+        [Display(Name = "Dog照片ID")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int PhotoID { get; set; }
+        public int DogPhotoID { get; set; }
 
         [Display(Name = "訂單ID")]
-        public int OrdersID { get; set; }
+        public int OrderDetailID { get; set; }
         [JsonIgnore]
-        [ForeignKey("OrdersID")]
-        public virtual Orders Orders { get; set; }
+        [ForeignKey("OrderDetailID")]
+        public virtual OrderDetails OrderDetails { get; set; }
 
         [Display(Name = "接單者拍照")]
         [MaxLength(255)]
-        public string DrivermageUrl { get; set; }
+        public string DriverImageUrl { get; set; }
 
         [Display(Name = "建立日期")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:d}")]

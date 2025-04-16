@@ -13,6 +13,14 @@ namespace Dog.Models
         使用者 = 1,
         接單員 = 2,
     }
+    public enum CommonIssues
+    {
+        垃圾量超過方案限制 = 1,
+        未找到垃圾袋用戶無回應 = 2,
+        無QR碼用戶無回應 = 3,
+        垃圾袋破損嚴重 = 4,
+        面交未見用戶已聯絡無回應 = 5
+    }
     public enum OrderStatus
     {
         未完成 = 1,

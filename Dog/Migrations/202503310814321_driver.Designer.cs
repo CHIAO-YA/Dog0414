@@ -7,13 +7,13 @@ namespace Dog.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.5.1")]
-    public sealed partial class _123123 : IMigrationMetadata
+    public sealed partial class driver : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(_123123));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(driver));
         
         string IMigrationMetadata.Id
         {
-            get { return "202503310317119_123123"; }
+            get { return "202503310814321_driver"; }
         }
         
         string IMigrationMetadata.Source

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dog.Migrations;
+using System;
 using System.Data.Entity;
 using System.Linq;
 
@@ -16,10 +17,11 @@ namespace Dog.Models
         public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<Plan> Plans { get; set; }
         public virtual DbSet<Photo> Photo { get; set; }
-        public virtual DbSet<DogPhoto> DogPhoto { get; set; }
+        public virtual DbSet<DriverPhoto> DriverPhoto { get; set; }
+        public virtual DbSet<OrderDetails> OrderDetails { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Orders>().Property(o => o.KG).HasPrecision(18, 2);
+            modelBuilder.Entity<OrderDetails>().Property(o => o.KG).HasPrecision(18, 2);
             //跟對類別order設定.取得order.公斤的屬性.設定資料類型
             modelBuilder.Entity<Discount>().Property(d => d.DiscountRate).HasPrecision(18, 2);
             // 調用基類的 OnModelCreating，以確保 EF 可以繼續進行其他設定

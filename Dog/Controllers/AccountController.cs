@@ -76,7 +76,7 @@ namespace Dog.Controllers
             return VerifyPassword(inputPassword, storedHash, storedSalt);
         }
         [HttpPost]
-        [Route("api/employee/login")]//員工登入
+        [Route("GET/admin/login")]//員工登入
         public IHttpActionResult EmployeeLogin([FromBody] LoginDto loginDto)
         {
             try
@@ -100,7 +100,13 @@ namespace Dog.Controllers
                 // ✅ 產生 JWT Token
                 JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
                 string jwtToken = jwtAuthUtil.GenerateToken(user.EmployeeID, user.Account, user.Name);
-
+                //var ExpRefresh = new Dictionary<string, object>
+                //{
+                //    { "Id", user.EmployeeID},
+                //    { "Account", user.Account},
+                //    { "Name", user.Name},
+                //};
+                //string jwtToken2 = jwtAuthUtil.ExpRefreshToken(ExpRefresh);
 
                 return Ok(new
                 {
@@ -122,7 +128,7 @@ namespace Dog.Controllers
 
         [JwtAuthFilter] // 這個標註已經確保了只有帶有有效JWT令牌的請求才能訪問
         [HttpGet]
-        [Route("api/employee/info")] // 建議添加路由
+        [Route("GET/admin/login/Info")] // 建議添加路由
         public IHttpActionResult GetEmployeeInfo()
         {
             // 從請求標頭獲取Authorization值並移除"Bearer "前綴
@@ -154,7 +160,7 @@ namespace Dog.Controllers
 
 
         [HttpPost]
-        [Route("api/register")]//新增使用者資料(註冊)
+        [Route("POST/admin/Register")]//新增使用者資料(註冊)
         public IHttpActionResult ApiRegister([FromBody] RegisterDto registerDto)
         {
             // 1. 確保帳號不為空

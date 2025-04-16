@@ -22,7 +22,7 @@ namespace Dog.Security
                 { "Id",id },
                 { "Account", account },
                 { "NickName", name },
-                { "Exp", DateTime.Now.AddMinutes(30).ToString() } // JwtToken過期時效設定 30 分
+                { "Exp", DateTime.Now.AddMonths(6).ToString() } // JwtToken過期時效設定 30 分
             };
             // 產生 JwtToken
             return JWT.Encode(payload, Encoding.UTF8.GetBytes(secretKey), JwsAlgorithm.HS512);

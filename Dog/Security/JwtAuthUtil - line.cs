@@ -22,7 +22,8 @@ namespace Dog.Security
             {
                 { "lineId",lineId },
                 { "userRole", userRole },
-                { "Exp", DateTime.Now.AddMinutes(30).ToString() } // JwtToken過期時效設定 30 分
+                { "Exp", DateTime.Now.AddMonths(6).ToString() }
+               // { "Exp", DateTime.Now.AddMinutes(30).ToString() } // JwtToken過期時效設定 30 分//使用者使用超過30分鐘就會強迫登出
             };
             // 產生 JwtToken
             return JWT.Encode(payload, Encoding.UTF8.GetBytes(secretlineKey), JwsAlgorithm.HS512);

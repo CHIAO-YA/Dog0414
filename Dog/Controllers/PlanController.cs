@@ -7,20 +7,20 @@ using System.Web.Http;
 
 namespace Dog.Controllers
 {
-    public class DiscountsController : ApiController
+    public class PlanController : ApiController
     {
         Models.Model1 db = new Models.Model1();
 
         [HttpGet]//取資料 取得所有Discount
-        [Route("GET/user/discounts")]
-        public IHttpActionResult GetDiscount()
+        [Route("GET/user/plans")]
+        public IHttpActionResult Getplans()
         {
-            // 使用投影查詢，只選擇需要的屬性
-            var Discount = db.Discount.Select(d => new
+            var Plans = db.Plans.Select(d => new
             {
-                DiscountID = d.DiscountID,
-                Months = d.Months,
-                DiscountRate = d.DiscountRate // 不包含 Orders 導航屬性
+                PlanID = d.PlanID,
+                PlanName = d.PlanName,
+                Liter = d.Liter, // 不包含 Orders 導航屬性
+                Price = d.Price
             }).ToList();
 
             return Ok(new
@@ -28,9 +28,8 @@ namespace Dog.Controllers
                 statusCode = 200,
                 status = true,
                 message = "成功取得",
-                Discount
+                Plans
             });
         }
-
     }
 }
