@@ -80,6 +80,10 @@ namespace Dog.Models
         [Display(Name = "已取消時間")]
         public DateTime? CanceledAt { get; set; }
 
+        [Display(Name = "RQcode")]
+        public string RQcode { get; set; }  
+
+
         // 顯示用的編號生成邏輯
         public void GenerateOrderDetailsNumber()
         {

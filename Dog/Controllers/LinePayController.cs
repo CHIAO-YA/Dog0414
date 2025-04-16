@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Dog.Models;
-using Dog.Security; 
+using Dog.Security;
 //using System.Web.Mvc;
 using Newtonsoft.Json;
 
@@ -23,21 +23,81 @@ namespace Dog.Controllers
         {
             try
             {
-                //驗證資料
-                if (string.IsNullOrEmpty(request.OrderNumber) || string.IsNullOrEmpty(request.orderId))
+                // 1. 驗證訂單資訊
+                if (string.IsNullOrEmpty(request.orderId)) return BadRequest("訂單ID不能為空");
+                int ordersId;
+                if (!int.TryParse(request.orderId, out ordersId)) return BadRequest("訂單ID格式不正確");
+                // 2. 查詢資料庫確認訂單存在並驗證狀態
+                using (var db = new Models.Model1())
                 {
-                    return BadRequest("訂單資料不完整");
+                    var order = db.Orders.FirstOrDefault(o => o.OrdersID.ToString() == request.orderId);
+                    if (order == null) { return NotFound(); }
+
+                    //3.檢查訂單狀態 - 避免重複支付
+                    if (order.PaymentStatus == PaymentStatus.已付款) return BadRequest("此訂單已完成支付");
+                    //4.使用專門方法計算訂單總金額以確保正確性
+                    decimal totalAmount = order.TotalAmount;
+                    if (totalAmount != order.TotalAmount) { return BadRequest("訂單金額有誤，請重新下單"); }//資料庫
+                    if (request.amount != (int)order.TotalAmount){return BadRequest("訂單金額不符，請重新確認");}//前端
+                    //5.設定 Line Pay 請求所需資訊
+                    request.amount = (int)totalAmount;
+                    //6.設定商品資訊（將顯示在 Line Pay 付款頁面上）
+                    request.packages = new List<PackageDto>
+                    {
+                        new PackageDto
+                        {
+                            id = "pkg-" + ordersId,
+                            amount = (int)totalAmount,
+                            products = new List<ProductDto>
+                            {
+                                new ProductDto
+                                {
+                                    name = order.Plan?.PlanName ?? "方案",
+                                    quantity = 1,
+                                    price = (int)totalAmount
+                                }
+                            }
+                        }
+                    };
+                    // 7. 設定付款結果回調URL
+                    request.redirectUrls = new RedirectUrlsDto
+                    {
+                        confirmUrl = "https://www.youtube.com", // 成功
+                        cancelUrl = "https://www.google.com"    // 失敗/取消
+                    };
+
+                    // 8. 呼叫 Line Pay 服務預約交易
+                    var result = await _linePayService.ReservePaymentAsync(request);
+                    // 9. 處理預約交易結果
+                    if (result != null && result.returnCode == "0000") // 假設 0000 代表成功
+                    {
+                        // 更新訂單狀態為「等待付款」
+                        order.LinePayTransactionId = result.info?.transactionId;
+                        order.LinePayStatus = "reserved";
+                        order.PaymentStatus = PaymentStatus.未付款; // 假設有此枚舉值
+                        order.UpdatedAt = DateTime.Now;
+                        db.SaveChanges();
+                        // 返回成功結果，前端可據此導向到 Line Pay 支付頁面
+                        return Ok(new
+                        {
+                            success = true,
+                            message = "交易預約成功",
+                            paymentUrl = result.info?.paymentUrl?.web,
+                            transactionId = result.info?.transactionId,
+                        });
+                    }
+                    else
+                    {
+                        // 預約交易失敗
+                        return Ok(new
+                        {
+                            success = false,
+                            message = "交易預約失敗",
+                            errorCode = result?.returnCode,
+                            errorMessage = result?.returnMessage
+                        });
+                    }
                 }
-                //$$
-                //decimal totalAmount = 0;
-                //foreach (var item in request.Items)
-                //{
-                //    totalAmount += item.Price * item.Quantity; // 根據商品價格和數量計算總金額
-                //}
-                request.successUrl = "https://www.youtube.com"; // 成功導向
-                request.faillUrl = "https://www.google.com";  // 失敗導向
-                var result = await _linePayService.ReservePaymentAsync(request);
-                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -54,22 +114,38 @@ namespace Dog.Controllers
             try
             {
                 // 用來查詢對應的訂單，例如查 DB 是否有這筆 ordersID 和 transactionId
-                string ordersID = request.ordersID;//	自家訂單編號，用來知道是哪一筆訂單
-                long transactionId = request.transactionId;//LinePay 付款後回傳的編號，是該筆交易在 LinePay 裡的唯一識別
-
-                // 建立要送給 LinePay 的確認請求物件
-                var confirmRequest = new ConfirmRequestDto
+                string ordersID = request.ordersID;// 來自前端的訂單編號
+                long transactionId = request.transactionId;// LinePay 回傳的交易 ID
+                                                          
+                using (var db = new Models.Model1())
                 {
-                    transactionId = transactionId,
-                    amount = 500 // 假設固定金額，你也可以從 DB 撈實際金額
-                };
+                    // 先從資料庫獲取訂單
+                    var order = db.Orders.FirstOrDefault(o => o.OrdersID.ToString() == ordersID);
+                    if (order == null) return NotFound();
+
+                    // 建立要送給 LinePay 的確認請求物件
+                    var confirmRequest = new ConfirmRequestDto
+                    {
+                    transactionId = request.transactionId,
+                    amount = (int)order.TotalAmount // 使用資料庫訂單金額
+                    };
 
                 var result = await _linePayService.GetPaymentStatusAsync(confirmRequest);
 
                 // TODO: 在這裡可以根據 ordersID + transactionId 對應你自己的訂單資料庫狀態更新
-                // 例如：更新該筆訂單為「已付款」
-
-                return Ok(result);
+                if (result.returnCode == "0000")// 假設 LinePay 會回傳是否成功的標記
+                {
+                    order.PaymentStatus = PaymentStatus.已付款; // 假設有此枚舉值
+                      // 儲存更新到資料庫
+                }
+                else
+                {
+                    order.PaymentStatus = PaymentStatus.付款失敗; // 使用枚舉而非字串
+                   
+                }
+                    db.SaveChanges();
+                    return Ok(result);
+                }
             }
             catch (Exception ex)
             {
@@ -82,10 +158,7 @@ namespace Dog.Controllers
     {
         public string ordersID { get; set; }          // 你自家的訂單編號（用來找誰的訂單）
         public long transactionId { get; set; }       // LinePay 回傳的交易 ID
-
+        public int amount { get; set; }
     }
-    //private decimal OrderTotalMoney(Orders orders)
-    //{
 
-    //}
 }

@@ -13,9 +13,7 @@ namespace Dog.Models
         public string currency { get; } = "TWD";
         public string orderId { get; set; }
         public List<PackageDto> packages { get; set; }
-        //public RedirectUrlsDto redirectUrls { get; set; }
-        public string successUrl { get; set; }  // 成功導向網址
-        public string faillUrl { get; set; }   // 失敗導向網址
+        public RedirectUrlsDto redirectUrls { get; set; }
         public string OrderNumber { get; set; } // 自家訂單編號，用來知道是哪一筆訂單
     }
 
@@ -26,15 +24,17 @@ namespace Dog.Models
         public List<ProductDto> products { get; set; }
     }
 
-    //public class RedirectUrlsDto
-    //{
-    //    public string confirmUrl { get; set; }
-    //    public string cancelUrl { get; set; }
-    //}
+    public class RedirectUrlsDto
+    {
+        public string confirmUrl { get; set; }
+        public string cancelUrl { get; set; }
+    }
 
     public class ProductDto
     {
+        public string id { get; set; }         // ✅ Line Pay 規定必填
         public string name { get; set; }
+        public string imageUrl { get; set; }   // ✅ Line Pay 規定必填
         public int quantity { get; set; }
         public int price { get; set; }
     }

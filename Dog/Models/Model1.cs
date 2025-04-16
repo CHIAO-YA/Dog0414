@@ -27,6 +27,7 @@ namespace Dog.Models
             // 調用基類的 OnModelCreating，以確保 EF 可以繼續進行其他設定
             modelBuilder.Entity<Orders>().Property(o => o.Longitude).HasPrecision(18, 6);
             modelBuilder.Entity<Orders>().Property(o => o.Latitude).HasPrecision(18, 6);
+            modelBuilder.Entity<Orders>().Property(o => o.TotalAmount).HasPrecision(18, 2);
             base.OnModelCreating(modelBuilder);
         }
     }

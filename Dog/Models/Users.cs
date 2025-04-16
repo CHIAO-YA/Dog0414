@@ -33,6 +33,8 @@ namespace Dog.Models
         [MaxLength(255)]
         public string LinePicUrl { get; set; }
 
+        [Display(Name = "司機是否上班")]
+        public bool IsOnline { get; set; }
 
         [Display(Name = "建立日期")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:d}")]

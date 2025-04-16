@@ -26,7 +26,7 @@ namespace Dog.Models
         [JsonIgnore]//不要理他
         [ForeignKey("UsersID")]//外鍵導航屬性
         public virtual Users Users { get; set; }//UsersID關聯到Users表通過User導航屬性訪問
-                                                //order.User 訪問下單的用戶
+        //order.User 訪問下單的用戶
         //[Display(Name = "外送員ID")]
         //public string DriverID { get; set; }
         //[JsonIgnore]//不要理他
@@ -59,6 +59,10 @@ namespace Dog.Models
         [Display(Name = "地址")]
         [MaxLength(255)]
         public string Addresses { get; set; }
+
+        [Display(Name = "區域")]
+        [MaxLength(50)]
+        public string Region { get; set; }
 
         [Display(Name = "經度")]
         public decimal? Longitude { get; set; }
@@ -95,7 +99,9 @@ namespace Dog.Models
         public PaymentStatus? PaymentStatus { get; set; }
 
 
-
+        [Display(Name = "訂單總金額")]
+        //[Column(TypeName = "decimal(18, 0)")]
+        public decimal TotalAmount { get; set; }
 
 
         // Line Pay 相關欄位
@@ -114,6 +120,7 @@ namespace Dog.Models
         public DateTime? LinePayConfirmedAt { get; set; }  // 成功確認付款的時間
 
 
+        
 
 
 

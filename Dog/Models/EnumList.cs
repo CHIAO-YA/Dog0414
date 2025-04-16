@@ -33,7 +33,8 @@ namespace Dog.Models
     {
         未付款 = 0,
         已付款 = 1,
-        已退款 = 2
+        已退款 = 2,
+        付款失敗=3
     }
     public enum IdentityEnum
     {

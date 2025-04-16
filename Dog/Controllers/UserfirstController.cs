@@ -756,6 +756,42 @@ namespace Dog.Controllers
                 return BadRequest("UsersID為必填欄位");
             }
 
+            var planIdContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "PlanID");
+            if (planIdContent != null)
+            {
+                string planIdStr = await planIdContent.ReadAsStringAsync();
+                if (int.TryParse(planIdStr, out int planId))
+                    orders.PlanID = planId;
+                else
+                    return BadRequest("PlanID格式錯誤");
+            }
+            else
+            {
+                return BadRequest("PlanID為必填欄位");
+            }
+
+            // 讀取地址欄位並提取區域
+            var addressesContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "Addresses");
+            if (addressesContent != null)
+            {
+                orders.Addresses = await addressesContent.ReadAsStringAsync();
+
+                // 提取區域，假設有一個方法可以將地址轉換為區域
+                string region = GetRegionFromAddress(orders.Addresses);
+                if (!string.IsNullOrEmpty(region))
+                {
+                    orders.Region = region;  // 設置提取的區域
+                }
+                else
+                {
+                    return BadRequest("無法從地址中提取區域");
+                }
+            }
+            else
+            {
+                return BadRequest("Addresses為必填欄位");
+            }
+
             // 讀取其他必要欄位
             var discountIdContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "DiscountID");
             if (discountIdContent != null)
@@ -779,7 +815,7 @@ namespace Dog.Controllers
                 orders.OrderPhone = await orderPhoneContent.ReadAsStringAsync();
             }
 
-            var addressesContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "Addresses");
+            var addressContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "Addresses");
             if (addressesContent != null)
             {
                 orders.Addresses = await addressesContent.ReadAsStringAsync();
@@ -845,6 +881,9 @@ namespace Dog.Controllers
             // 先保存訂單
             db.Orders.Add(orders);
             db.SaveChanges();
+
+            // 計算訂單總金額並更新
+            CalculateTotalAmount(orders.OrdersID);
 
             // **推算每個服務日期**
             var serviceDates = GetServiceDates(orders.StartDate.Value, orders.EndDate.Value, orders.WeekDay);
@@ -923,91 +962,101 @@ namespace Dog.Controllers
             });
         }
 
-        //[HttpPost]
-        //[Route("POST/user/orders")]//新增訂單
-        //public IHttpActionResult CreateOrder([FromBody] OrderWithPhoto OrderWithPhoto)
-        //{
-        //    if (!ModelState.IsValid) //檢查請求是否有效
-        //    {
-        //        return BadRequest(ModelState); //如果請求無效，回傳 400 錯誤
-        //    }
-        //    var orders = OrderWithPhoto.Order;
-        //    string validWeekDays = ValidateAndFormatWeekDays(orders.WeekDay);
-        //    if (validWeekDays == null) { return BadRequest("WeekDay 格式錯誤，請使用 1~7 代表星期日到星期六，並用逗號分隔。"); }
-        //    orders.WeekDay = validWeekDays; // 轉換後的格式
+        [HttpPost]
+        [Route("POST/user/orders/11")]//新增訂單
+        public IHttpActionResult CreateOrder([FromBody] OrderWithPhoto OrderWithPhoto)
+        {
+            if (!ModelState.IsValid) //檢查請求是否有效
+            {
+                return BadRequest(ModelState); //如果請求無效，回傳 400 錯誤
+            }
+            var orders = OrderWithPhoto.Order;
+            string validWeekDays = ValidateAndFormatWeekDays(orders.WeekDay);
+            if (validWeekDays == null) { return BadRequest("WeekDay 格式錯誤，請使用 1~7 代表星期日到星期六，並用逗號分隔。"); }
+            orders.WeekDay = validWeekDays; // 轉換後的格式
 
-        //    // **統一使用 UTC 時間**
-        //    var currentTimeUtc = DateTime.UtcNow;
-        //    orders.CreatedAt = DateTime.SpecifyKind(currentTimeUtc, DateTimeKind.Utc);
-        //    orders.UpdatedAt = DateTime.SpecifyKind(currentTimeUtc, DateTimeKind.Utc);
+            // **統一使用 UTC 時間**
+            var currentTimeUtc = DateTime.UtcNow;
+            orders.CreatedAt = DateTime.SpecifyKind(currentTimeUtc, DateTimeKind.Utc);
+            orders.UpdatedAt = DateTime.SpecifyKind(currentTimeUtc, DateTimeKind.Utc);
 
-        //    // **計算 EndDate**
-        //    var Months = db.Discount.FirstOrDefault(d => d.DiscountID == orders.DiscountID);
-        //    if (Months != null && orders.StartDate.HasValue)
-        //    {
-        //        // 根據月份計算天數
-        //        int days = Months.Months * 30; // 1個月=30天, 3個月=90天, 6個月=180天
-        //        orders.EndDate = orders.StartDate.Value.AddDays(days);
-        //    }
-        //    // **轉換成台灣時間**
-        //    TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
-        //    DateTime createdAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.CreatedAt.Value, taiwanTimeZone);
-        //    DateTime updatedAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.UpdatedAt.Value, taiwanTimeZone);
-        //    // 設置訂單編號
-        //    orders.OrderNumber = GetOrderNumber(0);
+            // **計算 EndDate**
+            var Months = db.Discount.FirstOrDefault(d => d.DiscountID == orders.DiscountID);
+            if (Months != null && orders.StartDate.HasValue)
+            {
+                // 根據月份計算天數
+                int days = Months.Months * 30; // 1個月=30天, 3個月=90天, 6個月=180天
+                orders.EndDate = orders.StartDate.Value.AddDays(days);
+            }
+            // **轉換成台灣時間**
+            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            DateTime createdAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.CreatedAt.Value, taiwanTimeZone);
+            DateTime updatedAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.UpdatedAt.Value, taiwanTimeZone);
+            // 設置訂單編號
+            orders.OrderNumber = GetOrderNumber(0);
 
-        //    // 先保存訂單
-        //    db.Orders.Add(orders);
-        //    db.SaveChanges();
-        //    // **推算每個服務日期**
-        //    var serviceDates = GetServiceDates(orders.StartDate.Value, orders.EndDate.Value, orders.WeekDay);
+            // 先保存訂單
+            db.Orders.Add(orders);
+            db.SaveChanges();
+            // **推算每個服務日期**
+            var serviceDates = GetServiceDates(orders.StartDate.Value, orders.EndDate.Value, orders.WeekDay);
 
-        //    // 新增 OrderDetails
-        //    foreach (var serviceDate in serviceDates)
-        //    {
-        //        var orderDetail = new OrderDetails
-        //        {
-        //            OrdersID = orders.OrdersID, // 設置訂單 ID
-        //            ServiceDate = serviceDate, // 設置服務日期
-        //            OrderStatus = OrderStatus.未完成, // 設置初始狀態
-        //            CreatedAt = orders.CreatedAt, // 添加创建时间
-        //            UpdatedAt = orders.UpdatedAt,  // 添加更新时间
-        //                                           // 明確設置這些欄位為 null
-        //            ReportedAt = null,
-        //            PendingAt = null,
-        //            OnTheWayAt = null,
-        //            CompletedAt = null,
-        //            CanceledAt = null
-        //        };
-        //        orderDetail.GenerateOrderDetailsNumber(); // 根據日期生成訂單詳細編號
-        //        db.OrderDetails.Add(orderDetail); // 新增至 OrderDetails 表
+            // 新增 OrderDetails
+            foreach (var serviceDate in serviceDates)
+            {
+                var orderDetail = new OrderDetails
+                {
+                    OrdersID = orders.OrdersID, // 設置訂單 ID
+                    ServiceDate = serviceDate, // 設置服務日期
+                    OrderStatus = OrderStatus.未完成, // 設置初始狀態
+                    CreatedAt = orders.CreatedAt, // 添加创建时间
+                    UpdatedAt = orders.UpdatedAt,  // 添加更新时间
+                                                   // 明確設置這些欄位為 null
+                    ReportedAt = null,
+                    PendingAt = null,
+                    OngoingAt = null,
+                    CompletedAt = null,
+                    CanceledAt = null
+                };
+                orderDetail.GenerateOrderDetailsNumber(); // 根據日期生成訂單詳細編號
+                db.OrderDetails.Add(orderDetail); // 新增至 OrderDetails 表
 
-        //    }
+            }
 
-        //    // 處理照片
-        //    if (OrderWithPhoto.Photo != null && !string.IsNullOrEmpty(OrderWithPhoto.Photo.OrderImageUrl))
-        //    {
-        //        var photo = new Photo
-        //        {
-        //            OrdersID = orders.OrdersID,
-        //            OrderImageUrl = OrderWithPhoto.Photo.OrderImageUrl,
-        //            CreatedAt = orders.CreatedAt,
-        //            UpdatedAt = orders.UpdatedAt
-        //        };
-        //        db.Photo.Add(photo);
-        //    }
-        //    db.SaveChanges();
-        //    return Ok(new
-        //    {
-        //        StatusCode = 200,
-        //        status = "新增成功",
-        //        orders,
-        //        PaymentStatus = PaymentStatus.未付款, // 設置初始付款狀態
+            // 處理照片
+            if (OrderWithPhoto.Photo != null && !string.IsNullOrEmpty(OrderWithPhoto.Photo.OrderImageUrl))
+            {
+                var photo = new Photo
+                {
+                    OrdersID = orders.OrdersID,
+                    OrderImageUrl = OrderWithPhoto.Photo.OrderImageUrl,
+                    CreatedAt = orders.CreatedAt,
+                    UpdatedAt = orders.UpdatedAt
+                };
+                db.Photo.Add(photo);
+            }
+            db.SaveChanges();
+            return Ok(new
+            {
+                StatusCode = 200,
+                status = "新增成功",
+                orders,
+                PaymentStatus = PaymentStatus.未付款, // 設置初始付款狀態
 
-        //    });
-        //}
+            });
+        }
 
-        
+        // 假設這是一個簡單的地址到區域的轉換方法，實際上你可能需要依賴地理編碼 API
+        private string GetRegionFromAddress(string address)
+        {
+            // 這是一個簡單的示例，假設地址格式是「市/區/街道」，根據實際需求進行解析
+            var addressParts = address.Split('/');
+            if (addressParts.Length >= 2)
+            {
+                return addressParts[1]; // 假設第二部分是區域
+            }
+            return null;
+        }
 
         public class OrderWithPhoto
         {
@@ -1075,6 +1124,34 @@ namespace Dog.Controllers
 
             return number;
         }
+
+        private decimal CalculateTotalAmount(int OrdersID, bool saveToDatabase = true)
+        {
+            using (var db = new Models.Model1())
+            {
+                var order = db.Orders.Include("Plan").Include("Discount").FirstOrDefault(o => o.OrdersID == OrdersID);
+                if (order == null) throw new Exception($"訂單 ID {OrdersID} 不存在");
+                int weekday = 0;// 計算週內收集次數 (WeekDayCount)
+                {
+                    weekday = order.WeekDay.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                }
+                //? 如果不是null會繼續 ?? 是 null則 Price會被視為null不會拋出錯誤
+                decimal price = order.Plan?.Price ?? 0;
+                int months = order.Discount?.Months ?? 1;
+                decimal discountRate = order.Discount?.DiscountRate ?? 1m;// 這裡的 1m 表示一個 decimal 類型的 1
+                decimal weeklyAmount = price * weekday;
+                decimal subtotal = weeklyAmount * months;
+                decimal discountedAmount = subtotal * discountRate;
+                decimal totalAmount = Math.Round(discountedAmount, 0);
+                if (saveToDatabase)
+                {
+                    order.TotalAmount = totalAmount;
+                    db.SaveChanges();
+                }
+                return totalAmount;
+            }
+        }
+
 
 
         private List<DateTime> GetServiceDates(DateTime startDate, DateTime endDate, string weekDays)//計算ServiceDate

@@ -27,7 +27,7 @@ namespace Dog.Models
         public int Liter { get; set; }
 
         [Display(Name = "價格")]
-        [Range(0, 100)]
+        [Range(0, 1000)]
         public int Price { get; set; }
 
         [Display(Name = "公斤")]

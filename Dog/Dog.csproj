@@ -226,6 +226,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DiscountsController.cs" />
     <Compile Include="Controllers\DogController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -254,6 +255,14 @@
     <Compile Include="Migrations\202504080435153_go.cs" />
     <Compile Include="Migrations\202504080435153_go.Designer.cs">
       <DependentUpon>202504080435153_go.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504090556022_0409.cs" />
+    <Compile Include="Migrations\202504090556022_0409.Designer.cs">
+      <DependentUpon>202504090556022_0409.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504100446474_0410.cs" />
+    <Compile Include="Migrations\202504100446474_0410.Designer.cs">
+      <DependentUpon>202504100446474_0410.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Discount.cs" />
@@ -433,6 +442,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504080435153_go.resx">
       <DependentUpon>202504080435153_go.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504090556022_0409.resx">
+      <DependentUpon>202504090556022_0409.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504100446474_0410.resx">
+      <DependentUpon>202504100446474_0410.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

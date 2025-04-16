@@ -76,7 +76,7 @@ namespace Dog.Controllers
             return VerifyPassword(inputPassword, storedHash, storedSalt);
         }
         [HttpPost]
-        [Route("GET/admin/login")]//員工登入
+        [Route("POST/admin/login")]//員工登入
         public IHttpActionResult EmployeeLogin([FromBody] LoginDto loginDto)
         {
             try
