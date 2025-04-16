@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Web;
 using System.Threading.Tasks;
+using System.Drawing.Drawing2D;
 
 namespace Dog.Controllers
 {
@@ -67,7 +68,7 @@ namespace Dog.Controllers
                 { "name", basicResult.name },
                 { "date", basicResult.date },
                 { "total", todayOrderDetails.Count },
-                { "status", GetStatusText(todayOrder.OrderStatus) }
+                { "status", todayOrder.OrderStatus.ToString() }
             };
             // 如果有司機收運時間，則顯示
             if (todayOrder.DriverTimeStart.HasValue && todayOrder.DriverTimeEnd.HasValue)
@@ -83,20 +84,20 @@ namespace Dog.Controllers
             });
         }
 
-        private string GetStatusText(OrderStatus? status)// 訂單狀態
-        {
-            switch (status)
-            {
-                case OrderStatus.未排定: return "未排定";
-                case OrderStatus.已排定: return "已排定";
-                case OrderStatus.前往中: return "前往中";
-                case OrderStatus.已抵達: return "已抵達";
-                case OrderStatus.已完成: return "已完成";
-                case OrderStatus.異常: return "異常";
-                case OrderStatus.已取消: return "已取消";
-                default: return "未知狀態";
-            }
-        }
+        //private string GetStatusText(OrderStatus? status)// 訂單狀態
+        //{
+        //    switch (status)
+        //    {
+        //        case OrderStatus.未排定: return "未排定";
+        //        case OrderStatus.已排定: return "已排定";
+        //        case OrderStatus.前往中: return "前往中";
+        //        case OrderStatus.已抵達: return "已抵達";
+        //        case OrderStatus.已完成: return "已完成";
+        //        case OrderStatus.異常: return "異常";
+        //        case OrderStatus.已取消: return "已取消";
+        //        default: return "未知狀態";
+        //    }
+        //}
 
         private string GetChineseDayOfWeek(DateTime date)
         {
@@ -254,7 +255,7 @@ namespace Dog.Controllers
                 .Include(o => o.Plan)
                 .Include(o => o.OrderDetails)
             .Where(o => o.UsersID == UsersID && o.PaymentStatus != PaymentStatus.未付款 &&
-            o.OrderDetails.Any(od => od.OrderStatus == OrderStatus.未排定 || od.OrderStatus == OrderStatus.前往中));
+            o.OrderDetails.Any(od => od.OrderStatus == OrderStatus.未排定 || od.OrderStatus == OrderStatus.已排定 || od.OrderStatus == OrderStatus.前往中));
             if (OrdersID.HasValue)
             {
                 ordersQuery = ordersQuery.Where(o => o.OrdersID == OrdersID.Value);
@@ -278,7 +279,7 @@ namespace Dog.Controllers
             {
                 // 先找出下一個服務日期
                 var nextServiceDate = o.OrderDetails
-                .Where(od => (int)od.OrderStatus == (int)OrderStatus.未排定 &&
+                .Where(od => (int)od.OrderStatus == (int)OrderStatus.已排定 &&
                 od.ServiceDate > DateTime.Now).OrderBy(od => od.ServiceDate)
                 .Select(od => od.ServiceDate).FirstOrDefault();
                 return new
@@ -304,7 +305,8 @@ namespace Dog.Controllers
                         ServiceDate = od.ServiceDate.ToString("yyyy/MM/dd"),
                         DriverTime = (od.DriverTimeStart.HasValue && od.DriverTimeEnd.HasValue) ?
                             $"{od.DriverTimeStart.Value.ToString("HH:mm")}-{od.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
-                        Status = od.OrderStatus.ToString()
+                        Status = od.OrderStatus.ToString(),
+                        Ongoing = od.OngoingAt,
                     }).ToList()
                 };
             })
@@ -389,7 +391,7 @@ namespace Dog.Controllers
                     .Include(o => o.OrderDetails)
                     .Where(o => o.UsersID == UsersID &&
                     o.OrderDetails.All(od => od.OrderStatus == OrderStatus.已完成 ||
-                    od.OrderStatus == OrderStatus.已取消) ||
+                    od.OrderStatus == OrderStatus.已取消) || 
                     (o.EndDate.HasValue && o.EndDate.Value < today));
                 if (OrdersID.HasValue)
                 {
@@ -420,17 +422,22 @@ namespace Dog.Controllers
                     EndDate = o.EndDate.HasValue ? o.EndDate.Value.ToString("yyyy/MM/dd") : null,
                     WeekDay = ConvertWeekDayToString(o.WeekDay),
                     o.Addresses,
-                    TotalCount = CalculateTotalServiceCount(o.StartDate, o.EndDate, o.WeekDay),
-                    OrderDetail = o.OrderDetails
-                .OrderByDescending(od => od.ServiceDate) // 按日期降序排列
+                    TotalCount = o.OrderDetails.Count(),
+                    //TotalCount = CalculateTotalServiceCount(o.StartDate, o.EndDate, o.WeekDay),
+                    OrderDetail = o.OrderDetails.OrderByDescending(od => od.ServiceDate) // 按日期降序排列
                 .Select(od => new
                 {
                     od.OrderDetailID,
+                    od.OrderDetailsNumber,
                     ServiceDate = od.ServiceDate.ToString("yyyy/MM/dd"),
                     DriverTime = (od.DriverTimeStart.HasValue && od.DriverTimeEnd.HasValue) ?
                                $"{od.DriverTimeStart.Value.ToString("HH:mm")}-{od.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
                     Status = od.OrderStatus.ToString(),
-                    CanceledAt = od.CanceledAt.HasValue ? od.CanceledAt.Value.ToString("yyyy/MM/dd HH:mm") : null
+                    CanceledAt = od.CanceledAt.HasValue ? od.CanceledAt.Value.ToString("yyyy/MM/dd HH:mm") : null,
+                    od.KG,
+                    Ongoing = od.OngoingAt,
+                    Arrived = od.ArrivedAt,
+                    Completed = od.CompletedAt,
                 }).ToList()
                 }).ToList();
 
@@ -452,44 +459,44 @@ namespace Dog.Controllers
 
         private int CalculateRemainingServices(ICollection<OrderDetails> orderDetails)
         {
-            return orderDetails.Count(od => (od.OrderStatus == OrderStatus.未排定 || od.OrderStatus == OrderStatus.前往中) && od.ServiceDate > DateTime.Now);
+            return orderDetails.Count(od => (od.OrderStatus == OrderStatus.未排定 || od.OrderStatus == OrderStatus.已排定 || od.OrderStatus == OrderStatus.前往中 || od.OrderStatus == OrderStatus.已抵達) && od.ServiceDate > DateTime.Now);
             // 遍歷該訂單的所有服務詳情記錄只計算狀態為「未完成」或「前往中」的記錄數量
         }
-        // 計算該訂單的總次數
-        private int CalculateTotalServiceCount(DateTime? startDate, DateTime? endDate, string weekDayString)
-        {
-            // 檢查空值
-            if (!startDate.HasValue || !endDate.HasValue || string.IsNullOrEmpty(weekDayString) || startDate > endDate)
-                return 0;
+        //// 計算該訂單的總次數
+        //private int CalculateTotalServiceCount(DateTime? startDate, DateTime? endDate, string weekDayString)
+        //{
+        //    // 檢查空值
+        //    if (!startDate.HasValue || !endDate.HasValue || string.IsNullOrEmpty(weekDayString) || startDate > endDate)
+        //        return 0;
 
-            var weekDays = weekDayString.Split(',')
-                                        .Select(d => int.Parse(d.Trim()))
-                                        .ToList();
+        //    var weekDays = weekDayString.Split(',')
+        //                                .Select(d => int.Parse(d.Trim()))
+        //                                .ToList();
 
-            // 將星期日的 0 轉換為 .NET 的 DayOfWeek 中的 7 (星期日)
-            for (int i = 0; i < weekDays.Count; i++)
-            {
-                if (weekDays[i] == 0)
-                    weekDays[i] = 7;
-            }
+        //    // 將星期日的 0 轉換為 .NET 的 DayOfWeek 中的 7 (星期日)
+        //    for (int i = 0; i < weekDays.Count; i++)
+        //    {
+        //        if (weekDays[i] == 0)
+        //            weekDays[i] = 7;
+        //    }
 
-            int count = 0;
-            DateTime currentDate = startDate.Value; // 使用 .Value 來獲取 DateTime? 的值
+        //    int count = 0;
+        //    DateTime currentDate = startDate.Value; // 使用 .Value 來獲取 DateTime? 的值
 
-            while (currentDate <= endDate.Value) // 使用 .Value 來獲取 DateTime? 的值
-            {
-                // .NET 中星期一是 1，星期日是 0，需要轉換一下
-                int dayOfWeek = (int)currentDate.DayOfWeek;
-                if (dayOfWeek == 0) dayOfWeek = 7; // 將星期日從 0 轉換為 7
+        //    while (currentDate <= endDate.Value) // 使用 .Value 來獲取 DateTime? 的值
+        //    {
+        //        // .NET 中星期一是 1，星期日是 0，需要轉換一下
+        //        int dayOfWeek = (int)currentDate.DayOfWeek;
+        //        if (dayOfWeek == 0) dayOfWeek = 7; // 將星期日從 0 轉換為 7
 
-                if (weekDays.Contains(dayOfWeek))
-                    count++;
+        //        if (weekDays.Contains(dayOfWeek))
+        //            count++;
 
-                currentDate = currentDate.AddDays(1);
-            }
+        //        currentDate = currentDate.AddDays(1);
+        //    }
 
-            return count;
-        }
+        //    return count;
+        //}
         // 將數字格式的星期轉換為中文文字（例如："1,3,5" 轉換為 "星期一、星期三、星期五"）
         private string ConvertWeekDayToString(string weekDayString)
         {
@@ -580,8 +587,8 @@ namespace Dog.Controllers
         }
 
         [HttpGet]
-        [Route("GET/user/ReviseordersMemInfo/{OrdersID}")]//修改收運資訊
-        public IHttpActionResult GetReviseOrderMemInfo(int OrdersID)
+        [Route("GET/user/RevisedMemInfo/{OrdersID}")]//修改收運資訊
+        public IHttpActionResult GetRevisedMemInfo(int OrdersID)
         {
             var Orders = db.Orders.Include(o => o.Photo).Include(o => o.Plan).Include(o => o.Discount).Include(o => o.OrderDetails).Where(od => od.OrdersID == OrdersID).ToList();
             if (!Orders.Any())
@@ -622,8 +629,8 @@ namespace Dog.Controllers
         }
 
         [HttpPut]
-        [Route("Put/user/ReviseordersMemInfo/{OrdersID}")]//更新收運資訊
-        public async Task<IHttpActionResult> PutReviseOrderMemInfo(int OrdersID, int UsersID)
+        [Route("Put/user/RevisedMemInfo/{OrdersID}")]//更新收運資訊
+        public async Task<IHttpActionResult> PutRevisedMemInfo(int OrdersID)
         {
             if (!Request.Content.IsMimeMultipartContent())
             {
@@ -635,7 +642,7 @@ namespace Dog.Controllers
             Directory.CreateDirectory(uploadPath); // 確保資料夾存在
 
             // 根據 OrdersID 和 UsersID 查詢訂單
-            var order = db.Orders.Include(o => o.Photo).FirstOrDefault(o => o.OrdersID == OrdersID && o.UsersID == UsersID);
+            var order = db.Orders.Include(o => o.Photo).FirstOrDefault(o => o.OrdersID == OrdersID);
             if (order == null) { return NotFound(); }
 
             // 讀取multipart請求內容
@@ -671,6 +678,7 @@ namespace Dog.Controllers
             if (addressContent != null)
             {
                 string address = await addressContent.ReadAsStringAsync();
+                
                 if (!string.IsNullOrEmpty(address))
                 {
                     if (address.Length < 5)
@@ -678,6 +686,11 @@ namespace Dog.Controllers
                         return BadRequest("地址格式錯誤，請輸入有效的地址。");
                     }
                     order.Addresses = address;
+                    string region = GetRegionFromAddress(order.Addresses);
+                    if(!string.IsNullOrEmpty(region))
+                    {
+                        order.Region = region;
+                    }
                 }
             }
 
@@ -690,12 +703,21 @@ namespace Dog.Controllers
             }
             // 獲取當前時間
             var currentTime = DateTime.Now;
-            // 清空現有的圖片資料前先更新時間戳
-            foreach (var photo in order.Photo)
+            // 找到所有相關照片
+            var photosToDelete = db.Photo.Where(p => p.OrdersID == order.OrdersID).ToList();
+
+            // 手動從資料庫中刪除這些照片
+            foreach (var photo in photosToDelete)
             {
-                photo.UpdatedAt = currentTime;
+                db.Photo.Remove(photo);
             }
-            order.Photo.Clear(); // 清空現有的圖片資料
+
+            //// 將新照片添加到資料庫（而不是添加到 order.Photo 集合）
+            //foreach (var photo in order.Photo)
+            //{
+            //    photo.UpdatedAt = currentTime;
+            //}
+            //order.Photo.Clear(); // 清空現有的圖片資料
             foreach (var fileData in provider.Contents)
             {
                 // 需要檢查是否為檔案欄位
@@ -948,7 +970,7 @@ namespace Dog.Controllers
             Directory.CreateDirectory(uploadPath); // 確保資料夾存在
                                                    // 讀取multipart請求內容
             var provider = await Request.Content.ReadAsMultipartAsync();
-
+           
             // 從表單欄位建立Orders物件
             var orders = new Orders();
 
@@ -1004,22 +1026,30 @@ namespace Dog.Controllers
             }
 
             // 讀取其他必要欄位
-            var monthsContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "Months");
-            if (monthsContent != null)
+            //var monthsContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "Months");
+            //if (monthsContent != null)
+            //{
+            //    string monthsStr = await monthsContent.ReadAsStringAsync();
+            //    if (int.TryParse(monthsStr, out int months))
+            //    {
+            //        var discount = db.Discount.FirstOrDefault(d => d.DiscountID == orders.DiscountID);
+            //        if (discount != null)
+            //        {
+            //            discount.Months = months;  // 更新 Months 值
+            //        }
+            //    }
+            //    else
+            //        return BadRequest("Months格式錯誤");
+            //}
+            var discountIdContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "DiscountID");
+            if (discountIdContent != null)
             {
-                string monthsStr = await monthsContent.ReadAsStringAsync();
-                if (int.TryParse(monthsStr, out int months))
-                {
-                    var discount = db.Discount.FirstOrDefault(d => d.DiscountID == orders.DiscountID);
-                    if (discount != null)
-                    {
-                        discount.Months = months;  // 更新 Months 值
-                    }
-                }
+                string discountIdStr = await discountIdContent.ReadAsStringAsync();
+                if (int.TryParse(discountIdStr, out int discountId))
+                    orders.DiscountID = discountId;
                 else
-                    return BadRequest("Months格式錯誤");
+                    return BadRequest("DiscountID格式錯誤");
             }
-
             // 讀取 LinePay 的付款方式（選填）
             var linePayMethodContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "LinePayMethod");
             if (linePayMethodContent != null)
@@ -1108,6 +1138,11 @@ namespace Dog.Controllers
 
             // 計算訂單總金額並更新
             decimal totalAmount = CalculateTotalAmount(orders.OrdersID);
+            // 重新獲取最新的訂單信息，確保包含最新的總金額
+            orders = db.Orders.Find(orders.OrdersID);
+            orders.PaymentStatus = PaymentStatus.未付款; // 設置初始付款狀態
+            orders.LinePayMethod = "LinePay";
+
 
             // **推算每個服務日期**
             var serviceDates = GetServiceDates(orders.StartDate.Value, orders.EndDate.Value, orders.WeekDay);
@@ -1130,13 +1165,14 @@ namespace Dog.Controllers
                     CanceledAt = null
                 };
                 string datePart = serviceDate.ToString("MMdd");
-                orderDetail.OrderDetailsNumber = $"O{orders.OrderNumber}-{datePart}";
+                orderDetail.OrderDetailsNumber = $"{orders.OrderNumber}-{datePart}";
                 db.OrderDetails.Add(orderDetail); // 新增至 OrderDetails 表
             }
 
 
             // 建立一個陣列來存儲所有圖片的路徑
             List<string> uploadedPaths = new List<string>();
+           
 
             // 處理圖片上傳
             foreach (var fileData in provider.Contents)
@@ -1187,7 +1223,6 @@ namespace Dog.Controllers
                 StatusCode = 200,
                 status = "新增成功",
                 orders,
-                PaymentStatus = PaymentStatus.未付款, // 設置初始付款狀態
             });
         }
 
@@ -1280,14 +1315,32 @@ namespace Dog.Controllers
         }
 
         // 假設這是一個簡單的地址到區域的轉換方法，實際上你可能需要依賴地理編碼 API
+        //private string GetRegionFromAddress(string address)
+        //{
+        //    // 使用正規表達式找出「某某區」
+        //    var match = System.Text.RegularExpressions.Regex.Match(address, @"\p{IsCJKUnifiedIdeographs}+區");
+        //    if (match.Success)
+        //    {
+        //        return match.Value;  // 例如「鳳山區」
+        //    }
+        //    return null;
+        //}
         private string GetRegionFromAddress(string address)
         {
-            // 這是一個簡單的示例，假設地址格式是「市/區/街道」，根據實際需求進行解析
-            var addressParts = address.Split('/');
-            if (addressParts.Length >= 2)
+            if (string.IsNullOrEmpty(address))
+                return null;
+
+            // 查找"區"的位置
+            int indexOfDistrict = address.IndexOf("區");
+
+            // 如果找到"區"且位置允許提取前面至少兩個字符
+            if (indexOfDistrict >= 2)
             {
-                return addressParts[1]; // 假設第二部分是區域
+                // 只提取"區"及其前面的兩個字符，不包含市或縣
+                return address.Substring(indexOfDistrict - 2, 3); // 這會返回 "鳳山區"
             }
+
+            // 處理其他情況...
             return null;
         }
 

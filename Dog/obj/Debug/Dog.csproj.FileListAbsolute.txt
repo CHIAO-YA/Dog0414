@@ -148,3 +148,4 @@ D:\SQL Server\Dog\Dog\obj\Debug\Dog.Migrations._040601.resources
 D:\SQL Server\Dog\Dog\obj\Debug\Dog.Migrations.go.resources
 D:\SQL Server\Dog\Dog\obj\Debug\Dog.Migrations._0409.resources
 D:\SQL Server\Dog\Dog\obj\Debug\Dog.Migrations._0410.resources
+D:\SQL Server\Dog\Dog\obj\Debug\Dog.Migrations._0415.resources

@@ -11,6 +11,7 @@ using System.Web.Configuration;
 using System.Web.Http;
 using static System.Net.Mime.MediaTypeNames;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 
 namespace Dog.Controllers
@@ -19,30 +20,142 @@ namespace Dog.Controllers
     {
         Models.Model1 db = new Models.Model1();
 
+        //[HttpGet]
+        //[Route("GET/driver/today/{DriverID}")]  // 查詢某個司機今天的所有訂單
+        //public IHttpActionResult GetDriverToday(int DriverID)
+        //{
+        //    // 檢查接單者是否存在
+        //    var Driver = db.Users.FirstOrDefault(u => u.UsersID == DriverID && u.Roles == Role.接單員);
+        //    if (Driver == null) { return NotFound(); }
+        //    //只查「今天 00:00」~「明天 00:00」之間的資料 就是今天一整天的資料
+        //    var Today = DateTime.Today;// 今天的 00:00
+        //    var Tomorrow = Today.AddDays(1);// 明天的 00:00
+
+        //    // 查詢當天該接單者負責的所有訂單
+        //    var DriverToday = db.OrderDetails.Include(od => od.Orders.Photo).Where(od => od.DriverID == DriverID && od.ServiceDate >= Today && od.ServiceDate < Tomorrow).ToList();
+
+        //    // 根據訂單狀態統計數量
+        //    var TodayActiveStatus = new
+        //    {
+        //        UnScheduled = DriverToday.Count(od => od.OrderStatus == OrderStatus.未排定),
+        //        Scheduled = DriverToday.Count(od => od.OrderStatus == OrderStatus.已排定),
+        //        Ongoing = DriverToday.Count(od => od.OrderStatus == OrderStatus.前往中),
+        //        Arrived = DriverToday.Count(od => od.OrderStatus == OrderStatus.已抵達),
+        //        Total = DriverToday.Count(od=> od.OrderStatus == OrderStatus.未排定 || 
+        //                                       od.OrderStatus == OrderStatus.已排定||
+        //                                       od.OrderStatus == OrderStatus.前往中 ||
+        //                                       od.OrderStatus == OrderStatus.已抵達)
+        //    };
+        //    var TodayCompletedStatus = new
+        //    {
+        //        Completed = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成),
+        //        Abnormal = DriverToday.Count(od => od.OrderStatus == OrderStatus.異常),
+        //        Total = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成 ||
+        //                                       od.OrderStatus == OrderStatus.異常 ||
+        //                                       od.OrderStatus == OrderStatus.已取消)
+        //    };
+
+        //    // 如果沒有訂單，返回基本信息
+        //    if (!DriverToday.Any())
+        //    {
+        //        return Ok(new
+        //        {
+        //            statusCode = 200,
+        //            status = true,
+        //            message = "今日無訂單",
+        //            result = new
+        //            {
+        //                DriverID,
+        //                Number = Driver.Number.Trim(),
+        //                DriverName = Driver.LineId.Trim(),
+        //                Today = Today.ToString("yyyy/MM/dd"),
+        //                TodayActiveStatus,
+        //                TodayCompletedStatus
+        //            }
+        //        });
+        //    }
+        //    // 組合結果
+        //    var result = new
+        //    {
+        //        DriverID,
+        //        Number = Driver.Number.Trim(),
+        //        DriverName = Driver.LineId.Trim(),
+        //        Today = Today.ToString("yyyy/MM/dd"),
+        //        Total = DriverToday.Count,
+        //        TodayActiveStatus,
+        //        TodayCompletedStatus,
+        //        Orders = DriverToday.Select(od => new
+        //        {
+        //            od.OrderDetailID,
+        //            ServiceTime = od.DriverTimeStart.HasValue ? od.DriverTimeStart.Value.ToString("HH:mm") : null,
+        //            od.OrderDetailsNumber,
+        //            od.Orders.Addresses,
+        //            CustomerNumber = od.Orders.Users.Number.Trim(),
+        //            CustomerName = od.Orders.OrderName,
+        //            od.Orders.Notes,
+        //            Photo = od.Orders.Photo.Select(p => p.OrderImageUrl).ToList(),
+        //            Status = od.OrderStatus.ToString(),
+        //            od.Orders.Plan.PlanName,
+        //            od.Orders.Plan.PlanKG,
+        //            od.Orders.Plan.Liter
+        //        })
+        //    };
+
+        //    return Ok(new
+        //    {
+        //        statusCode = 200,
+        //        status = true,
+        //        message = "成功取得",
+        //        result
+        //    });
+        //}
+
+
         [HttpGet]
-        [Route("GET/driver/today/{DriverID}")]  // 查詢某個司機今天的所有訂單
-        public IHttpActionResult GetDriverToday(int DriverID)
+        [Route("GET/driver/today/{DriverID}/{OrderDetailID?}")]  // 查詢某個司機今天的所有訂單
+        public IHttpActionResult GetDriverTodayorder(int DriverID, int? OrderDetailID)
         {
             // 檢查接單者是否存在
             var Driver = db.Users.FirstOrDefault(u => u.UsersID == DriverID && u.Roles == Role.接單員);
             if (Driver == null) { return NotFound(); }
-            //只查「今天 00:00」~「明天 00:00」之間的資料 就是今天一整天的資料
+
             var Today = DateTime.Today;// 今天的 00:00
             var Tomorrow = Today.AddDays(1);// 明天的 00:00
 
             // 查詢當天該接單者負責的所有訂單
-            var DriverToday = db.OrderDetails.Include(od => od.Orders.Photo).Where(od => od.DriverID == DriverID && od.ServiceDate >= Today && od.ServiceDate < Tomorrow).ToList();
-
-            // 根據訂單狀態統計數量
-            var TodayStatus = new
+            var DriverToday = db.OrderDetails.Include(od => od.Orders.Photo)
+                                 .Where(od => od.DriverID == DriverID && 
+                                             od.ServiceDate >= Today &&
+                                             od.ServiceDate < Tomorrow);
+            if(OrderDetailID.HasValue)
             {
-                Waiting = DriverToday.Count(od => od.OrderStatus == OrderStatus.未完成),
+                DriverToday = DriverToday.Where(od => od.OrderDetailID == OrderDetailID.Value);
+            }
+             var DriverTodayorder = DriverToday.ToList();
+            // 根據訂單狀態統計數量
+            var TodayActiveStatus = new
+            {
+                UnScheduled = DriverToday.Count(od => od.OrderStatus == OrderStatus.未排定),
+                Scheduled = DriverToday.Count(od => od.OrderStatus == OrderStatus.已排定),
                 Ongoing = DriverToday.Count(od => od.OrderStatus == OrderStatus.前往中),
-                Completed = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成),
-                Reported = DriverToday.Count(od => od.OrderStatus == OrderStatus.異常回報),
-                Canceled = DriverToday.Count(od => od.OrderStatus == OrderStatus.已取消)
+                Arrived = DriverToday.Count(od => od.OrderStatus == OrderStatus.已抵達),
+                Total = DriverToday.Count(od => od.OrderStatus == OrderStatus.未排定 ||
+                                               od.OrderStatus == OrderStatus.已排定 ||
+                                               od.OrderStatus == OrderStatus.前往中 ||
+                                               od.OrderStatus == OrderStatus.已抵達)
             };
-
+            var TodayCompletedStatus = new
+            {
+                Completed = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成),
+                Abnormal = DriverToday.Count(od => od.OrderStatus == OrderStatus.異常),
+                Total = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成 ||
+                                               od.OrderStatus == OrderStatus.異常 ||
+                                               od.OrderStatus == OrderStatus.已取消)
+            };
+            if(OrderDetailID.HasValue && !DriverToday.Any())
+            {
+                return NotFound();
+            }
             // 如果沒有訂單，返回基本信息
             if (!DriverToday.Any())
             {
@@ -57,7 +170,8 @@ namespace Dog.Controllers
                         Number = Driver.Number.Trim(),
                         DriverName = Driver.LineId.Trim(),
                         Today = Today.ToString("yyyy/MM/dd"),
-                        TodayStatus
+                        TodayActiveStatus,
+                        TodayCompletedStatus
                     }
                 });
             }
@@ -68,20 +182,22 @@ namespace Dog.Controllers
                 Number = Driver.Number.Trim(),
                 DriverName = Driver.LineId.Trim(),
                 Today = Today.ToString("yyyy/MM/dd"),
-                Total = DriverToday.Count,
-                TodayStatus,
+                TodayActiveStatus,
+                TodayCompletedStatus,
                 Orders = DriverToday.Select(od => new
                 {
                     od.OrderDetailID,
                     ServiceTime = od.DriverTimeStart.HasValue ? od.DriverTimeStart.Value.ToString("HH:mm") : null,
                     od.OrderDetailsNumber,
                     od.Orders.Addresses,
-                    CustomerNumber = od.Orders.Users.Number,
+                    CustomerNumber = od.Orders.Users.Number.Trim(),
                     CustomerName = od.Orders.OrderName,
                     od.Orders.Notes,
                     Photo = od.Orders.Photo.Select(p => p.OrderImageUrl).ToList(),
-                    Status = od.OrderStatus.ToString()
-
+                    Status = od.OrderStatus.ToString(),
+                    od.Orders.Plan.PlanName,
+                    od.Orders.Plan.PlanKG,
+                    od.Orders.Plan.Liter
                 })
             };
 
@@ -94,45 +210,45 @@ namespace Dog.Controllers
             });
         }
 
-        [HttpGet]
-        [Route("GET/driver/orders/{OrderDetailID}")]//訂單詳情
-        public IHttpActionResult GetOrderDetail(int OrderDetailID)
-        {
-            var orderDetail = db.OrderDetails.Include(od => od.Orders.Plan).Include(od => od.Orders.Photo).FirstOrDefault(od => od.OrderDetailID == OrderDetailID);
+        //[HttpGet]
+        //[Route("GET/driver/orders/{OrderDetailID}")]//訂單詳情
+        //public IHttpActionResult GetOrderDetail(int OrderDetailID)
+        //{
+        //    var orderDetail = db.OrderDetails.Include(od => od.Orders.Plan).Include(od => od.Orders.Photo).FirstOrDefault(od => od.OrderDetailID == OrderDetailID);
 
-            if (orderDetail == null)
-            {
-                return NotFound();
-            }
+        //    if (orderDetail == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var result = new
-            {
-                orderDetail.OrderDetailID,
-                orderDetail.OrderDetailsNumber,
-                ServiceTimeStart = orderDetail.DriverTimeStart.HasValue ? orderDetail.DriverTimeStart.Value.ToString("HH:mm") : null,
-                orderDetail.Orders.Addresses,
-                orderDetail.Orders.OrderName,
-                orderDetail.Orders.Users.Number,
-                orderDetail.Orders.OrderPhone,
-                OrderImageUrl = orderDetail.Orders.Photo.Select(p => p.OrderImageUrl).ToList(),
-                orderDetail.Orders.Notes,
-                Status = orderDetail.OrderStatus.ToString(),
-                orderDetail.Orders.Plan.PlanName,
-                orderDetail.Orders.Plan.PlanKG,
-                orderDetail.Orders.Plan.Liter,
-                orderDetail.DriverPhoto,
-                orderDetail.KG,
-            };
-            return Ok(new
-            {
-                statusCode = 200,
-                status = true,
-                message = "成功取得",
-                result
-            });
+        //    var result = new
+        //    {
+        //        orderDetail.OrderDetailID,
+        //        orderDetail.OrderDetailsNumber,
+        //        ServiceTimeStart = orderDetail.DriverTimeStart.HasValue ? orderDetail.DriverTimeStart.Value.ToString("HH:mm") : null,
+        //        orderDetail.Orders.Addresses,
+        //        orderDetail.Orders.OrderName,
+        //        orderDetail.Orders.Users.Number,
+        //        orderDetail.Orders.OrderPhone,
+        //        OrderImageUrl = orderDetail.Orders.Photo.Select(p => p.OrderImageUrl).ToList(),
+        //        orderDetail.Orders.Notes,
+        //        Status = orderDetail.OrderStatus.ToString(),
+        //        orderDetail.Orders.Plan.PlanName,
+        //        orderDetail.Orders.Plan.PlanKG,
+        //        orderDetail.Orders.Plan.Liter,
+        //        orderDetail.DriverPhoto,
+        //        orderDetail.KG,
+        //    };
+        //    return Ok(new
+        //    {
+        //        statusCode = 200,
+        //        status = true,
+        //        message = "成功取得",
+        //        result
+        //    });
 
 
-        }
+        //}
 
         [HttpPut]
         [Route("PUT/driver/orders/{OrderDetailID}/status")]//改變訂單狀態OrderStatus
@@ -149,7 +265,7 @@ namespace Dog.Controllers
                 return BadRequest("無效的訂單狀態");
             }
             // 更新訂單狀態
-            orderDetail.OrderStatus = (OrderStatus)OrderStatus;
+            orderDetail.OrderStatus =OrderStatus;
             orderDetail.UpdatedAt = DateTime.Now;
 
             db.SaveChanges();
@@ -166,6 +282,8 @@ namespace Dog.Controllers
                 }
             });
         }
+
+
 
         [HttpPut]
         [Route("PUT/driver/orders/{OrderDetailID}/weight")]//垃圾收運量
@@ -208,7 +326,7 @@ namespace Dog.Controllers
             if (isOverWeight)
             {
                 // 異常回報
-                OrderDetail.OrderStatus = OrderStatus.異常回報;
+                OrderDetail.OrderStatus = OrderStatus.異常;
                 OrderDetail.ReportedAt = currentTime;// 填 ReportedAt
                 if (!string.IsNullOrEmpty(CommonIssues))// 填 CommonIssues
                 {

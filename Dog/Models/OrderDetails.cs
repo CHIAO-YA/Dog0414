@@ -73,6 +73,9 @@ namespace Dog.Models
         [Display(Name = "前往中時間")]
         public DateTime? OngoingAt { get; set; }
 
+        [Display(Name = "已抵達時間")]
+        public DateTime? ArrivedAt { get; set; }
+
 
         [Display(Name = "已完成時間")]
         public DateTime? CompletedAt { get; set; }

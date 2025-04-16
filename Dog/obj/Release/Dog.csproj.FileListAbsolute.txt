@@ -1,4 +1,3 @@
-D:\SQL Server\Dog\Dog\bin\Dog.dll.config
 D:\SQL Server\Dog\Dog\bin\Dog.dll
 D:\SQL Server\Dog\Dog\bin\Dog.pdb
 D:\SQL Server\Dog\Dog\bin\roslyn\csc.exe
@@ -148,3 +147,5 @@ D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations._040601.resources
 D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations.go.resources
 D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations._0409.resources
 D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations._0410.resources
+D:\SQL Server\Dog\Dog\bin\Dog.dll.config
+D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations._0415.resources

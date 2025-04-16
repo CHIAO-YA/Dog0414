@@ -187,25 +187,175 @@ namespace Dog.Controllers
         [Route("GET/admin/orders")]//訂單管理
         public IHttpActionResult GetOrderDetails(string OrderDetailID = null, string keyword = null, string staatus = null)
         {
-            var query = db.OrderDetails.Include(o =>o.Orders).Include(o =>o).AsQueryable();
+            var query = db.Orders.Include(o => o.OrderDetails).Include(o => o.Plan).Include(o => o.Discount).AsQueryable();
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                query = query.Where(o => o.OrderNumber.Contains(keyword) ||
+                o.OrderName.Contains(keyword) ||
+                o.Plan.PlanName.Contains(keyword));
+            }
+            //if(!string.IsNullOrEmpty(staatus))
+            //{
+            //    query = query.Where(o => DetermineOrderStatus(o.OrderDetails, o.EndDate) == staatus);
+            //}
+            var Orders = query.ToList();
+
+            var result = Orders.Select(o =>new
+            {
+                o.OrdersID,
+                OrderNumber = o.OrderNumber,
+                OrderName = o.OrderName,
+                OrderStatus = DetermineOrderStatus(o.OrderDetails, o.EndDate),
+                remainingCount = CalculateRemainingServices(o.OrderDetails),
+                TotalCount = o.OrderDetails.Count(),
+                o.Plan.PlanName,
+                CollectionMethod = "定點收運",
+                o.Discount.Months,
+                WeekDay = ConvertWeekDayToString(o.WeekDay),
+                CreatedAt = o.CreatedAt.HasValue ? o.CreatedAt.Value.ToString("yyyy/MM/dd") : ""
+            }).ToList();
 
             return Ok(new
             {
                 statusCode = 200,
                 status = true,
                 message = "成功取得用戶列表",
-                statistics = new
-                {
-                    //total,
-                    //Ongoing,
-                    //Completed
-                },
-                //result
+                result
             });
         }
 
+        // 將數字格式的星期轉換為中文文字（例如："1,3,5" 轉換為 "星期一、星期三、星期五"）
+        private string ConvertWeekDayToString(string weekDayString)
+        {
+            if (string.IsNullOrEmpty(weekDayString)) return string.Empty;// 檢查是否為空或null是則返回空字串
 
+            var days = weekDayString.Split(',');// 使用逗號分隔輸入的字串，獲取各個星期數字
+            var chineseDays = new List<string>();
+            foreach (var day in days)
+            {
+                switch (day.Trim())//去除空格//根據數字 轉換 對應星期
+                {
+                    case "1": chineseDays.Add("一"); break;// 1 對應 星期一
+                    case "2": chineseDays.Add("二"); break;
+                    case "3": chineseDays.Add("三"); break;
+                    case "4": chineseDays.Add("四"); break;
+                    case "5": chineseDays.Add("五"); break;
+                    case "6": chineseDays.Add("六"); break;
+                    case "7": chineseDays.Add("日"); break;
+                    default: break;// 對於未知值不添加任何內容
+                }
+            }
+            return string.Join("、", chineseDays);
+        }
 
+        private string DetermineOrderStatus(ICollection<OrderDetails> orderDetails, DateTime? endDate)
+        {
+            if (orderDetails == null || !orderDetails.Any())
+                return "未知"; // 如果不需要"未知"，可以返回其他默認狀態
+
+            // 如果有任何訂單詳情是異常的，整個訂單視為異常
+            if (orderDetails.Any(od => od.OrderStatus == OrderStatus.異常))
+                return OrderStatus.異常.ToString();
+
+            // 訂單狀態是已完成或已取消，或結束日期已過，就視為已結束
+            var today = DateTime.Today;
+            if (orderDetails.All(od => od.OrderStatus == OrderStatus.已完成 || od.OrderStatus == OrderStatus.已取消) ||
+                (endDate.HasValue && endDate.Value < today))
+                return "已結束"; // 這裡可以返回 "已完成" 或 "已取消" 取決於您的需求
+
+            // 如果有進行中的訂單，返回進行中
+            if (orderDetails.Any(od => od.OrderStatus == OrderStatus.前往中 || od.OrderStatus == OrderStatus.已抵達))
+                return OrderStatus.前往中.ToString();
+
+            // 如果有已排定但未開始的訂單
+            if (orderDetails.Any(od => od.OrderStatus == OrderStatus.已排定))
+                return OrderStatus.已排定.ToString();
+
+            // 默認情況，應該是未排定
+            return OrderStatus.未排定.ToString();
+        }
+
+        [HttpGet]
+        [Route("GET/admin/OrderDetails/{OrdersID}/{OrderDetailID?}")]//客戶所有有效訂單+訂單詳情
+        public IHttpActionResult GetUserOrder(int OrdersID, int? OrderDetailID = null)
+        {
+            // 檢查用戶是否存在
+            if (!db.Orders.Any(o => o.OrdersID == OrdersID)) { return NotFound(); }
+            // 獲取用戶的所有訂單，排除未付款訂單
+            var ordersQuery = db.Orders
+                .Include(o => o.Plan)
+                .Include(o => o.Discount)
+            .Where(o => o.OrdersID == OrdersID && o.PaymentStatus != PaymentStatus.未付款 &&
+            o.OrderDetails.Any(od => od.OrderStatus == OrderStatus.未排定 || od.OrderStatus == OrderStatus.前往中));
+            if (OrderDetailID.HasValue)
+            {
+                ordersQuery = ordersQuery.Where(o => o.OrderDetails.Any(od => od.OrderDetailID == OrderDetailID.Value));
+            }
+            var Orders = ordersQuery.ToList();
+            if (!Orders.Any())
+            {
+                return Ok(new
+                {
+                    statusCode = 200,
+                    status = true,
+                    message = "找不到符合條件的訂單",
+                });
+            }
+            // 取得這些訂單的所有照片
+            var orderIds = Orders.Select(o => o.OrdersID).ToList();
+            var orderPhotos = db.Photo.Where(p => orderIds.Contains(p.OrdersID)).ToLookup(p => p.OrdersID);
+            // 查詢該用戶的訂單，只要訂單詳情中有任何一筆是「未完成」或「前往中」狀態，就視為有效訂單
+            // 並且確保訂單狀態不是未付款
+            var result = Orders.Select(o =>
+            {
+
+                return new
+                {
+                    o.OrdersID,
+                    o.OrderNumber,
+                    o.CreatedAt,
+                    OrderStatus = DetermineOrderStatus(o.OrderDetails, o.EndDate),
+                    o.OrderName,
+                    o.OrderPhone,
+                    o.Addresses,
+                    CollectionMethod = "放置固定地點",
+                    o.Notes,
+                    Photos = orderPhotos[o.OrdersID].Select(p => p.OrderImageUrl), // 取出照片網址
+
+                    o.Plan.PlanName,
+                    o.Plan.PlanKG,
+                    o.Plan.Liter,
+                    StartDate = o.StartDate.HasValue ? o.StartDate.Value.ToString("yyyy/MM/dd") : null,
+                    EndDate = o.EndDate.HasValue ? o.EndDate.Value.ToString("yyyy/MM/dd") : null,
+                    o.Discount.Months,
+                    WeekDay = ConvertWeekDayToString(o.WeekDay),
+
+                    o.LinePayMethod,
+                    o.TotalAmount,
+                    o.LinePayConfirmedAt,
+                    o.LinePayTransactionId,
+
+                    TotalCount = o.OrderDetails.Count(),
+
+                    OrderDetails = o.OrderDetails.Select(od => new
+                    {
+                        od.OrderDetailID,
+                        ServiceDate = od.ServiceDate.ToString("yyyy/MM/dd"),
+                        DriverTime = (od.DriverTimeStart.HasValue && od.DriverTimeEnd.HasValue) ?
+                            $"{od.DriverTimeStart.Value.ToString("HH:mm")}-{od.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
+                        Status = od.OrderStatus.ToString(),
+                    }).ToList()
+                };
+            })
+            .ToList();
+            return Ok(new
+            {
+                statusCode = 200,
+                status = true,
+                message = "成功取得",
+                result
+            });
+        }
 
     }
 }
