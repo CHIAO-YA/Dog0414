@@ -17,10 +17,13 @@ namespace Dog.Controllers
         {
             var Plans = db.Plans.Select(d => new
             {
-                PlanID = d.PlanID,
-                PlanName = d.PlanName,
-                Liter = d.Liter, // 不包含 Orders 導航屬性
-                Price = d.Price
+                d.PlanID,
+                d.PlanName,
+                d.Liter, 
+                d.Price,
+                d.PlanKG,
+                d.PlanDescription,
+                d.PlanPeople
             }).ToList();
 
             return Ok(new

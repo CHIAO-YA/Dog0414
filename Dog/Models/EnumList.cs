@@ -23,9 +23,9 @@ namespace Dog.Models
     }
     public enum OrderStatus
     {
-        未完成 = 1,
-        前往中 = 2,
-        已完成 = 3,
+        未完成 = 1,//Waiting
+        前往中 = 2,//Ongoing
+        已完成 = 3,//Completed
         異常回報 = 4,
         已取消 = 5
     }

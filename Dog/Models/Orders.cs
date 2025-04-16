@@ -94,21 +94,32 @@ namespace Dog.Models
         [Display(Name = "付款狀態")]
         public PaymentStatus? PaymentStatus { get; set; }
 
-        //[Display(Name = "公斤數")]
-        //public decimal? KG { get; set; }
 
-        //[Display(Name = "QRcode")]
-        //public string QRcode { get; set; }
 
-        //[Display(Name = "常見問題")]
-        //public CommonIssues? CommonIssues { get; set; }
 
-        //[Display(Name = "問題描述")]
-        //[MaxLength(500)]
-        //public string IssueDescription { get; set; } 
 
-        //[Display(Name = "回報時間")]
-        //public DateTime? ReportedAt { get; set; } = DateTime.Now;
+        // Line Pay 相關欄位
+        [Display(Name = "LinePay交易ID")]
+        public long? LinePayTransactionId { get; set; }  // 由 Line Pay 回傳
+
+        [Display(Name = "LinePay付款方式")]
+        [MaxLength(50)]
+        public string LinePayMethod { get; set; }  // 例如: CREDIT_CARD, LINE_PAY 等
+
+        [Display(Name = "LinePay交易狀態")]
+        [MaxLength(50)]
+        public string LinePayStatus { get; set; }  // reserved, confirmed, failed 等
+
+        [Display(Name = "付款確認時間")]
+        public DateTime? LinePayConfirmedAt { get; set; }  // 成功確認付款的時間
+
+
+
+
+
+
+
+
 
         // 一對多關聯 (一個 Order 有多個 Photo)
         public virtual ICollection<OrderDetails> OrderDetails { get; set; }

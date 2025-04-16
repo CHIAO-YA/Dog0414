@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>D:\SQL Server\Dog\Dog\bin\app.publish\</_PublishTargetUrl>
-    <History>True|2025-04-01T05:32:21.8704121Z||;False|2025-04-01T13:31:46.3328740+08:00||;False|2025-04-01T13:31:01.3582297+08:00||;True|2025-03-31T18:16:12.9646699+08:00||;True|2025-03-31T18:03:38.5151828+08:00||;True|2025-03-31T17:57:48.8769046+08:00||;True|2025-03-31T13:25:16.3202832+08:00||;True|2025-03-28T17:15:03.7231698+08:00||;True|2025-03-28T16:48:31.5436151+08:00||;True|2025-03-26T11:36:23.6172513+08:00||;True|2025-03-19T17:15:55.9826975+08:00||;</History>
+    <History>True|2025-04-05T06:05:45.4226723Z||;False|2025-04-05T13:53:23.4797631+08:00||;False|2025-04-05T13:52:45.8497237+08:00||;True|2025-04-05T13:19:19.1601623+08:00||;True|2025-04-01T13:32:21.8704121+08:00||;False|2025-04-01T13:31:46.3328740+08:00||;False|2025-04-01T13:31:01.3582297+08:00||;True|2025-03-31T18:16:12.9646699+08:00||;True|2025-03-31T18:03:38.5151828+08:00||;True|2025-03-31T17:57:48.8769046+08:00||;True|2025-03-31T13:25:16.3202832+08:00||;True|2025-03-28T17:15:03.7231698+08:00||;True|2025-03-28T16:48:31.5436151+08:00||;True|2025-03-26T11:36:23.6172513+08:00||;True|2025-03-19T17:15:55.9826975+08:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -79,10 +79,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>09/10/2013 16:29:20</publishTime>
     </File>
     <File Include="bin/Dog.dll">
-      <publishTime>04/01/2025 15:22:06</publishTime>
+      <publishTime>04/06/2025 15:14:48</publishTime>
     </File>
     <File Include="bin/Dog.pdb">
-      <publishTime>04/01/2025 15:22:06</publishTime>
+      <publishTime>04/06/2025 15:14:48</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>06/17/2024 04:46:24</publishTime>
@@ -540,6 +540,9 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="Scripts/modernizr-2.8.3.js">
       <publishTime>03/18/2025 09:29:33</publishTime>
     </File>
+    <File Include="Security/dog2.png">
+      <publishTime>04/02/2025 13:44:56</publishTime>
+    </File>
     <File Include="Views/Home/Index.cshtml">
       <publishTime>03/18/2025 09:29:20</publishTime>
     </File>
@@ -556,7 +559,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>03/18/2025 09:29:20</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>04/01/2025 14:31:19</publishTime>
+      <publishTime>04/05/2025 13:19:18</publishTime>
     </File>
   </ItemGroup>
 </Project>

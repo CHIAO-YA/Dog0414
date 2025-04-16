@@ -7,13 +7,13 @@ namespace Dog.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.5.1")]
-    public sealed partial class _new : IMigrationMetadata
+    public sealed partial class _444 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(_new));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(_444));
         
         string IMigrationMetadata.Id
         {
-            get { return "202504011514543_new"; }
+            get { return "202504050559385_444"; }
         }
         
         string IMigrationMetadata.Source

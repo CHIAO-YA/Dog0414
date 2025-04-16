@@ -142,7 +142,5 @@ D:\SQL Server\Dog\Dog\obj\Release\Dog.csproj.Up2Date
 D:\SQL Server\Dog\Dog\obj\Release\Dog.dll
 D:\SQL Server\Dog\Dog\obj\Release\Dog.pdb
 D:\SQL Server\Dog\Dog\bin\jose-jwt.dll
-D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations._new.resources
-D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations.driver.resources
-D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations.OrderDetails.resources
-D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations.qr.resources
+D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations._444.resources
+D:\SQL Server\Dog\Dog\obj\Release\Dog.Migrations._0406.resources

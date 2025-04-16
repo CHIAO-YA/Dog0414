@@ -27,7 +27,16 @@ namespace Dog.Models
         public DateTime ServiceDate { get; set; }  // 每次服務的具體日期
 
         [Display(Name = "外送員ID")]
-        public string DriverID { get; set; }  // 司機 ID
+        public int? DriverID { get; set; }  // 司機 ID
+
+        [Display(Name = "收運時間開始")]
+        public DateTime? DriverTimeStart { get; set; }  // 司機收運時間
+
+        [Display(Name = "收運時間結束")]
+        public DateTime? DriverTimeEnd { get; set; }  // 司機收運時間
+
+        [Display(Name = "是否上班")]
+        public bool? DriverOnline { get; set; }  // 司機上班狀態
 
 
         [Display(Name = "訂單狀態")]
@@ -46,20 +55,30 @@ namespace Dog.Models
 
         
         [Display(Name = "建立日期")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:d}")]
-        [DataType(DataType.DateTime)]
         public DateTime? CreatedAt { get; set; }
 
-        [Display(Name = "更新日期")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:d}")]
-        [DataType(DataType.DateTime)]
+        [Display(Name = "更新日期(記錄收運重量跟圖片)")]
         public DateTime? UpdatedAt { get; set; }
 
         [Display(Name = "回報時間")]
-        public DateTime? ReportedAt { get; set; } = DateTime.Now;
+        public DateTime? ReportedAt { get; set; }
 
         [Display(Name = "QRcode")]
         public string QRcode { get; set; }
+
+        // 新增各狀態時間戳
+        [Display(Name = "時間")]
+        public DateTime? PendingAt { get; set; }
+
+        [Display(Name = "前往中時間")]
+        public DateTime? OngoingAt { get; set; }
+
+
+        [Display(Name = "已完成時間")]
+        public DateTime? CompletedAt { get; set; }
+
+        [Display(Name = "已取消時間")]
+        public DateTime? CanceledAt { get; set; }
 
         // 顯示用的編號生成邏輯
         public void GenerateOrderDetailsNumber()
@@ -68,7 +87,7 @@ namespace Dog.Models
             string datePart = ServiceDate.ToString("MMdd");
 
             // 根據訂單 ID 和日期生成編號，例如：O1234-0311
-            OrderDetailsNumber = $"O{OrdersID}-{datePart}";
+            OrderDetailsNumber = $"O{Orders.OrderNumber}-{datePart}";
         }
         //public virtual ICollection<Photo> Photos { get; set; }
         public virtual ICollection<DriverPhoto> DriverPhoto { get; set; }

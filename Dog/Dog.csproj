@@ -227,22 +227,33 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DiscountsController.cs" />
+    <Compile Include="Controllers\DogController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LineAuthController.cs" />
     <Compile Include="Controllers\LinePayController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
-    <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\PlanController.cs" />
-    <Compile Include="Controllers\TodayController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\UserfirstController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202504011514543_new.cs" />
-    <Compile Include="Migrations\202504011514543_new.Designer.cs">
-      <DependentUpon>202504011514543_new.cs</DependentUpon>
+    <Compile Include="Migrations\202504050559385_444.cs" />
+    <Compile Include="Migrations\202504050559385_444.Designer.cs">
+      <DependentUpon>202504050559385_444.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504060714021_0406.cs" />
+    <Compile Include="Migrations\202504060714021_0406.Designer.cs">
+      <DependentUpon>202504060714021_0406.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504060859390_040601.cs" />
+    <Compile Include="Migrations\202504060859390_040601.Designer.cs">
+      <DependentUpon>202504060859390_040601.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504080435153_go.cs" />
+    <Compile Include="Migrations\202504080435153_go.Designer.cs">
+      <DependentUpon>202504080435153_go.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Discount.cs" />
@@ -334,6 +345,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Uitility\" />
+    <Folder Include="Uploads\" />
     <Folder Include="Views\Orders\" />
     <Folder Include="Views\Photo\" />
     <Folder Include="Views\User\" />
@@ -410,8 +422,17 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202504011514543_new.resx">
-      <DependentUpon>202504011514543_new.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202504050559385_444.resx">
+      <DependentUpon>202504050559385_444.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504060714021_0406.resx">
+      <DependentUpon>202504060714021_0406.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504060859390_040601.resx">
+      <DependentUpon>202504060859390_040601.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504080435153_go.resx">
+      <DependentUpon>202504080435153_go.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
