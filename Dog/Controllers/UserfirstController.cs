@@ -255,7 +255,8 @@ namespace Dog.Controllers
                 .Include(o => o.Plan)
                 .Include(o => o.OrderDetails)
             .Where(o => o.UsersID == UsersID && o.PaymentStatus != PaymentStatus.未付款 &&
-            o.OrderDetails.Any(od => od.OrderStatus == OrderStatus.未排定 || od.OrderStatus == OrderStatus.已排定 || od.OrderStatus == OrderStatus.前往中));
+            o.OrderDetails.Any(od => od.OrderStatus == OrderStatus.未排定 || 
+            od.OrderStatus == OrderStatus.已排定 || od.OrderStatus == OrderStatus.前往中));
             if (OrdersID.HasValue)
             {
                 ordersQuery = ordersQuery.Where(o => o.OrdersID == OrdersID.Value);
@@ -306,7 +307,8 @@ namespace Dog.Controllers
                         DriverTime = (od.DriverTimeStart.HasValue && od.DriverTimeEnd.HasValue) ?
                             $"{od.DriverTimeStart.Value.ToString("HH:mm")}-{od.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
                         Status = od.OrderStatus.ToString(),
-                        Ongoing = od.OngoingAt,
+                        od.OngoingAt,
+                        od.ArrivedAt,
                     }).ToList()
                 };
             })
@@ -391,7 +393,7 @@ namespace Dog.Controllers
                     .Include(o => o.OrderDetails)
                     .Where(o => o.UsersID == UsersID &&
                     o.OrderDetails.All(od => od.OrderStatus == OrderStatus.已完成 ||
-                    od.OrderStatus == OrderStatus.已取消) || 
+                        od.OrderStatus == OrderStatus.異常) ||
                     (o.EndDate.HasValue && o.EndDate.Value < today));
                 if (OrdersID.HasValue)
                 {
@@ -417,7 +419,7 @@ namespace Dog.Controllers
                     o.Plan.PlanName,
                     o.Plan.PlanKG,
                     o.Plan.Liter,
-                    Photo = orderPhotos[o.OrdersID].Select(p => p.OrderImageUrl).ToList(),
+                    Photos = orderPhotos[o.OrdersID].Select(p => p.OrderImageUrl).ToList(),
                     StartDate = o.StartDate.HasValue ? o.StartDate.Value.ToString("yyyy/MM/dd") : null,
                     EndDate = o.EndDate.HasValue ? o.EndDate.Value.ToString("yyyy/MM/dd") : null,
                     WeekDay = ConvertWeekDayToString(o.WeekDay),
@@ -433,7 +435,7 @@ namespace Dog.Controllers
                     DriverTime = (od.DriverTimeStart.HasValue && od.DriverTimeEnd.HasValue) ?
                                $"{od.DriverTimeStart.Value.ToString("HH:mm")}-{od.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
                     Status = od.OrderStatus.ToString(),
-                    CanceledAt = od.CanceledAt.HasValue ? od.CanceledAt.Value.ToString("yyyy/MM/dd HH:mm") : null,
+                    //CanceledAt = od.CanceledAt.HasValue ? od.CanceledAt.Value.ToString("yyyy/MM/dd HH:mm") : null,
                     od.KG,
                     Ongoing = od.OngoingAt,
                     Arrived = od.ArrivedAt,
@@ -523,13 +525,14 @@ namespace Dog.Controllers
 
         [HttpGet]
         [Route("GET/users/{UsersID}/orders/{OrdersID}/orderDetails/{OrderDetailID}")]//原定日期
-        public IHttpActionResult GetOrderAppointment(int UsersID, int OrdersID)
+        public IHttpActionResult GetOrderAppointment(int UsersID, int OrdersID, int OrderDetailID)
         {
             // 查詢特定用戶的特定訂單
-            var order = db.Orders.Include("OrderDetails").FirstOrDefault(o => o.OrdersID == OrdersID && o.UsersID == UsersID);
+            var order = db.Orders.FirstOrDefault(o => o.OrdersID == OrdersID && o.UsersID == UsersID);
             if (order == null) { return NotFound(); }
+
             // 找出指定的預約詳情
-            var day = order.OrderDetails.FirstOrDefault(od => od.ServiceDate != null);
+            var day = db.OrderDetails.FirstOrDefault(od => od.OrderDetailID == OrderDetailID && od.OrdersID == OrdersID);
             if (day == null) { return NotFound(); }
             return Ok(new
             {
@@ -540,6 +543,7 @@ namespace Dog.Controllers
                 {
                     day.OrdersID,
                     order.UsersID,
+                    OrderStatus = day.OrderStatus.ToString(),
                     day.OrderDetailID,
                     OriginalDate = day.ServiceDate.ToString("yyyy/MM/dd"),
                     DriverTime = (day.DriverTimeStart.HasValue && day.DriverTimeEnd.HasValue) ? $"{day.DriverTimeStart.Value.ToString("HH:mm")}-{day.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
@@ -1158,11 +1162,11 @@ namespace Dog.Controllers
                     CreatedAt = orders.CreatedAt, // 添加创建时间
                     UpdatedAt = orders.UpdatedAt,  // 添加更新时间
                                                    // 明確設置這些欄位為 null
-                    ReportedAt = null,
-                    PendingAt = null,
+                    UnScheduled = null,
                     OngoingAt = null,
+                    ArrivedAt = null,
                     CompletedAt = null,
-                    CanceledAt = null
+                    //Scheduled = null
                 };
                 string datePart = serviceDate.ToString("MMdd");
                 orderDetail.OrderDetailsNumber = $"{orders.OrderNumber}-{datePart}";
@@ -1278,11 +1282,11 @@ namespace Dog.Controllers
                     CreatedAt = orders.CreatedAt, // 添加创建时间
                     UpdatedAt = orders.UpdatedAt,  // 添加更新时间
                                                    // 明確設置這些欄位為 null
-                    ReportedAt = null,
-                    PendingAt = null,
+                    UnScheduled = null,
                     OngoingAt = null,
+                    ArrivedAt = null,
                     CompletedAt = null,
-                    CanceledAt = null
+                    //Scheduled = null
                 };
                 //orderDetail.GenerateOrderDetailsNumber(); // 根據日期生成訂單詳細編號
                 string datePart = serviceDate.ToString("MMdd");

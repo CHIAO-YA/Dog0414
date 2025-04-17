@@ -29,7 +29,6 @@ namespace Dog.Models
         已抵達 = 3,//Arrived
         已完成 = 4,//Completed
         異常 = 5,//Abnormal
-        已取消 = 6
     }
     public enum PaymentStatus
     {

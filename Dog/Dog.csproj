@@ -268,6 +268,10 @@
     <Compile Include="Migrations\202504150500003_0415.Designer.cs">
       <DependentUpon>202504150500003_0415.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202504170803104_admin.cs" />
+    <Compile Include="Migrations\202504170803104_admin.Designer.cs">
+      <DependentUpon>202504170803104_admin.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Discount.cs" />
     <Compile Include="Models\DriverPhoto.cs" />
@@ -455,6 +459,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504150500003_0415.resx">
       <DependentUpon>202504150500003_0415.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504170803104_admin.resx">
+      <DependentUpon>202504170803104_admin.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

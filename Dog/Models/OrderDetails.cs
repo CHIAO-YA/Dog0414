@@ -60,15 +60,15 @@ namespace Dog.Models
         [Display(Name = "更新日期(記錄收運重量跟圖片)")]
         public DateTime? UpdatedAt { get; set; }
 
-        [Display(Name = "回報時間")]
+        [Display(Name = "異常回報時間")]
         public DateTime? ReportedAt { get; set; }
 
         [Display(Name = "QRcode")]
         public string QRcode { get; set; }
 
         // 新增各狀態時間戳
-        [Display(Name = "時間")]
-        public DateTime? PendingAt { get; set; }
+        [Display(Name = "未排定時間")]
+        public DateTime? UnScheduled { get; set; }
 
         [Display(Name = "前往中時間")]
         public DateTime? OngoingAt { get; set; }
@@ -80,8 +80,8 @@ namespace Dog.Models
         [Display(Name = "已完成時間")]
         public DateTime? CompletedAt { get; set; }
 
-        [Display(Name = "已取消時間")]
-        public DateTime? CanceledAt { get; set; }
+        [Display(Name = "已排定時間")]
+        public DateTime? ScheduledAt { get; set; }
 
         [Display(Name = "RQcode")]
         public string RQcode { get; set; }  

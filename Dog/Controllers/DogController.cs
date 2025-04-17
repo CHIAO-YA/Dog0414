@@ -12,6 +12,7 @@ using System.Web.Http;
 using static System.Net.Mime.MediaTypeNames;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace Dog.Controllers
@@ -149,8 +150,7 @@ namespace Dog.Controllers
                 Completed = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成),
                 Abnormal = DriverToday.Count(od => od.OrderStatus == OrderStatus.異常),
                 Total = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成 ||
-                                               od.OrderStatus == OrderStatus.異常 ||
-                                               od.OrderStatus == OrderStatus.已取消)
+                                               od.OrderStatus == OrderStatus.異常)
             };
             if(OrderDetailID.HasValue && !DriverToday.Any())
             {
@@ -265,8 +265,26 @@ namespace Dog.Controllers
                 return BadRequest("無效的訂單狀態");
             }
             // 更新訂單狀態
-            orderDetail.OrderStatus =OrderStatus;
+            orderDetail.OrderStatus = OrderStatus;
             orderDetail.UpdatedAt = DateTime.Now;
+            // 根據狀態更新對應的時間字段
+            DateTime currentTime = DateTime.Now;
+
+            // 根據狀態更新對應的時間欄位
+            switch (OrderStatus)
+            {
+                case OrderStatus.前往中:
+                    orderDetail.OngoingAt = currentTime;
+                    break;
+                case OrderStatus.已抵達:
+                    orderDetail.ArrivedAt = currentTime;
+                    break;
+                case OrderStatus.已完成:
+                case OrderStatus.異常:  // 異常狀態也記錄在已完成時間
+                    orderDetail.CompletedAt = currentTime;
+                    break;
+                    // 未排定和已排定狀態不在這個API中處理，它們在其他地方設置
+            }
 
             db.SaveChanges();
 
@@ -282,7 +300,7 @@ namespace Dog.Controllers
                 }
             });
         }
-
+     
 
 
         [HttpPut]
