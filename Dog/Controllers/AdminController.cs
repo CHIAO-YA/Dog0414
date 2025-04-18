@@ -7,10 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Web.Http;
-using System.Web.Razor.Tokenizer.Symbols;
-using System.Data.Entity;//EF6 使用 System.Data.Entity 命名空間  //EF Core 使用 Microsoft.EntityFrameworkCore 命名空間
+using System.Data.Entity;
 namespace Dog.Controllers
-{
+{//EF6 使用 System.Data.Entity 命名空間  //EF Core 使用 Microsoft.EntityFrameworkCore 命名空間
     public class AdminController : ApiController
     {
         Models.Model1 db = new Models.Model1();
@@ -365,223 +364,228 @@ namespace Dog.Controllers
         [Route("GET/Admin/OrderDetail/Pending")] //任務派發
         public IHttpActionResult AssignTasks(int? DriverID = null, DateTime? date = null, string status = null, string keyword = null, string Region = null, string Plan = null)
         {
-            DateTime Today = date ?? DateTime.Today;
-
-            var query = db.OrderDetails
-            .Include(od => od.Orders).Include(od => od.Orders.Plan)
-            .Where(od => od.ServiceDate.Date == Today.Date &&
-             od.OrderStatus == OrderStatus.未排定 && od.DriverID == null);
-
-            var allDrivers = db.Users.Where(u => u.Roles == Role.接單員).ToDictionary(d => d.UsersID);
-            //ToDictionary 將集合轉換為字典(Dictionary)找特定司機可以通過 ID 直接找，不需要歷遍整個列表
-            var allRegion = db.Orders.Where(o => !string.IsNullOrEmpty(o.Region))
-                            .Select(o => o.Region).Distinct();//不重複
-            if (!string.IsNullOrEmpty(status))
+            try
             {
-                if (status == "未分派")
+                DateTime Today = date ?? DateTime.Today;
+
+                var query = db.OrderDetails
+               .Include(od => od.Orders)
+               .Include(od => od.Orders.Plan)
+               .Where(od => DbFunctions.TruncateTime(od.ServiceDate) == Today.Date);
+
+                var allDrivers = db.Users.Where(u => u.Roles == Role.接單員).ToDictionary(d => d.UsersID);
+                //ToDictionary 將集合轉換為字典(Dictionary)找特定司機可以通過 ID 直接找，不需要歷遍整個列表
+                var driverTaskCounts = db.OrderDetails
+                .Where(od => DbFunctions.TruncateTime(od.ServiceDate) == Today.Date && od.DriverID != null)
+                .GroupBy(od => od.DriverID)
+                .Select(g => new { DriverID = g.Key, Count = g.Count() })
+                .ToDictionary(x => x.DriverID, x => x.Count);
+                //司機有多少訂單
+                // 這裡的 x.DriverID 是分組的鍵，x.Count 是每個鍵的計數
+                var allRegion = db.Orders.Where(o => !string.IsNullOrEmpty(o.Region))
+                                .Select(o => o.Region).Distinct();//不重複
+                if (!string.IsNullOrEmpty(status))
                 {
-                    query = query.Where(od => od.OrderStatus == OrderStatus.未排定 && od.DriverID == null);
+                    query = query.Where(od => od.OrderStatus == OrderStatus.未排定 || od.OrderStatus == OrderStatus.已排定);
                 }
-                else if (status == "已分派")
+
+                if (!string.IsNullOrEmpty(Region) && Region != "全區")
                 {
-                    query = query.Where(od => od.OrderStatus == OrderStatus.已排定 && od.DriverID != null);
+                    query = query.Where(od => od.Orders.Region.Contains(Region));
                 }
-            }
-            else
-            {
+                if (!string.IsNullOrEmpty(Plan) && Plan != "全部方案")
+                {
+                    query = query.Where(od => od.Orders.Plan.PlanName.Contains(Plan));
+                }
+                if (DriverID.HasValue && DriverID.Value > 0)
+                {
+                    query = query.Where(od => od.DriverID == DriverID.Value);
+                }
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(od => od.Orders.OrderNumber.Contains(keyword) ||
+                    od.Orders.OrderName.Contains(keyword));
+                }
 
-                query = query.Where(od => od.OrderStatus == OrderStatus.未排定 && od.OrderStatus == OrderStatus.已排定);
-            }
+                var Orders = query.ToList();
 
-            if (!string.IsNullOrEmpty(Region) && Region != "全區")
-            {
-                query = query.Where(od => od.Orders.Region.Contains(Region));
-            }
-            if (!string.IsNullOrEmpty(Plan) && Plan != "全部方案")
-            {
-                query = query.Where(od => od.Orders.Plan.PlanName.Contains(Plan));
-            }
-            if (DriverID.HasValue && DriverID.Value > 0)
-            {
-                query = query.Where(od => od.DriverID == DriverID.Value);
-            }
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                query = query.Where(od => od.Orders.OrderNumber.Contains(keyword) ||
-                od.Orders.OrderName.Contains(keyword));
-            }
+                if (!Orders.Any())
+                {
+                    return Ok(new
+                    {
+                        statusCode = 200,
+                        status = true,
+                        message = "找不到符合條件的訂單",
+                    });
+                }
 
-            var Orders = query.ToList();
+                var result = Orders.Select(od =>
+                {
+                    // 在 Select 內部定義變數
+                    string EveryDriver;
+                    if (od.DriverID.HasValue && allDrivers.ContainsKey(od.DriverID.Value))
+                    {   //是否已分派給了司機 &&  是否存在該司機
+                        EveryDriver = $"{allDrivers[od.DriverID.Value].LineName}";
+                    }                        //字典中查到的司機的LineName
+                    else
+                    {
+                        EveryDriver = "-";
+                    }
 
-            if (!Orders.Any())
-            {
+                    // 返回匿名物件
+                    return new
+                    {
+                        od.OrderDetailID,
+                        OrderName = od.Orders?.OrderName?.Trim()??"",
+                        od.OrderStatus,
+                        od.Orders.Region,
+                        od.Orders.Plan.PlanName,
+                        od.DriverTimeStart,
+                        od.DriverTimeEnd,
+                        ResponsibleDriver = EveryDriver
+                    };
+                }).ToList();
+
+                int totalCount = Orders.Count();
+                int UnScheduled = Orders.Count(od => od.OrderStatus == OrderStatus.未排定);
+                int Scheduled = Orders.Count(od => od.OrderStatus == OrderStatus.已排定);
+                int totalDrivers = allDrivers.Count();
+                int DriverIsOnline = allDrivers.Values.Count(d => d.IsOnline);
+
                 return Ok(new
                 {
                     statusCode = 200,
                     status = true,
-                    message = "找不到符合條件的訂單",
+                    message = "成功取得任務派發",
+                    DriversCount = allDrivers.Values.Select(d => new
+                    {
+                        totalCount,
+                        UnScheduled,
+                        Scheduled,
+                        totalDrivers,
+                        DriverIsOnline,
+                        d.UsersID,
+                        //d.LineName,
+                        LineName = d.LineName.Trim(),
+                        d.IsOnline,
+                        TodayTaskCount = (driverTaskCounts.ContainsKey(d.UsersID) ? driverTaskCounts[d.UsersID] : 0).ToString().Trim(),
+                    }).ToList(),
+                    result
                 });
             }
-
-            var result = Orders.Select(od =>
+            catch (Exception ex)
             {
-                // 在 Select 內部定義變數
-                string EveryDriver;
-                if (od.DriverID.HasValue && allDrivers.ContainsKey(od.DriverID.Value))
-                {   //是否已分派給了司機 &&  是否存在該司機
-                    EveryDriver = $"{allDrivers[od.DriverID.Value].LineName}";
-                }                        //字典中查到的司機的LineName
-                else
-                {
-                    EveryDriver = "-";
-                }
+                // 回傳詳細錯誤訊息，協助你除錯
+                return InternalServerError(new Exception("發生錯誤：" + ex.Message));
+            }
+        }
 
-                // 返回匿名物件
+        [HttpPost]
+        [Route("POST/Admin/OrderDetail/TaskAssign/RegionTime")] //任務分配
+        public IHttpActionResult AssignTasks([FromBody] TaskRequest request)
+        {
+            if (request == null || request.Assign == null || !request.Assign.Any())//如果都沒選就按送出
+            {
+                return BadRequest("請提供有效的任務分派請求");
+            }
+            var today = DateTime.Today;
+            //挑出被勾選的任務
+            var allTaskIds = request.Assign.SelectMany(d => d.Tasks).Distinct().ToList();
+            var taskDetails = db.OrderDetails
+                             .Include(od => od.Orders)
+                             .Where(od => allTaskIds.Contains(od.OrderDetailID) && // 只選擇被勾選的任務
+                               od.ServiceDate.Date == today.Date &&
+                              (od.OrderStatus == OrderStatus.未排定 || 
+                              od.OrderStatus == OrderStatus.已排定)).ToList();
+
+            var Driver = request.Assign.Select(d => d.DriverID).Distinct().ToList();
+            var IsOnlineDrivers = db.Users.Where(u => Driver.Contains(u.UsersID) && u.IsOnline)
+            .ToDictionary(d => d.UsersID);
+
+            if (IsOnlineDrivers.Count != Driver.Count)
+            {
+                return BadRequest("部分司機不存在或不在線");
+            }
+            foreach (var Assign in request.Assign)
+            {
+                var TaskCount = db.OrderDetails.Count(od =>
+                                od.DriverID == Assign.DriverID &&
+                                od.ServiceDate.Date == today.Date);
+
+                if (TaskCount + Assign.Tasks.Count > 25)
+                {
+                    return BadRequest($"司機 {IsOnlineDrivers[Assign.DriverID].LineName} 分配後將超過每日上限(25筆)");
+                }
+            }
+            foreach (var Assign in request.Assign)
+            {
+                var driverTasks = taskDetails
+                    .Where(t => Assign.Tasks.Contains(t.OrderDetailID))
+                    .OrderBy(t => t.Orders.Region)
+                    .ThenBy(t => t.Orders.CreatedAt)
+                    .ToList();
+                var startTime = DateTime.Today.AddHours(9);
+
+                foreach (var task in driverTasks)
+                {
+                    var endTime = startTime.AddMinutes(30);
+                    task.DriverID = Assign.DriverID;
+                    task.OrderStatus = OrderStatus.已排定;
+                    task.DriverTimeStart = startTime;
+                    task.DriverTimeEnd = endTime;
+                    task.ScheduledAt = DateTime.Now;
+                    task.UpdatedAt = DateTime.Now;
+
+                    // 下一個時間段
+                    startTime = endTime;
+                }
+            }
+            // 5. 保存變更
+            db.SaveChanges();
+
+            // 6. 準備返回結果
+            var result = request.Assign.Select(distribution =>
+            {
+                var driverTasks = taskDetails
+                    .Where(t => distribution.Tasks.Contains(t.OrderDetailID))
+                    .Select(t => new
+                    {
+                        t.OrderDetailID,
+                        t.Orders.OrderNumber,
+                        t.Orders.OrderName,
+                        t.Orders.Region,
+                        ServiceDate = t.ServiceDate.ToString("yyyy/MM/dd"),
+                        TimeSlot = $"{t.DriverTimeStart?.ToString("HH:mm")}-{t.DriverTimeEnd?.ToString("HH:mm")}",
+                        Status = t.OrderStatus.ToString()
+                    })
+                    .ToList();
+
                 return new
                 {
-                    od.OrderDetailID,
-                    od.Orders.OrderName,
-                    od.OrderStatus,
-                    od.Orders.Region,
-                    od.Orders.Plan.PlanName,
-                    od.DriverTimeStart,
-                    od.DriverTimeEnd,
-                    ResponsibleDriver = EveryDriver
+                    DriverID = distribution.DriverID,
+                    DriverName = IsOnlineDrivers[distribution.DriverID].LineName,
+                    AssignedTaskCount = distribution.Tasks.Count,
+                    Tasks = driverTasks
                 };
             }).ToList();
-
-            int totalCount = Orders.Count();
-            int UnScheduled = Orders.Count(od => od.OrderStatus == OrderStatus.未排定);
-            int Scheduled = Orders.Count(od => od.OrderStatus == OrderStatus.已排定);
-            int totalDrivers = allDrivers.Count();
-            int DriverIsOnline = allDrivers.Values.Count(d => d.IsOnline);
-
-            return Ok(new
-            {
-                statusCode = 200,
-                status = true,
-                message = "成功取得任務派發",
-                Amount = new
+            
+                return Ok(new
                 {
-                    totalCount,
-                    UnScheduled,
-                    Scheduled,
-                    totalDrivers,
-                    DriverIsOnline
-                },
-                Filters = new
-                {
-                    Region,
-                    Plan,
-                    Drivers = allDrivers.Values.Select(d => new { d.UsersID, d.LineName, d.IsOnline }).ToList()
-                },
-                result
-            });
+                    statusCode = 200,
+                    status = true,
+                    message = $"成功分派任務並安排時間",
+                    result
+                });
+            
+
         }
 
-        //[HttpPost]
-        //[Route("POST/Admin/OrderDetail/TaskAssign/RegionTime")] //任務分配
-        //public IHttpActionResult AssignTasks([FromBody] Tasks Tasks)
-        //{
-        //    if (Tasks == null || Tasks.Assign == null || !Tasks.Assign.Any())//如果都沒選就按送出
-        //    {
-        //        return BadRequest("請提供有效的任務分派請求");
-        //    }
-        //    var today = DateTime.Today;
-        //    //取出所有要被分派的任務ID，不管它們是分給哪個司機的
-        //    //var alltask = Tasks.Assign.SelectMany(d => d.Tasks).Distinct();
-        //    var taskDetails = db.OrderDetails.Include(od => od.Orders).Where(od => od.ServiceDate.Date == today.Date &&
-        //            od.OrderStatus == OrderStatus.未排定 && od.OrderStatus == OrderStatus.已排定).ToList();
-
-        //    var Driver = Tasks.Assign.Select(d => d.DriverID).Distinct().ToList();
-        //    var IsOnlineDrivers = db.Users.Where(u => Driver.Contains(u.UsersID) && u.IsOnline)
-        //    .ToDictionary(d => d.UsersID);
-
-        //    if (IsOnlineDrivers.Count != Driver.Count)
-        //    {
-        //        return BadRequest("部分司機不存在或不在線");
-        //    }
-        //    foreach (var Assign in Tasks.Assign)
-        //    {
-        //        var TaskCount = db.OrderDetails.Count(od =>
-        //                        od.DriverID == Assign.DriverID &&
-        //                        od.ServiceDate.Date == today.Date);
-
-        //        if (TaskCount + Assign.Tasks.Count > 25)
-        //        {
-        //            return BadRequest($"司機 {IsOnlineDrivers[Assign.DriverID].LineName} 分配後將超過每日上限(25筆)");
-        //        }
-        //    }
-        //    foreach (var Assign in Tasks.Assign)
-        //    {
-        //        var driverTasks = taskDetails
-        //            .Where(t => Assign.Tasks.Contains(t.OrderDetailID))
-        //            .OrderBy(t => t.Orders.Region)
-        //            .ThenBy(t => t.Orders.CreatedAt)
-        //            .ToList();
-        //        var startTime = DateTime.Today.AddHours(9);
-
-        //        foreach (var task in driverTasks)
-        //        {
-        //            var endTime = startTime.AddMinutes(30);
-        //            task.DriverID = distribution.DriverID;
-        //            task.OrderStatus = OrderStatus.已排定;
-        //            task.DriverTimeStart = startTime;
-        //            task.DriverTimeEnd = endTime;
-        //            task.Scheduled = DateTime.Now;
-        //            task.UpdatedAt = DateTime.Now;
-
-        //            // 下一個時間段
-        //            startTime = endTime;
-        //        }
-        //    }
-        //    // 5. 保存變更
-        //    db.SaveChanges();
-
-        //    // 6. 準備返回結果
-        //    var result = model.Distributions.Select(distribution =>
-        //    {
-        //        var driverTasks = taskDetails
-        //            .Where(t => distribution.Tasks.Contains(t.OrderDetailID))
-        //            .Select(t => new
-        //            {
-        //                t.OrderDetailID,
-        //                t.Orders.OrderNumber,
-        //                t.Orders.OrderName,
-        //                t.Orders.Region,
-        //                ServiceDate = t.ServiceDate.ToString("yyyy/MM/dd"),
-        //                TimeSlot = $"{t.DriverTimeStart?.ToString("HH:mm")}-{t.DriverTimeEnd?.ToString("HH:mm")}",
-        //                Status = t.OrderStatus.ToString()
-        //            })
-        //            .ToList();
-
-        //        return new
-        //        {
-        //            DriverID = distribution.DriverID,
-        //            DriverName = drivers[distribution.DriverID].LineName,
-        //            AssignedTaskCount = distribution.Tasks.Count,
-        //            Tasks = driverTasks
-        //        };
-        //    }).ToList();
-        //    {
-        //            return Ok(new
-        //            {
-        //                statusCode = 200,
-        //                status = true,
-        //                message = $"成功分派任務並安排時間",
-        //                result
-        //            });
-        //        }
-
-        //    }
-
-        public class Tasks// 整個任務分派的請求
+        public class TaskRequest// 整個任務分派的請求
         {
-            public List<Assign> Assign { get; set; } // 每個分派指令都表示「要將哪些任務分派給哪個司機」
+            public List<AssignTask> Assign { get; set; } // 每個分派指令都表示「要將哪些任務分派給哪個司機」
         }
 
-
-        public class Assign// 分派指令
+        public class AssignTask// 分派指令
         {
             public int DriverID { get; set; }
             public List<int> Tasks { get; set; }//分派給司機的任務ID列表

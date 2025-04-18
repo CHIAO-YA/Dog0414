@@ -534,15 +534,28 @@ namespace Dog.Controllers
             // 找出指定的預約詳情
             var day = db.OrderDetails.FirstOrDefault(od => od.OrderDetailID == OrderDetailID && od.OrdersID == OrdersID);
             if (day == null) { return NotFound(); }
+
+            // 查詢該訂單的所有任務日期 - 先加載到內存
+            var orderDatesData = db.OrderDetails
+                .Where(od => od.OrdersID == OrdersID)
+                .OrderBy(od => od.ServiceDate)
+                .ToList();
+
+
             return Ok(new
             {
                 statusCode = 200,
                 status = true,
                 message = "成功取得",
+                allOrderDates = orderDatesData.Select(od => new {
+                    ServiceDate = od.ServiceDate.ToString("yyyy/MM/dd"),
+                }),
                 result = new
                 {
                     day.OrdersID,
                     order.UsersID,
+
+                    order.EndDate,
                     OrderStatus = day.OrderStatus.ToString(),
                     day.OrderDetailID,
                     OriginalDate = day.ServiceDate.ToString("yyyy/MM/dd"),
@@ -1115,9 +1128,9 @@ namespace Dog.Controllers
             }
 
             // **統一使用 UTC 時間**
-            var currentTimeUtc = DateTime.UtcNow;
-            orders.CreatedAt = DateTime.SpecifyKind(currentTimeUtc, DateTimeKind.Utc);
-            orders.UpdatedAt = DateTime.SpecifyKind(currentTimeUtc, DateTimeKind.Utc);
+            var currentTimeUtc = DateTime.Now;
+            orders.CreatedAt = currentTimeUtc;
+            orders.UpdatedAt = currentTimeUtc;
 
             // **計算 EndDate**
             var Months = db.Discount.FirstOrDefault(d => d.DiscountID == orders.DiscountID);
@@ -1129,9 +1142,9 @@ namespace Dog.Controllers
             }
 
             // **轉換成台灣時間**
-            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
-            DateTime createdAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.CreatedAt.Value, taiwanTimeZone);
-            DateTime updatedAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.UpdatedAt.Value, taiwanTimeZone);
+            //TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            //DateTime createdAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.CreatedAt.Value, taiwanTimeZone);
+            //DateTime updatedAtTaiwan = TimeZoneInfo.ConvertTimeFromUtc(orders.UpdatedAt.Value, taiwanTimeZone);
 
             // 設置訂單編號
             orders.OrderNumber = GetOrderNumber(0);

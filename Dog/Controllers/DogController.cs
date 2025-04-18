@@ -114,7 +114,7 @@ namespace Dog.Controllers
 
         [HttpGet]
         [Route("GET/driver/today/{DriverID}/{OrderDetailID?}")]  // 查詢某個司機今天的所有訂單
-        public IHttpActionResult GetDriverTodayorder(int DriverID, int? OrderDetailID)
+        public IHttpActionResult GetDriverTodayorder(int DriverID, int? OrderDetailID = null)
         {
             // 檢查接單者是否存在
             var Driver = db.Users.FirstOrDefault(u => u.UsersID == DriverID && u.Roles == Role.接單員);
@@ -136,28 +136,28 @@ namespace Dog.Controllers
             // 根據訂單狀態統計數量
             var TodayActiveStatus = new
             {
-                UnScheduled = DriverToday.Count(od => od.OrderStatus == OrderStatus.未排定),
-                Scheduled = DriverToday.Count(od => od.OrderStatus == OrderStatus.已排定),
-                Ongoing = DriverToday.Count(od => od.OrderStatus == OrderStatus.前往中),
-                Arrived = DriverToday.Count(od => od.OrderStatus == OrderStatus.已抵達),
-                Total = DriverToday.Count(od => od.OrderStatus == OrderStatus.未排定 ||
+                UnScheduled = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.未排定),
+                Scheduled = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.已排定),
+                Ongoing = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.前往中),
+                Arrived = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.已抵達),
+                Total = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.未排定 ||
                                                od.OrderStatus == OrderStatus.已排定 ||
                                                od.OrderStatus == OrderStatus.前往中 ||
                                                od.OrderStatus == OrderStatus.已抵達)
             };
             var TodayCompletedStatus = new
             {
-                Completed = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成),
-                Abnormal = DriverToday.Count(od => od.OrderStatus == OrderStatus.異常),
-                Total = DriverToday.Count(od => od.OrderStatus == OrderStatus.已完成 ||
+                Completed = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.已完成),
+                Abnormal = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.異常),
+                Total = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.已完成 ||
                                                od.OrderStatus == OrderStatus.異常)
             };
-            if(OrderDetailID.HasValue && !DriverToday.Any())
+            if(OrderDetailID.HasValue && !DriverTodayorder.Any())
             {
                 return NotFound();
             }
             // 如果沒有訂單，返回基本信息
-            if (!DriverToday.Any())
+            if (!DriverTodayorder.Any())
             {
                 return Ok(new
                 {
@@ -184,7 +184,7 @@ namespace Dog.Controllers
                 Today = Today.ToString("yyyy/MM/dd"),
                 TodayActiveStatus,
                 TodayCompletedStatus,
-                Orders = DriverToday.Select(od => new
+                Orders = DriverTodayorder.Select(od => new
                 {
                     od.OrderDetailID,
                     ServiceTime = od.DriverTimeStart.HasValue ? od.DriverTimeStart.Value.ToString("HH:mm") : null,
@@ -250,29 +250,32 @@ namespace Dog.Controllers
 
         //}
 
+        
         [HttpPut]
-        [Route("PUT/driver/orders/{OrderDetailID}/status")]//改變訂單狀態OrderStatus
-        public IHttpActionResult UpdateOrderStatus(int OrderDetailID, [FromBody] OrderStatus OrderStatus)
+        [Route("driver/orders/{OrderDetailID}/status")]//改變訂單狀態OrderStatus
+        public IHttpActionResult UpdateOrderStatus(int OrderDetailID, int statusValue)
         {
+            if (!Enum.IsDefined(typeof(OrderStatus), statusValue))
+            {
+                return BadRequest("無效的訂單狀態");
+            }
             var orderDetail = db.OrderDetails.FirstOrDefault(od => od.OrderDetailID == OrderDetailID);
             if (orderDetail == null)
             {
                 return NotFound();
             }
-            // 驗證傳入的狀態值是否有效
-            if (!Enum.IsDefined(typeof(OrderStatus), OrderStatus))
-            {
-                return BadRequest("無效的訂單狀態");
-            }
-            // 更新訂單狀態
-            orderDetail.OrderStatus = OrderStatus;
+
+            var newStatus = (OrderStatus)statusValue;
+            orderDetail.OrderStatus = newStatus;
             orderDetail.UpdatedAt = DateTime.Now;
-            // 根據狀態更新對應的時間字段
-            DateTime currentTime = DateTime.Now;
+            var currentTime = DateTime.Now;
 
             // 根據狀態更新對應的時間欄位
-            switch (OrderStatus)
+            switch (newStatus)
             {
+                case OrderStatus.已排定:
+                    orderDetail.ScheduledAt = currentTime;
+                    break;
                 case OrderStatus.前往中:
                     orderDetail.OngoingAt = currentTime;
                     break;
@@ -300,7 +303,7 @@ namespace Dog.Controllers
                 }
             });
         }
-     
+
 
 
         [HttpPut]
@@ -338,6 +341,7 @@ namespace Dog.Controllers
             // 7. 更新重量與時間
             OrderDetail.KG = kg;
             OrderDetail.UpdatedAt = currentTime;
+            OrderDetail.CompletedAt = currentTime;
 
             // 檢查是否超過計畫重量【KG > 計畫重量】→ 狀態改為 異常回報
             bool isOverWeight = kg > OrderDetail.Orders.Plan.PlanKG;
