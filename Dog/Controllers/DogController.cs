@@ -197,7 +197,7 @@ namespace Dog.Controllers
                     Status = od.OrderStatus.ToString(),
                     od.Orders.Plan.PlanName,
                     od.Orders.Plan.PlanKG,
-                    od.Orders.Plan.Liter
+                    od.Orders.Plan.Liter,
                 })
             };
 

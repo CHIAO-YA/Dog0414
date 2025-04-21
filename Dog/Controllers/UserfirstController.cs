@@ -84,20 +84,6 @@ namespace Dog.Controllers
             });
         }
 
-        //private string GetStatusText(OrderStatus? status)// 訂單狀態
-        //{
-        //    switch (status)
-        //    {
-        //        case OrderStatus.未排定: return "未排定";
-        //        case OrderStatus.已排定: return "已排定";
-        //        case OrderStatus.前往中: return "前往中";
-        //        case OrderStatus.已抵達: return "已抵達";
-        //        case OrderStatus.已完成: return "已完成";
-        //        case OrderStatus.異常: return "異常";
-        //        case OrderStatus.已取消: return "已取消";
-        //        default: return "未知狀態";
-        //    }
-        //}
 
         private string GetChineseDayOfWeek(DateTime date)
         {
@@ -291,6 +277,7 @@ namespace Dog.Controllers
                     o.Plan.PlanKG,
                     o.Plan.Liter,
                     o.Addresses,
+                    o.Notes,
                     WeekDay = ConvertWeekDayToString(o.WeekDay),
                     StartDate = o.StartDate.HasValue ? o.StartDate.Value.ToString("yyyy/MM/dd") : null,
                     EndDate = o.EndDate.HasValue ? o.EndDate.Value.ToString("yyyy/MM/dd") : null,
@@ -307,8 +294,11 @@ namespace Dog.Controllers
                         DriverTime = (od.DriverTimeStart.HasValue && od.DriverTimeEnd.HasValue) ?
                             $"{od.DriverTimeStart.Value.ToString("HH:mm")}-{od.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
                         Status = od.OrderStatus.ToString(),
+                        od.DriverPhoto,
+                        od.KG,
                         od.OngoingAt,
                         od.ArrivedAt,
+                        od.CompletedAt,
                     }).ToList()
                 };
             })
@@ -419,6 +409,7 @@ namespace Dog.Controllers
                     o.Plan.PlanName,
                     o.Plan.PlanKG,
                     o.Plan.Liter,
+                    o.Notes,
                     Photos = orderPhotos[o.OrdersID].Select(p => p.OrderImageUrl).ToList(),
                     StartDate = o.StartDate.HasValue ? o.StartDate.Value.ToString("yyyy/MM/dd") : null,
                     EndDate = o.EndDate.HasValue ? o.EndDate.Value.ToString("yyyy/MM/dd") : null,
@@ -437,6 +428,7 @@ namespace Dog.Controllers
                     Status = od.OrderStatus.ToString(),
                     //CanceledAt = od.CanceledAt.HasValue ? od.CanceledAt.Value.ToString("yyyy/MM/dd HH:mm") : null,
                     od.KG,
+                    od.DriverPhoto,
                     Ongoing = od.OngoingAt,
                     Arrived = od.ArrivedAt,
                     Completed = od.CompletedAt,

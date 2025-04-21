@@ -4,8 +4,8 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 -->
 <Project>
   <PropertyGroup>
-    <_PublishTargetUrl>D:\SQL Server\Dog-0417\Dog\bin\app.publish\</_PublishTargetUrl>
-    <History>True|2025-04-17T11:54:23.4026896Z||;True|2025-04-17T16:17:01.0187610+08:00||;True|2025-04-16T19:31:14.1793162+08:00||;True|2025-04-16T18:21:19.5550426+08:00||;True|2025-04-16T16:12:25.1414583+08:00||;True|2025-04-14T18:22:35.0708510+08:00||;False|2025-04-14T18:21:58.9997658+08:00||;False|2025-04-14T18:21:27.9258285+08:00||;False|2025-04-12T20:56:09.6185123+08:00||;False|2025-04-12T20:56:05.1776959+08:00||;True|2025-04-11T15:02:57.7288874+08:00||;True|2025-04-11T12:17:40.5742076+08:00||;True|2025-04-09T16:02:49.7448695+08:00||;True|2025-04-09T13:46:29.7119583+08:00||;True|2025-04-05T14:05:45.4226723+08:00||;False|2025-04-05T13:53:23.4797631+08:00||;False|2025-04-05T13:52:45.8497237+08:00||;True|2025-04-05T13:19:19.1601623+08:00||;True|2025-04-01T13:32:21.8704121+08:00||;False|2025-04-01T13:31:46.3328740+08:00||;False|2025-04-01T13:31:01.3582297+08:00||;True|2025-03-31T18:16:12.9646699+08:00||;True|2025-03-31T18:03:38.5151828+08:00||;True|2025-03-31T17:57:48.8769046+08:00||;True|2025-03-31T13:25:16.3202832+08:00||;True|2025-03-28T17:15:03.7231698+08:00||;True|2025-03-28T16:48:31.5436151+08:00||;True|2025-03-26T11:36:23.6172513+08:00||;True|2025-03-19T17:15:55.9826975+08:00||;</History>
+    <_PublishTargetUrl>D:\SQL Server\Dog-0418 - 複製\Dog\bin\app.publish\</_PublishTargetUrl>
+    <History>True|2025-04-21T04:31:54.1143814Z||;True|2025-04-20T23:48:38.4783594+08:00||;True|2025-04-20T23:35:44.1914754+08:00||;True|2025-04-19T17:50:28.6681168+08:00||;True|2025-04-17T19:54:23.4026896+08:00||;True|2025-04-17T16:17:01.0187610+08:00||;True|2025-04-16T19:31:14.1793162+08:00||;True|2025-04-16T18:21:19.5550426+08:00||;True|2025-04-16T16:12:25.1414583+08:00||;True|2025-04-14T18:22:35.0708510+08:00||;False|2025-04-14T18:21:58.9997658+08:00||;False|2025-04-14T18:21:27.9258285+08:00||;False|2025-04-12T20:56:09.6185123+08:00||;False|2025-04-12T20:56:05.1776959+08:00||;True|2025-04-11T15:02:57.7288874+08:00||;True|2025-04-11T12:17:40.5742076+08:00||;True|2025-04-09T16:02:49.7448695+08:00||;True|2025-04-09T13:46:29.7119583+08:00||;True|2025-04-05T14:05:45.4226723+08:00||;False|2025-04-05T13:53:23.4797631+08:00||;False|2025-04-05T13:52:45.8497237+08:00||;True|2025-04-05T13:19:19.1601623+08:00||;True|2025-04-01T13:32:21.8704121+08:00||;False|2025-04-01T13:31:46.3328740+08:00||;False|2025-04-01T13:31:01.3582297+08:00||;True|2025-03-31T18:16:12.9646699+08:00||;True|2025-03-31T18:03:38.5151828+08:00||;True|2025-03-31T17:57:48.8769046+08:00||;True|2025-03-31T13:25:16.3202832+08:00||;True|2025-03-28T17:15:03.7231698+08:00||;True|2025-03-28T16:48:31.5436151+08:00||;True|2025-03-26T11:36:23.6172513+08:00||;True|2025-03-19T17:15:55.9826975+08:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -79,10 +79,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>09/10/2013 16:29:20</publishTime>
     </File>
     <File Include="bin/Dog.dll">
-      <publishTime>04/18/2025 12:59:52</publishTime>
+      <publishTime>04/21/2025 12:31:53</publishTime>
     </File>
     <File Include="bin/Dog.pdb">
-      <publishTime>04/18/2025 12:59:52</publishTime>
+      <publishTime>04/21/2025 12:31:53</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>06/17/2024 04:46:24</publishTime>
@@ -99,6 +99,57 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="bin/Konscious.Security.Cryptography.Blake2.dll">
       <publishTime>06/18/2024 10:20:34</publishTime>
     </File>
+    <File Include="bin/LineBot.dll">
+      <publishTime>01/01/2025 22:39:32</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Authentication.Abstractions.dll">
+      <publishTime>11/13/2018 01:29:06</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Authentication.Core.dll">
+      <publishTime>11/13/2018 01:29:10</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Authorization.dll">
+      <publishTime>11/13/2018 01:39:28</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Authorization.Policy.dll">
+      <publishTime>11/13/2018 01:39:32</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Hosting.Abstractions.dll">
+      <publishTime>11/13/2018 01:30:22</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll">
+      <publishTime>11/13/2018 01:30:20</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Http.Abstractions.dll">
+      <publishTime>11/13/2018 01:29:00</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Http.dll">
+      <publishTime>11/13/2018 01:29:06</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Http.Extensions.dll">
+      <publishTime>11/13/2018 01:29:06</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Http.Features.dll">
+      <publishTime>11/13/2018 01:28:58</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Mvc.Abstractions.dll">
+      <publishTime>11/13/2018 01:40:10</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Mvc.Core.dll">
+      <publishTime>04/20/2019 07:24:44</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.ResponseCaching.Abstractions.dll">
+      <publishTime>11/13/2018 01:37:50</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Routing.Abstractions.dll">
+      <publishTime>11/13/2018 01:38:16</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.Routing.dll">
+      <publishTime>11/13/2018 01:38:20</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNetCore.WebUtilities.dll">
+      <publishTime>11/13/2018 01:29:00</publishTime>
+    </File>
     <File Include="bin/Microsoft.Bcl.AsyncInterfaces.dll">
       <publishTime>10/31/2023 23:00:18</publishTime>
     </File>
@@ -111,8 +162,38 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
       <publishTime>09/05/2018 16:10:50</publishTime>
     </File>
+    <File Include="bin/Microsoft.DotNet.PlatformAbstractions.dll">
+      <publishTime>05/16/2018 05:01:34</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.Configuration.Abstractions.dll">
+      <publishTime>11/11/2018 08:26:38</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.DependencyInjection.Abstractions.dll">
+      <publishTime>11/11/2018 08:26:36</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.DependencyInjection.dll">
+      <publishTime>11/11/2018 08:26:44</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.DependencyModel.dll">
+      <publishTime>05/16/2018 05:01:54</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.FileProviders.Abstractions.dll">
+      <publishTime>11/11/2018 08:26:38</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.Hosting.Abstractions.dll">
+      <publishTime>11/13/2018 01:30:20</publishTime>
+    </File>
     <File Include="bin/Microsoft.Extensions.Logging.Abstractions.dll">
-      <publishTime>05/17/2018 04:17:48</publishTime>
+      <publishTime>11/11/2018 08:26:40</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.ObjectPool.dll">
+      <publishTime>11/11/2018 08:26:48</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.Options.dll">
+      <publishTime>11/11/2018 08:26:38</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Extensions.Primitives.dll">
+      <publishTime>11/11/2018 08:26:36</publishTime>
     </File>
     <File Include="bin/Microsoft.IdentityModel.Abstractions.dll">
       <publishTime>03/08/2025 02:51:52</publishTime>
@@ -125,6 +206,9 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     </File>
     <File Include="bin/Microsoft.IdentityModel.Tokens.dll">
       <publishTime>03/08/2025 02:51:52</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Net.Http.Headers.dll">
+      <publishTime>11/13/2018 01:28:58</publishTime>
     </File>
     <File Include="bin/Microsoft.Web.Infrastructure.dll">
       <publishTime>04/11/2022 19:09:46</publishTime>
@@ -287,6 +371,9 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     </File>
     <File Include="bin/System.Buffers.dll">
       <publishTime>02/19/2020 18:05:18</publishTime>
+    </File>
+    <File Include="bin/System.ComponentModel.Annotations.dll">
+      <publishTime>05/15/2018 21:29:36</publishTime>
     </File>
     <File Include="bin/System.Diagnostics.DiagnosticSource.dll">
       <publishTime>10/15/2024 11:20:52</publishTime>
@@ -559,7 +646,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>03/18/2025 09:29:20</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>04/17/2025 19:54:22</publishTime>
+      <publishTime>04/21/2025 11:33:24</publishTime>
     </File>
   </ItemGroup>
 </Project>

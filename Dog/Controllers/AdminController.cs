@@ -493,10 +493,10 @@ namespace Dog.Controllers
             var allTaskIds = request.Assign.SelectMany(d => d.Tasks).Distinct().ToList();
             var taskDetails = db.OrderDetails
                              .Include(od => od.Orders)
-                             .Where(od => allTaskIds.Contains(od.OrderDetailID) && // 只選擇被勾選的任務
-                               od.ServiceDate.Date == today.Date &&
-                              (od.OrderStatus == OrderStatus.未排定 || 
-                              od.OrderStatus == OrderStatus.已排定)).ToList();
+                             .Where(od => allTaskIds.Contains(od.OrderDetailID) &&
+                 DbFunctions.TruncateTime(od.ServiceDate) == today &&
+                 (od.OrderStatus == OrderStatus.未排定 ||
+                  od.OrderStatus == OrderStatus.已排定)).ToList();
 
             var Driver = request.Assign.Select(d => d.DriverID).Distinct().ToList();
             var IsOnlineDrivers = db.Users.Where(u => Driver.Contains(u.UsersID) && u.IsOnline)
@@ -510,7 +510,7 @@ namespace Dog.Controllers
             {
                 var TaskCount = db.OrderDetails.Count(od =>
                                 od.DriverID == Assign.DriverID &&
-                                od.ServiceDate.Date == today.Date);
+                                DbFunctions.TruncateTime(od.ServiceDate) == today);
 
                 if (TaskCount + Assign.Tasks.Count > 25)
                 {
@@ -563,7 +563,7 @@ namespace Dog.Controllers
                 return new
                 {
                     DriverID = distribution.DriverID,
-                    DriverName = IsOnlineDrivers[distribution.DriverID].LineName,
+                    DriverName = (IsOnlineDrivers[distribution.DriverID].LineName).ToString().Trim(),
                     AssignedTaskCount = distribution.Tasks.Count,
                     Tasks = driverTasks
                 };
@@ -590,5 +590,6 @@ namespace Dog.Controllers
             public int DriverID { get; set; }
             public List<int> Tasks { get; set; }//分派給司機的任務ID列表
         }
+
     }
 }
