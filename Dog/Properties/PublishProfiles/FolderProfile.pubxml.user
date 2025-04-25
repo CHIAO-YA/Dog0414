@@ -4,8 +4,8 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 -->
 <Project>
   <PropertyGroup>
-    <_PublishTargetUrl>D:\SQL Server\Dog-0418 - 複製\Dog\bin\app.publish\</_PublishTargetUrl>
-    <History>True|2025-04-21T04:31:54.1143814Z||;True|2025-04-20T23:48:38.4783594+08:00||;True|2025-04-20T23:35:44.1914754+08:00||;True|2025-04-19T17:50:28.6681168+08:00||;True|2025-04-17T19:54:23.4026896+08:00||;True|2025-04-17T16:17:01.0187610+08:00||;True|2025-04-16T19:31:14.1793162+08:00||;True|2025-04-16T18:21:19.5550426+08:00||;True|2025-04-16T16:12:25.1414583+08:00||;True|2025-04-14T18:22:35.0708510+08:00||;False|2025-04-14T18:21:58.9997658+08:00||;False|2025-04-14T18:21:27.9258285+08:00||;False|2025-04-12T20:56:09.6185123+08:00||;False|2025-04-12T20:56:05.1776959+08:00||;True|2025-04-11T15:02:57.7288874+08:00||;True|2025-04-11T12:17:40.5742076+08:00||;True|2025-04-09T16:02:49.7448695+08:00||;True|2025-04-09T13:46:29.7119583+08:00||;True|2025-04-05T14:05:45.4226723+08:00||;False|2025-04-05T13:53:23.4797631+08:00||;False|2025-04-05T13:52:45.8497237+08:00||;True|2025-04-05T13:19:19.1601623+08:00||;True|2025-04-01T13:32:21.8704121+08:00||;False|2025-04-01T13:31:46.3328740+08:00||;False|2025-04-01T13:31:01.3582297+08:00||;True|2025-03-31T18:16:12.9646699+08:00||;True|2025-03-31T18:03:38.5151828+08:00||;True|2025-03-31T17:57:48.8769046+08:00||;True|2025-03-31T13:25:16.3202832+08:00||;True|2025-03-28T17:15:03.7231698+08:00||;True|2025-03-28T16:48:31.5436151+08:00||;True|2025-03-26T11:36:23.6172513+08:00||;True|2025-03-19T17:15:55.9826975+08:00||;</History>
+    <_PublishTargetUrl>D:\SQL Server\Dog-0421\Dog\bin\app.publish\</_PublishTargetUrl>
+    <History>True|2025-04-24T05:44:13.4710444Z||;False|2025-04-24T13:43:34.1369456+08:00||;False|2025-04-24T13:43:13.0593639+08:00||;True|2025-04-23T13:55:53.1703155+08:00||;True|2025-04-22T17:29:21.9851583+08:00||;True|2025-04-22T12:42:35.3953049+08:00||;True|2025-04-22T12:37:04.2094770+08:00||;True|2025-04-22T11:26:37.9341169+08:00||;True|2025-04-21T14:28:47.0502117+08:00||;True|2025-04-21T12:31:54.1143814+08:00||;True|2025-04-20T23:48:38.4783594+08:00||;True|2025-04-20T23:35:44.1914754+08:00||;True|2025-04-19T17:50:28.6681168+08:00||;True|2025-04-17T19:54:23.4026896+08:00||;True|2025-04-17T16:17:01.0187610+08:00||;True|2025-04-16T19:31:14.1793162+08:00||;True|2025-04-16T18:21:19.5550426+08:00||;True|2025-04-16T16:12:25.1414583+08:00||;True|2025-04-14T18:22:35.0708510+08:00||;False|2025-04-14T18:21:58.9997658+08:00||;False|2025-04-14T18:21:27.9258285+08:00||;False|2025-04-12T20:56:09.6185123+08:00||;False|2025-04-12T20:56:05.1776959+08:00||;True|2025-04-11T15:02:57.7288874+08:00||;True|2025-04-11T12:17:40.5742076+08:00||;True|2025-04-09T16:02:49.7448695+08:00||;True|2025-04-09T13:46:29.7119583+08:00||;True|2025-04-05T14:05:45.4226723+08:00||;False|2025-04-05T13:53:23.4797631+08:00||;False|2025-04-05T13:52:45.8497237+08:00||;True|2025-04-05T13:19:19.1601623+08:00||;True|2025-04-01T13:32:21.8704121+08:00||;False|2025-04-01T13:31:46.3328740+08:00||;False|2025-04-01T13:31:01.3582297+08:00||;True|2025-03-31T18:16:12.9646699+08:00||;True|2025-03-31T18:03:38.5151828+08:00||;True|2025-03-31T17:57:48.8769046+08:00||;True|2025-03-31T13:25:16.3202832+08:00||;True|2025-03-28T17:15:03.7231698+08:00||;True|2025-03-28T16:48:31.5436151+08:00||;True|2025-03-26T11:36:23.6172513+08:00||;True|2025-03-19T17:15:55.9826975+08:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -79,10 +79,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>09/10/2013 16:29:20</publishTime>
     </File>
     <File Include="bin/Dog.dll">
-      <publishTime>04/21/2025 12:31:53</publishTime>
+      <publishTime>04/25/2025 14:05:30</publishTime>
     </File>
     <File Include="bin/Dog.pdb">
-      <publishTime>04/21/2025 12:31:53</publishTime>
+      <publishTime>04/25/2025 14:05:30</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>06/17/2024 04:46:24</publishTime>
@@ -570,6 +570,9 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="Global.asax">
       <publishTime>03/18/2025 09:29:20</publishTime>
     </File>
+    <File Include="payment.html">
+      <publishTime>04/24/2025 16:41:37</publishTime>
+    </File>
     <File Include="Scripts/bootstrap.bundle.js">
       <publishTime>03/18/2025 09:29:25</publishTime>
     </File>
@@ -630,6 +633,15 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="Security/dog2.png">
       <publishTime>04/02/2025 13:44:56</publishTime>
     </File>
+    <File Include="success.html">
+      <publishTime>04/24/2025 16:23:16</publishTime>
+    </File>
+    <File Include="Uploads/22acb38a-d0ca-4fac-8f8c-173f67420830.jpg">
+      <publishTime>04/18/2025 17:12:43</publishTime>
+    </File>
+    <File Include="Uploads/dog.jpg">
+      <publishTime>03/25/2025 14:08:54</publishTime>
+    </File>
     <File Include="Views/Home/Index.cshtml">
       <publishTime>03/18/2025 09:29:20</publishTime>
     </File>
@@ -646,7 +658,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>03/18/2025 09:29:20</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>04/21/2025 11:33:24</publishTime>
+      <publishTime>04/21/2025 14:28:45</publishTime>
     </File>
   </ItemGroup>
 </Project>

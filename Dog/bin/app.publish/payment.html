@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>藍新金流付款</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .payment-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+            .payment-button:hover {
+                background-color: #45a049;
+            }
+    </style>
+</head>
+<body>
+    <h1>訂單付款</h1>
+    <p>請點擊下方按鈕前往藍新金流支付頁面完成付款</p>
+
+    <form name="Newebpay" method="post" action="https://ccore.newebpay.com/MPG/mpg_gateway">
+        <input type="hidden" name="MerchantID" value="MS155729652">
+        <input type="hidden" name="TradeInfo" value="761794361fa1eedcbd63f8e1082ad49b073f9f0afa2ab5cebb8b3fbbe738480afa5db40269439f4033af4afac901a18e452fa273c6a7b67f39c6bd51c2f213d85e12f9761e1d7abcbb7652ec68cd4db0ed3f0db44fe1009e8afb7f4abb4b7ef2124b82b659b29343acbe7dbf5d626c89d3c64c72080a22efc277847c5f2e38d00baf05091e2b2a1bf7e738580fd116b6ab3837d7f52aa65e8ebddb5cf6e628f5a7c050e276b90c17314e3d75436ce4c89a21e30849b8816a9cb8e28a683def920aa7d830081c68d65ba50862c79ee56440eded50ea3df3cffc41de2bfa154b7a622c6bcdc5e7ffe8ed8cdaeeace1f6acbe4aadc5b17d5ab9ea853ca3ef51efc22600e18630e2ddafb0dfebba6e0b30d85dee6811f139a297bddca67359b1a1a2861dfbb4ff6559e1128a963ba05f3b885de39d46e3e5e4fb93dafa5415c3763b951f980a856b3240859575581fda4e819973dcbaba812125ea63f4a4d859cbb9c3654cd470b191380e273d56b3a60c7af186024bb0dc50f67ed991fce0517e2f322874f3386816da002a816184422537">
+        <input type="hidden" name="TradeSha" value="6E83050E4CBDE004EFE9BEAE8B8F7AF8D139740F11ED9C2526DFE84A771E1992">
+        <input type="hidden" name="Version" value="2.0">
+        <input type="submit" value="前往付款" class="payment-button">
+    </form>
+</body>
+</html>

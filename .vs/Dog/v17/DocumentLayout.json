@@ -1,34 +1,34 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\",
+  "WorkspaceRootPath": "D:\\SQL Server\\Dog-0421\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\dog\\security\\linebot .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\linebot .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\userfirstcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\userfirstcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\dog\\controllers\\linebotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\linebotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0418 - \u8907\u88FD\\dog\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\payment.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\payment.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\dog\\security\\linebotservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\linebotservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\security\\cryptoutil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\cryptoutil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\dog\\security\\linepay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\linepay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\bluenewpaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\bluenewpaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\dog\\controllers\\linepaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\linepaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\security\\bluenewpayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\bluenewpayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\dog\\security\\linepayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\linepayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\models\\enumlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\models\\enumlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,7 +38,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 411,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -54,90 +54,94 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "LineBotController.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Controllers\\LineBotController.cs",
-              "RelativeDocumentMoniker": "Dog\\Controllers\\LineBotController.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Controllers\\LineBotController.cs",
-              "RelativeToolTip": "Dog\\Controllers\\LineBotController.cs",
-              "ViewState": "AgIAACQAAAAAAAAAAAAiwHYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-19T11:52:39.647Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "LineBot .cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LineBot .cs",
-              "RelativeDocumentMoniker": "Dog\\Security\\LineBot .cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LineBot .cs",
-              "RelativeToolTip": "Dog\\Security\\LineBot .cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAIwB0AAAABAAAAAAAAAA==",
+              "Title": "UserfirstController.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\UserfirstController.cs",
+              "RelativeDocumentMoniker": "Dog\\Controllers\\UserfirstController.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\UserfirstController.cs",
+              "RelativeToolTip": "Dog\\Controllers\\UserfirstController.cs",
+              "ViewState": "AgIAAD8CAAAAAAAAAIA1wJYCAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-19T11:51:06.474Z",
+              "WhenOpened": "2025-04-24T09:07:23.253Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "LineBotServices.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LineBotServices.cs",
-              "RelativeDocumentMoniker": "Dog\\Security\\LineBotServices.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LineBotServices.cs",
-              "RelativeToolTip": "Dog\\Security\\LineBotServices.cs",
-              "ViewState": "AgIAAFQAAAAAAAAAAAAcwHAAAAABAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "Dog\\Controllers\\AdminController.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "Dog\\Controllers\\AdminController.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAAwDMAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-19T11:51:33.655Z"
+              "WhenOpened": "2025-04-25T02:37:47.925Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "EnumList.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Models\\EnumList.cs",
+              "RelativeDocumentMoniker": "Dog\\Models\\EnumList.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Models\\EnumList.cs",
+              "RelativeToolTip": "Dog\\Models\\EnumList.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAACUAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-24T07:39:57.328Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Web.config",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Web.config",
-              "RelativeDocumentMoniker": "Dog\\Web.config",
-              "ToolTip": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Web.config",
-              "RelativeToolTip": "Dog\\Web.config",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2025-04-19T11:31:00.424Z",
+              "Title": "payment.html",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\payment.html",
+              "RelativeDocumentMoniker": "Dog\\payment.html",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\payment.html",
+              "RelativeToolTip": "Dog\\payment.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-04-24T07:26:26.058Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "LinePayController.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Controllers\\LinePayController.cs",
-              "RelativeDocumentMoniker": "Dog\\Controllers\\LinePayController.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Controllers\\LinePayController.cs",
-              "RelativeToolTip": "Dog\\Controllers\\LinePayController.cs",
-              "ViewState": "AgIAABwAAAAAAAAAAAAAwDUAAAAZAAAAAAAAAA==",
+              "Title": "BlueNewPayService.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\BlueNewPayService.cs",
+              "RelativeDocumentMoniker": "Dog\\Security\\BlueNewPayService.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\BlueNewPayService.cs",
+              "RelativeToolTip": "Dog\\Security\\BlueNewPayService.cs",
+              "ViewState": "AgIAAHIAAAAAAAAAAAAAwHYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-18T09:50:39.182Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "LinePayService.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LinePayService.cs",
-              "RelativeDocumentMoniker": "Dog\\Security\\LinePayService.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LinePayService.cs",
-              "RelativeToolTip": "Dog\\Security\\LinePayService.cs",
-              "ViewState": "AgIAAEoAAAAAAAAAAAAQwBgAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-18T09:51:17.658Z"
+              "WhenOpened": "2025-04-24T07:16:10.844Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "LinePay.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LinePay.cs",
-              "RelativeDocumentMoniker": "Dog\\Security\\LinePay.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0418 - \u8907\u88FD\\Dog\\Security\\LinePay.cs",
-              "RelativeToolTip": "Dog\\Security\\LinePay.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAFAAAAAAAAAA==",
+              "Title": "BlueNewPayController.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\BlueNewPayController.cs",
+              "RelativeDocumentMoniker": "Dog\\Controllers\\BlueNewPayController.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\BlueNewPayController.cs",
+              "RelativeToolTip": "Dog\\Controllers\\BlueNewPayController.cs",
+              "ViewState": "AgIAAK8AAAAAAAAAAAAAwMkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-19T10:09:25.835Z"
+              "WhenOpened": "2025-04-24T06:23:50.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CryptoUtil.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\CryptoUtil.cs",
+              "RelativeDocumentMoniker": "Dog\\Security\\CryptoUtil.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\CryptoUtil.cs",
+              "RelativeToolTip": "Dog\\Security\\CryptoUtil.cs",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAAAHwAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-24T06:20:48.866Z",
+              "EditorCaption": ""
             }
           ]
         },

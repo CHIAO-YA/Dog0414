@@ -113,26 +113,36 @@ namespace Dog.Controllers
 
 
         [HttpGet]
-        [Route("GET/driver/today/{DriverID}/{OrderDetailID?}")]  // 查詢某個司機今天的所有訂單
-        public IHttpActionResult GetDriverTodayorder(int DriverID, int? OrderDetailID = null)
+        [Route("GET/driver/day/{DriverID}/{Date?}/{OrderDetailID?}")]  // 查詢某個司機今天的所有訂單
+        public IHttpActionResult GetDriverTodayorder(int DriverID, string Date = null, int? OrderDetailID = null)
         {
             // 檢查接單者是否存在
             var Driver = db.Users.FirstOrDefault(u => u.UsersID == DriverID && u.Roles == Role.接單員);
             if (Driver == null) { return NotFound(); }
 
-            var Today = DateTime.Today;// 今天的 00:00
-            var Tomorrow = Today.AddDays(1);// 明天的 00:00
-
-            // 查詢當天該接單者負責的所有訂單
-            var DriverToday = db.OrderDetails.Include(od => od.Orders.Photo)
-                                 .Where(od => od.DriverID == DriverID && 
-                                             od.ServiceDate >= Today &&
-                                             od.ServiceDate < Tomorrow);
-            if(OrderDetailID.HasValue)
+            DateTime Day;//默認為今天
+            if (string.IsNullOrEmpty(Date) || !DateTime.TryParse(Date, out Day))
             {
-                DriverToday = DriverToday.Where(od => od.OrderDetailID == OrderDetailID.Value);
+                Day = DateTime.Today; // 如果沒有提供日期或日期格式錯誤，使用今天
             }
-             var DriverTodayorder = DriverToday.ToList();
+            else
+            {
+                Day = DateTime.Parse(Date).Date; // 確保只取日期部分
+            }
+
+            var nextDay = Day.AddDays(1); // 目標日期的下一天
+
+            // 查詢特定日期的訂單
+            var driverOrders = db.OrderDetails.Include(od => od.Orders.Photo).Include(od => od.DriverPhoto)
+                                      .Where(od => od.DriverID == DriverID &&
+                                                  od.ServiceDate >= Day &&
+                                                  od.ServiceDate < nextDay);
+            if (OrderDetailID.HasValue)
+            {
+                driverOrders = driverOrders.Where(od => od.OrderDetailID == OrderDetailID.Value);
+            }
+            var DriverTodayorder = driverOrders.ToList();
+
             // 根據訂單狀態統計數量
             var TodayActiveStatus = new
             {
@@ -152,7 +162,7 @@ namespace Dog.Controllers
                 Total = DriverTodayorder.Count(od => od.OrderStatus == OrderStatus.已完成 ||
                                                od.OrderStatus == OrderStatus.異常)
             };
-            if(OrderDetailID.HasValue && !DriverTodayorder.Any())
+            if (OrderDetailID.HasValue && !DriverTodayorder.Any())
             {
                 return NotFound();
             }
@@ -163,13 +173,13 @@ namespace Dog.Controllers
                 {
                     statusCode = 200,
                     status = true,
-                    message = "今日無訂單",
+                    message = $"{Day.ToString("yyyy/MM/dd")}無訂單",
                     result = new
                     {
                         DriverID,
                         Number = Driver.Number.Trim(),
                         DriverName = Driver.LineId.Trim(),
-                        Today = Today.ToString("yyyy/MM/dd"),
+                        Day = Day.ToString("yyyy/MM/dd"),
                         TodayActiveStatus,
                         TodayCompletedStatus
                     }
@@ -181,7 +191,7 @@ namespace Dog.Controllers
                 DriverID,
                 Number = Driver.Number.Trim(),
                 DriverName = Driver.LineId.Trim(),
-                Today = Today.ToString("yyyy/MM/dd"),
+                Day = Day.ToString("yyyy/MM/dd"),
                 TodayActiveStatus,
                 TodayCompletedStatus,
                 Orders = DriverTodayorder.Select(od => new
@@ -193,11 +203,15 @@ namespace Dog.Controllers
                     CustomerNumber = od.Orders.Users.Number.Trim(),
                     CustomerName = od.Orders.OrderName,
                     od.Orders.Notes,
+                    od.CommonIssues,
+                    od.IssueDescription,
                     Photo = od.Orders.Photo.Select(p => p.OrderImageUrl).ToList(),
+                    DriverPhotos = od.DriverPhoto.Select(p => p.DriverImageUrl).ToList(),
                     Status = od.OrderStatus.ToString(),
                     od.Orders.Plan.PlanName,
                     od.Orders.Plan.PlanKG,
                     od.Orders.Plan.Liter,
+                    od.KG,
                 })
             };
 
@@ -250,12 +264,12 @@ namespace Dog.Controllers
 
         //}
 
-        
+
         [HttpPut]
-        [Route("driver/orders/{OrderDetailID}/status")]//改變訂單狀態OrderStatus
-        public IHttpActionResult UpdateOrderStatus(int OrderDetailID, int statusValue)
+        [Route("driver/orders/status/{OrderDetailID}")]//改變訂單狀態OrderStatus
+        public IHttpActionResult UpdateOrderStatus(int OrderDetailID, [FromBody] UpdateStatusRequest request)
         {
-            if (!Enum.IsDefined(typeof(OrderStatus), statusValue))
+            if (!Enum.IsDefined(typeof(OrderStatus), request.OrderStatus))
             {
                 return BadRequest("無效的訂單狀態");
             }
@@ -265,7 +279,7 @@ namespace Dog.Controllers
                 return NotFound();
             }
 
-            var newStatus = (OrderStatus)statusValue;
+            var newStatus = (OrderStatus)request.OrderStatus;
             orderDetail.OrderStatus = newStatus;
             orderDetail.UpdatedAt = DateTime.Now;
             var currentTime = DateTime.Now;
@@ -304,6 +318,10 @@ namespace Dog.Controllers
             });
         }
 
+        public class UpdateStatusRequest
+        {
+            public OrderStatus OrderStatus { get; set; }
+        }
 
 
         [HttpPut]
@@ -369,44 +387,65 @@ namespace Dog.Controllers
             }
 
             // 8. 處理圖片（可選）
-            var fileContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.FileName != null);
-            if (fileContent == null)
+            var fileContents = provider.Contents.Where(c => c.Headers.ContentDisposition.FileName != null).ToList();
+            if (fileContents.Count == 0)
             {
                 return BadRequest("請上傳圖片，圖片為必填項");
             }
 
-            var fileName = fileContent.Headers.ContentDisposition.FileName.Trim('"');
-            var fileExtension = Path.GetExtension(fileName).ToLower();
-
-            // 檢查檔案類型
-            if (!new[] { ".jpg", ".jpeg", ".png", ".gif" }.Contains(fileExtension)) return BadRequest("只接受 jpg、jpeg、png、gif 格式");
-
-
-            // 讀取檔案內容
-            var fileBytes = await fileContent.ReadAsByteArrayAsync();
-
-            // 檢查檔案大小
-            if (fileBytes.Length > 5 * 1024 * 1024) return BadRequest("圖片大小不能超過 5MB");
-
-            // 生成新檔名
-            var newFileName = Guid.NewGuid().ToString() + fileExtension;
-            var savedFilePath = Path.Combine(uploadPath, newFileName);
-
-            // 儲存檔案
-            File.WriteAllBytes(savedFilePath, fileBytes);
-            var virtualPath = "/DriverPhotos/" + newFileName;
-
-            // 查詢是否已存在照片
-            var photo = db.DriverPhoto.FirstOrDefault(p => p.OrderDetailID == OrderDetailID);
-
-            if (photo != null)//【圖片重複上傳】→ 更新圖片，只填 UpdatedAt
+            // 刪除現有的所有照片記錄
+            var existingPhotos = db.DriverPhoto.Where(p => p.OrderDetailID == OrderDetailID).ToList();
+            foreach (var photo in existingPhotos)
             {
-                // 更新現有照片
-                photo.DriverImageUrl = virtualPath;
-                photo.UpdatedAt = currentTime;
+                // 刪除實際檔案（如果需要的話）
+                string oldPhotoPath = photo.DriverImageUrl;
+                if (!string.IsNullOrEmpty(oldPhotoPath))
+                {
+                    string oldPhotoFullPath = HttpContext.Current.Server.MapPath("~" + oldPhotoPath);
+                    if (File.Exists(oldPhotoFullPath))
+                    {
+                        try
+                        {
+                            File.Delete(oldPhotoFullPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            // 記錄錯誤但不中斷操作
+                            System.Diagnostics.Debug.WriteLine($"刪除舊照片失敗: {ex.Message}");
+                        }
+                    }
+                }
+
+                // 從數據庫刪除記錄
+                db.DriverPhoto.Remove(photo);
             }
-            else//【圖片第一次上傳】→ 新增圖片記錄【填 CreatedAt, UpdatedAt】
+
+            // 添加新上傳的所有照片
+            foreach (var fileContent in fileContents)
             {
+                var fileName = fileContent.Headers.ContentDisposition.FileName.Trim('"');
+                var fileExtension = Path.GetExtension(fileName).ToLower();
+
+                // 檢查檔案類型
+                if (!new[] { ".jpg", ".jpeg", ".png", ".gif" }.Contains(fileExtension))
+                    return BadRequest("只接受 jpg、jpeg、png、gif 格式");
+
+                // 讀取檔案內容
+                var fileBytes = await fileContent.ReadAsByteArrayAsync();
+
+                // 檢查檔案大小
+                if (fileBytes.Length > 10 * 1024 * 1024)
+                    return BadRequest("圖片大小不能超過 10MB");
+
+                // 生成新檔名
+                var newFileName = Guid.NewGuid().ToString() + fileExtension;
+                var savedFilePath = Path.Combine(uploadPath, newFileName);
+
+                // 儲存檔案
+                File.WriteAllBytes(savedFilePath, fileBytes);
+                var virtualPath = "/DriverPhotos/" + newFileName;
+
+                // 添加新照片記錄
                 db.DriverPhoto.Add(new DriverPhoto
                 {
                     OrderDetailID = OrderDetailID,
@@ -416,28 +455,30 @@ namespace Dog.Controllers
                 });
             }
 
-
-            // 儲存所有變更
+            // 保存所有變更（包括刪除舊照片和添加新照片）
             db.SaveChanges();
+            // 重新加載 OrderDetail 的 DriverPhoto 集合
+            db.Entry(OrderDetail).Collection(od => od.DriverPhoto).Load();
 
             return Ok(new
-            {
-                statusCode = 200,
-                status = true,
-                message = isOverWeight ? "重量超出計畫，已標記為異常回報" : "成功更新重量",
-                result = new
                 {
-                    OrderDetail.OrderDetailID,
-                    OrderDetail.KG,
-                    OrderStatus = OrderDetail.OrderStatus.ToString(),
-                    IsOverWeight = isOverWeight,
-                    OrderDetail.UpdatedAt,
-                    OrderDetail.ReportedAt,
-                    OrderDetail.CompletedAt,
-                    CommonIssues = OrderDetail.CommonIssues != null ? Enum.GetName(typeof(CommonIssues), OrderDetail.CommonIssues) : null, // 將 CommonIssues 轉換為文字
-                    OrderDetail.IssueDescription
-                }
-            });
+                    statusCode = 200,
+                    status = true,
+                    message = isOverWeight ? "重量超出計畫，已標記為異常回報" : "成功更新重量",
+                    result = new
+                    {
+                        OrderDetail.OrderDetailID,
+                        OrderDetail.KG,
+                        OrderStatus = OrderDetail.OrderStatus.ToString(),
+                        IsOverWeight = isOverWeight,
+                        OrderDetail.UpdatedAt,
+                        OrderDetail.ReportedAt,
+                        OrderDetail.CompletedAt,
+                        CommonIssues = OrderDetail.CommonIssues != null ? Enum.GetName(typeof(CommonIssues), OrderDetail.CommonIssues) : null, // 將 CommonIssues 轉換為文字
+                        OrderDetail.IssueDescription,
+                        DriverPhoto = OrderDetail.DriverPhoto.Select(p => p.DriverImageUrl).ToList(),
+                    }
+                });
+            }
         }
     }
-}

@@ -439,6 +439,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\BlueNewPayController.cs" />
     <Compile Include="Controllers\DiscountsController.cs" />
     <Compile Include="Controllers\DogController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -490,6 +491,8 @@
     <Compile Include="Models\DriverPhoto.cs" />
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\EnumList.cs" />
+    <Compile Include="Security\BlueNewPayService.cs" />
+    <Compile Include="Security\CryptoUtil.cs" />
     <Compile Include="Security\HmacSignature.cs" />
     <Compile Include="Security\LineBot .cs" />
     <Compile Include="Security\LineBotServices.cs" />
@@ -527,6 +530,7 @@
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="payment.html" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -559,6 +563,8 @@
     <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Security\dog2.png" />
+    <Content Include="Uploads\22acb38a-d0ca-4fac-8f8c-173f67420830.jpg" />
+    <Content Include="Uploads\dog.jpg" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -577,7 +583,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Uitility\" />
-    <Folder Include="Uploads\" />
     <Folder Include="Views\Orders\" />
     <Folder Include="Views\Photo\" />
     <Folder Include="Views\User\" />
