@@ -1,36 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\SQL Server\\Dog-0421\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\userfirstcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\userfirstcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\payment.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\payment.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\security\\cryptoutil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\cryptoutil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\bluenewpaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\bluenewpaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\security\\bluenewpayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\bluenewpayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\models\\enumlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\models\\enumlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -38,7 +9,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 411,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -51,97 +22,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UserfirstController.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\UserfirstController.cs",
-              "RelativeDocumentMoniker": "Dog\\Controllers\\UserfirstController.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\UserfirstController.cs",
-              "RelativeToolTip": "Dog\\Controllers\\UserfirstController.cs",
-              "ViewState": "AgIAAD8CAAAAAAAAAIA1wJYCAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-24T09:07:23.253Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AdminController.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\AdminController.cs",
-              "RelativeDocumentMoniker": "Dog\\Controllers\\AdminController.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\AdminController.cs",
-              "RelativeToolTip": "Dog\\Controllers\\AdminController.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAAwDMAAAAPAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-25T02:37:47.925Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "EnumList.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Models\\EnumList.cs",
-              "RelativeDocumentMoniker": "Dog\\Models\\EnumList.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Models\\EnumList.cs",
-              "RelativeToolTip": "Dog\\Models\\EnumList.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAAACUAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-24T07:39:57.328Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "payment.html",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\payment.html",
-              "RelativeDocumentMoniker": "Dog\\payment.html",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\payment.html",
-              "RelativeToolTip": "Dog\\payment.html",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2025-04-24T07:26:26.058Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "BlueNewPayService.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\BlueNewPayService.cs",
-              "RelativeDocumentMoniker": "Dog\\Security\\BlueNewPayService.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\BlueNewPayService.cs",
-              "RelativeToolTip": "Dog\\Security\\BlueNewPayService.cs",
-              "ViewState": "AgIAAHIAAAAAAAAAAAAAwHYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-24T07:16:10.844Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "BlueNewPayController.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\BlueNewPayController.cs",
-              "RelativeDocumentMoniker": "Dog\\Controllers\\BlueNewPayController.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\BlueNewPayController.cs",
-              "RelativeToolTip": "Dog\\Controllers\\BlueNewPayController.cs",
-              "ViewState": "AgIAAK8AAAAAAAAAAAAAwMkAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-24T06:23:50.179Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "CryptoUtil.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\CryptoUtil.cs",
-              "RelativeDocumentMoniker": "Dog\\Security\\CryptoUtil.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\CryptoUtil.cs",
-              "RelativeToolTip": "Dog\\Security\\CryptoUtil.cs",
-              "ViewState": "AgIAAHsAAAAAAAAAAAAAAHwAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-24T06:20:48.866Z",
-              "EditorCaption": ""
             }
           ]
         },

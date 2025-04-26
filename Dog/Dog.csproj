@@ -486,6 +486,14 @@
     <Compile Include="Migrations\202504170803104_admin.Designer.cs">
       <DependentUpon>202504170803104_admin.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202504250913574_qr.cs" />
+    <Compile Include="Migrations\202504250913574_qr.Designer.cs">
+      <DependentUpon>202504250913574_qr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504250939027_0425.cs" />
+    <Compile Include="Migrations\202504250939027_0425.Designer.cs">
+      <DependentUpon>202504250939027_0425.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Discount.cs" />
     <Compile Include="Models\DriverPhoto.cs" />
@@ -682,6 +690,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504170803104_admin.resx">
       <DependentUpon>202504170803104_admin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504250913574_qr.resx">
+      <DependentUpon>202504250913574_qr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504250939027_0425.resx">
+      <DependentUpon>202504250939027_0425.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

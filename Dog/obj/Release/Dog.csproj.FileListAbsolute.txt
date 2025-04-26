@@ -867,3 +867,5 @@ D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.csproj.CoreCompileInputs.cache
 D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.csproj.Up2Date
 D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.dll
 D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.pdb
+D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.Migrations.qr.resources
+D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.Migrations._0425.resources

@@ -281,8 +281,9 @@ namespace Dog.Controllers
 
             var newStatus = (OrderStatus)request.OrderStatus;
             orderDetail.OrderStatus = newStatus;
-            orderDetail.UpdatedAt = DateTime.Now;
             var currentTime = DateTime.Now;
+            orderDetail.UpdatedAt = currentTime;
+            
 
             // 根據狀態更新對應的時間欄位
             switch (newStatus)

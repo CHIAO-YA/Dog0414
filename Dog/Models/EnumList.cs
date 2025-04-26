@@ -13,6 +13,11 @@ namespace Dog.Models
         使用者 = 1,
         接單員 = 2,
     }
+    public enum RQcodeStatus
+    {
+        自行列印 = 1,
+        郵局貼紙 = 2,
+    }
     public enum CommonIssues
     {
         垃圾量超過方案限制 = 1,

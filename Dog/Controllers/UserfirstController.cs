@@ -304,6 +304,7 @@ namespace Dog.Controllers
                     OrderDetails = o.OrderDetails.Select(od => new
                     {
                         od.OrderDetailID,
+                        od.OrderDetailsNumber,
                         ServiceDate = od.ServiceDate.ToString("yyyy/MM/dd"),
                         DriverTime = (od.DriverTimeStart.HasValue && od.DriverTimeEnd.HasValue) ?
                             $"{od.DriverTimeStart.Value.ToString("HH:mm")}-{od.DriverTimeEnd.Value.ToString("HH:mm")}" : null,
@@ -593,7 +594,8 @@ namespace Dog.Controllers
             // 更新訂單細節中的 ServiceDate 欄位為新的預約日期
             orderDetail.ServiceDate = newServiceDate;
             // 更新 UpdatedAt 欄位為當前時間
-            orderDetail.UpdatedAt = DateTime.Now;
+            var currentTime = DateTime.Now;
+            orderDetail.UpdatedAt = currentTime;
             db.SaveChanges();
             return Ok(new
             {
@@ -639,7 +641,11 @@ namespace Dog.Controllers
                 o.OrderName,
                 o.OrderPhone,
                 o.Addresses,
-                OrderImageUrl = o.Photo.Select(p => p.OrderImageUrl).ToList(),
+                OrderImages = o.Photo.Select(p => new
+                {
+                     p.PhotoID,
+                     p.OrderImageUrl
+                }).ToList(),
                 o.Notes
             }).ToList();
             return Ok(new
@@ -736,21 +742,31 @@ namespace Dog.Controllers
                     }
                 }
             }
-            // 取當前時間
-            var currentTime = DateTime.Now;
-            // 找該照片
-            var photosToDelete = db.Photo.Where(p => p.OrdersID == order.OrdersID && PhotoID.Contains(p.PhotoID)).ToList();
 
-            // 刪除照片
-            foreach (var photo in photosToDelete)
+            // 如果有要刪除的圖片ID
+            if (PhotoID.Count > 0)
             {
-                string fullPath = HttpContext.Current.Server.MapPath(photo.OrderImageUrl);
-                if(File.Exists(fullPath))
+                // 找到要刪除的圖片記錄
+                var photosToDelete = db.Photo
+                    .Where(p => p.OrdersID == order.OrdersID && PhotoID.Contains(p.PhotoID))
+                    .ToList();
+
+                // 刪除這些圖片
+                foreach (var photo in photosToDelete)
                 {
-                    File.Delete(fullPath); // 刪檔案
+                    // 刪除實體檔案
+                    string fullPath = HttpContext.Current.Server.MapPath(photo.OrderImageUrl);
+                    if (File.Exists(fullPath))
+                    {
+                        File.Delete(fullPath); // 刪除實體檔案
+                    }
+                    // 從資料庫中刪除記錄
+                    db.Photo.Remove(photo);
                 }
-                db.Photo.Remove(photo);// 刪紀錄
+                db.SaveChanges();
             }
+            var currentTime = DateTime.Now;
+            var newPhotoUrls = new List<string>();
             //新增圖片
             foreach (var fileData in provider.Contents)
             {
@@ -778,12 +794,10 @@ namespace Dog.Controllers
                 File.WriteAllBytes(savedFilePath, fileBytes);
 
                 var virtualPath = "/Uploads/" + newFileName; // 存成網址路徑
-                //取代原圖ID 或 給他新ID
-                int firstPhotoID = PhotoID.Count > 0 ? PhotoID[0] : 0;
+
                 order.Photo.Add(new Photo
                 {
                     OrdersID = order.OrdersID,
-                    PhotoID = firstPhotoID, 
                     OrderImageUrl = virtualPath,
                     CreatedAt = currentTime,
                     UpdatedAt = currentTime
@@ -1403,7 +1417,7 @@ namespace Dog.Controllers
 
         private string GetOrderNumber(int OrdersID)//自動產生唯一編號不重複OrderNumber
         {
-            string prefix = "O";
+            string prefix = "ORD-"+DateTime.Now.ToString("yyyyMMdd-");
             string number;
             Random rand = new Random();
             do

@@ -8,6 +8,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using System.Data.Entity;
+
 
 namespace Dog.Controllers
 {
@@ -44,7 +46,7 @@ namespace Dog.Controllers
 
             return ResponseMessage(response);
         }
-      
+
 
         // 產生付款表單資料
         [HttpPost]
@@ -162,8 +164,46 @@ namespace Dog.Controllers
                 return InternalServerError(ex);
             }
         }
-    }
 
+        [HttpGet]
+        [Route("Get/Orders/{OrdersID}")]
+        public IHttpActionResult GetOrderByID(int OrdersID)
+        {
+            var order = db.Orders.Include(o => o.Plan).Include(o => o.Discount).FirstOrDefault(o => o.OrdersID == OrdersID);
+            if (order == null)
+            {
+                return Ok(new
+                {
+                    statusCode = 200,
+                    status = true,
+                    message = "找不到此訂單",
+                });
+            }
+            var photo = db.Photo.Where(p => p.OrdersID == order.OrdersID).Select(p => p.OrderImageUrl).ToList();
+
+            var result = new
+            {
+                order.OrderNumber,
+                order.TotalAmount,
+                order.PaymentStatus,
+                order.LinePayMethod,
+                order.Discount.Months,
+                order.Plan.PlanName,
+                order.Plan.Liter,
+                order.Plan.PlanKG,
+                order.CreatedAt,
+                order.UpdatedAt,
+            };
+
+            return Ok(new
+            {
+                statusCode = 200,
+                status = true,
+                message = "訂單資料取得成功",
+                result
+            });
+        }
+    }
     // 請求付款的模型
     public class BlueNewPaymentRequest
     {

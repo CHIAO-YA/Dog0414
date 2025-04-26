@@ -64,11 +64,13 @@ namespace Dog.Models
         [MaxLength(50)]
         public string Region { get; set; }
 
-        [Display(Name = "經度")]
-        public decimal? Longitude { get; set; }
+        //[Display(Name = "經度")]
+        //public decimal? Longitude { get; set; }
 
-        [Display(Name = "緯度")]
-        public decimal? Latitude { get; set; }
+        //[Display(Name = "緯度")]
+        //public decimal? Latitude { get; set; }
+        [Display(Name = "RQcodeStatus")]
+        public RQcodeStatus? RQcodeStatus { get; set; }
 
         [Display(Name = "備註")]
         public string Notes { get; set; }
