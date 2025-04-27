@@ -13,7 +13,7 @@ namespace Dog.Models
         使用者 = 1,
         接單員 = 2,
     }
-    public enum RQcodeStatus
+    public enum QRcodeStatus
     {
         自行列印 = 1,
         郵局貼紙 = 2,

@@ -490,9 +490,9 @@
     <Compile Include="Migrations\202504250913574_qr.Designer.cs">
       <DependentUpon>202504250913574_qr.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202504250939027_0425.cs" />
-    <Compile Include="Migrations\202504250939027_0425.Designer.cs">
-      <DependentUpon>202504250939027_0425.cs</DependentUpon>
+    <Compile Include="Migrations\202504260741212_0426.cs" />
+    <Compile Include="Migrations\202504260741212_0426.Designer.cs">
+      <DependentUpon>202504260741212_0426.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Discount.cs" />
@@ -573,6 +573,7 @@
     <Content Include="Security\dog2.png" />
     <Content Include="Uploads\22acb38a-d0ca-4fac-8f8c-173f67420830.jpg" />
     <Content Include="Uploads\dog.jpg" />
+    <Content Include="Uploads\跑跑狗狗.gif" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -694,8 +695,8 @@
     <EmbeddedResource Include="Migrations\202504250913574_qr.resx">
       <DependentUpon>202504250913574_qr.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504250939027_0425.resx">
-      <DependentUpon>202504250939027_0425.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202504260741212_0426.resx">
+      <DependentUpon>202504260741212_0426.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

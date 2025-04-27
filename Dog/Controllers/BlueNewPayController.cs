@@ -23,7 +23,7 @@ namespace Dog.Controllers
         public IHttpActionResult PaymentReturnPost()
         {
             // 可以自由更換要跳轉的網址
-            string redirectUrl = "https://lebuleduo.rocket-coding.com/GET/user/plans";
+            string redirectUrl = "http://localhost:5173/#/customer/subscribe-success";
             // 或是用這個：
             // string redirectUrl = "https://lebuleduo.vercel.app/#/auth/line/callback";
 

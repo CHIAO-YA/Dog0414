@@ -287,6 +287,11 @@ namespace Dog.Controllers
                 {
                     o.OrdersID,
                     o.OrderNumber,
+                    o.UsersID,
+                    UserNumber = new
+                    {
+                        o.Users.Number,
+                    },
                     o.Plan.PlanName,
                     o.Plan.PlanKG,
                     o.Plan.Liter,
@@ -1109,7 +1114,15 @@ namespace Dog.Controllers
             {
                 orders.Addresses = await addressesContent.ReadAsStringAsync();
             }
+            var qrcodeStatusContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "QRcodeStatus");
+            if (qrcodeStatusContent != null)
+            {
+                string qrcodeStatusStr = await qrcodeStatusContent.ReadAsStringAsync();
+                if (!int.TryParse(qrcodeStatusStr, out int qrcodeStatusValue) || !Enum.IsDefined(typeof(QRcodeStatus), qrcodeStatusValue))
+                    return BadRequest("QRcodeStatus 值無效");
 
+                orders.QRcodeStatus = (QRcodeStatus)qrcodeStatusValue;
+            }
             var weekDayContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "WeekDay");
             if (weekDayContent != null)
             {
@@ -1170,7 +1183,7 @@ namespace Dog.Controllers
             // 重新獲取最新的訂單信息，確保包含最新的總金額
             orders = db.Orders.Find(orders.OrdersID);
             orders.PaymentStatus = PaymentStatus.未付款; // 設置初始付款狀態
-            orders.LinePayMethod = "LinePay";
+            orders.LinePayMethod = "信用卡";
 
 
             // **推算每個服務日期**
@@ -1181,12 +1194,12 @@ namespace Dog.Controllers
             {
                 var orderDetail = new OrderDetails
                 {
-                    OrdersID = orders.OrdersID, // 設置訂單 ID
-                    ServiceDate = serviceDate, // 設置服務日期
-                    OrderStatus = OrderStatus.未排定, // 設置初始狀態
-                    CreatedAt = orders.CreatedAt, // 添加创建时间
-                    UpdatedAt = orders.UpdatedAt,  // 添加更新时间
-                                                   // 明確設置這些欄位為 null
+                    OrdersID = orders.OrdersID,
+                    ServiceDate = serviceDate, 
+                    OrderStatus = OrderStatus.未排定, 
+                    CreatedAt = orders.CreatedAt, 
+                    UpdatedAt = orders.UpdatedAt, 
+                                                  
                     UnScheduled = null,
                     OngoingAt = null,
                     ArrivedAt = null,

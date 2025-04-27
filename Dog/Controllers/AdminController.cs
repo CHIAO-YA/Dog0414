@@ -436,7 +436,7 @@ namespace Dog.Controllers
                     return new
                     {
                         od.OrderDetailID,
-                        OrderName = od.Orders?.OrderName?.Trim()??"",
+                        OrderName = od.Orders?.OrderName?.Trim() ?? "",
                         od.OrderStatus,
                         od.Orders.Region,
                         od.Orders.Plan.PlanName,
@@ -457,21 +457,24 @@ namespace Dog.Controllers
                     statusCode = 200,
                     status = true,
                     message = "成功取得任務派發",
-                    DriversCount = allDrivers.Values.Select(d => new
+                    Amount = new
                     {
                         totalCount,
                         UnScheduled,
                         Scheduled,
                         totalDrivers,
-                        DriverIsOnline,
+                        DriverIsOnline
+                    },
+                    Drivers = allDrivers.Values.Select(d => new
+                    {
                         d.UsersID,
-                        //d.LineName,
                         LineName = d.LineName.Trim(),
                         d.IsOnline,
                         TodayTaskCount = (driverTaskCounts.ContainsKey(d.UsersID) ? driverTaskCounts[d.UsersID] : 0).ToString().Trim(),
                     }).ToList(),
                     result
                 });
+
             }
             catch (Exception ex)
             {
@@ -568,15 +571,15 @@ namespace Dog.Controllers
                     Tasks = driverTasks
                 };
             }).ToList();
-            
-                return Ok(new
-                {
-                    statusCode = 200,
-                    status = true,
-                    message = $"成功分派任務並安排時間",
-                    result
-                });
-            
+
+            return Ok(new
+            {
+                statusCode = 200,
+                status = true,
+                message = $"成功分派任務並安排時間",
+                result
+            });
+
 
         }
 
