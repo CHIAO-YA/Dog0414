@@ -278,14 +278,12 @@ namespace Dog.Controllers
             {
                 return NotFound();
             }
-
+            var oldStatus = orderDetail.OrderStatus;
             var newStatus = (OrderStatus)request.OrderStatus;
             orderDetail.OrderStatus = newStatus;
             var currentTime = DateTime.Now;
             orderDetail.UpdatedAt = currentTime;
             
-
-            // 根據狀態更新對應的時間欄位
             switch (newStatus)
             {
                 case OrderStatus.已排定:
@@ -298,13 +296,70 @@ namespace Dog.Controllers
                     orderDetail.ArrivedAt = currentTime;
                     break;
                 case OrderStatus.已完成:
-                case OrderStatus.異常:  // 異常狀態也記錄在已完成時間
+                case OrderStatus.異常: 
                     orderDetail.CompletedAt = currentTime;
                     break;
-                    // 未排定和已排定狀態不在這個API中處理，它們在其他地方設置
             }
 
             db.SaveChanges();
+
+            // 添加通知邏輯
+            if (oldStatus != newStatus)
+            {
+                // 獲取訂單和用戶信息
+                var order = db.Orders.FirstOrDefault(o => o.OrdersID == orderDetail.OrdersID);
+                if (order != null)
+                {
+                    var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+                    if (user != null && !string.IsNullOrEmpty(user.LineId))
+                    {
+                        // 決定通知類型
+                        string notificationType = "";
+                        switch (newStatus)
+                        {
+                            case OrderStatus.前往中:
+                                notificationType = "收運進行中通知";
+                                break;
+                            case OrderStatus.已抵達:
+                                notificationType = "收運已抵達通知";
+                                break;
+                            case OrderStatus.已完成:
+                                notificationType = "收運已完成通知";
+                                break;
+                            case OrderStatus.異常:
+                                notificationType = "收運異常通知";
+                                break;
+                        }
+
+                        if (!string.IsNullOrEmpty(notificationType))
+                        {
+                            // 創建通知請求
+                            var lineNotification = new LineBotController.OrderStatusUpdateRequest
+                            {
+                                UsersID = user.LineId,
+                                NotificationType = notificationType,
+                                OrderStatus = newStatus.ToString(),
+                                OrderNumber = order.OrderNumber,
+                                TotalAmount = order.TotalAmount.ToString(),
+                                ServiceDate = orderDetail.ServiceDate.ToString("yyyy/MM/dd")
+                            };
+
+                            // 獲取司機上傳的照片URL (如果有)
+                            if (newStatus == OrderStatus.已完成)
+                            {
+                                var photo = db.DriverPhoto.FirstOrDefault(p => p.OrderDetailID == OrderDetailID);
+                                if (photo != null)
+                                {
+                                    lineNotification.OrderImageUrl = photo.DriverImageUrl;
+                                }
+                            }
+                            // 發送LINE通知
+                            var lineBotController = new LineBotController();
+                            lineBotController.OrderStatusWebhook(lineNotification);
+                        }
+                    }
+                }
+            }
 
             return Ok(new
             {
@@ -317,11 +372,6 @@ namespace Dog.Controllers
                     orderDetail.OrderStatus
                 }
             });
-        }
-
-        public class UpdateStatusRequest
-        {
-            public OrderStatus OrderStatus { get; set; }
         }
 
 
@@ -461,6 +511,35 @@ namespace Dog.Controllers
             // 重新加載 OrderDetail 的 DriverPhoto 集合
             db.Entry(OrderDetail).Collection(od => od.DriverPhoto).Load();
 
+            var order = OrderDetail.Orders; // 已經包含在查詢中
+            var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+            if (user != null && !string.IsNullOrEmpty(user.LineId))
+            {
+                string notificationType = isOverWeight ? "收運異常通知" : "收運已完成通知";
+
+                // 創建通知請求
+                var lineNotification = new LineBotController.OrderStatusUpdateRequest
+                {
+                    UsersID = user.LineId,
+                    NotificationType = notificationType,
+                    OrderStatus = OrderDetail.OrderStatus.ToString(),
+                    OrderNumber = order.OrderNumber,
+                    TotalAmount = order.TotalAmount.ToString(),
+                    ServiceDate = OrderDetail.ServiceDate.ToString("yyyy/MM/dd")
+                };
+
+                // 獲取最新上傳的照片URL
+                var photo = OrderDetail.DriverPhoto.FirstOrDefault();
+                if (photo != null)
+                {
+                    lineNotification.OrderImageUrl = photo.DriverImageUrl;
+                }
+
+                // 發送LINE通知
+                var lineBotController = new LineBotController();
+                lineBotController.OrderStatusWebhook(lineNotification);
+            }
+
             return Ok(new
                 {
                     statusCode = 200,
@@ -481,5 +560,10 @@ namespace Dog.Controllers
                     }
                 });
             }
+
+        public class UpdateStatusRequest
+        {
+            public OrderStatus OrderStatus { get; set; }
         }
+    }
     }

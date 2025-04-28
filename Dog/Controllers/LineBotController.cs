@@ -7,11 +7,13 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using isRock.LineBot;
+using Dog.Models;
 
 namespace Dog.Controllers
 {
     public class LineBotController : ApiController
     {
+        Models.Model1 db = new Models.Model1();
         // GET: 測試 API 是否正常運作
         [Route("api/linebot/test")]
         [HttpGet]
@@ -109,19 +111,30 @@ namespace Dog.Controllers
                         System.Diagnostics.Debug.WriteLine("JSON解析成功");
 
                         string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
+                        var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
                         // 確保事件不為空
                         if (receivedMsg.events != null && receivedMsg.events.Count > 0)
                         {
                             var lineEvent = receivedMsg.events[0];
+
+                            if (lineEvent.type == "加入官方帳號通知")
+                            {
+                                string userId = lineEvent.source.userId;
+                                var request = new OrderStatusUpdateRequest
+                                {
+                                    UsersID = userId,
+                                    NotificationType = "follow"
+                                };
+                                Welcome(linebot, request);
+                                return Ok();
+                            }
+
                             // 只處理文字訊息
                             if (lineEvent.type == "message" && lineEvent.message.type == "text")
                             {
                                 string userMsg = lineEvent.message.text;
                                 string replyToken = lineEvent.replyToken;
-
-                                // 建立 LineBot SDK 要使用的 Bot 物件
-                                var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
                                 // 檢查是否包含問題關鍵字
                                 if (userMsg.Contains("問題"))
@@ -198,18 +211,81 @@ namespace Dog.Controllers
                         System.Diagnostics.Debug.WriteLine($"處理訊息失敗: {parseEx.Message}");
                     }
                 }
-
                 return Ok();
             }
             catch (Exception ex)
             {
-                // 記錄錯誤，但仍返回OK
                 System.Diagnostics.Debug.WriteLine($"處理Webhook時出錯: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"錯誤詳情: {ex.StackTrace}");
-                return Ok(); // 不要返回InternalServerError
+                return Ok();
             }
         }
 
+
+
+
+        // 處理訂單狀態變化的請求
+        [HttpPost]
+        [Route("api/linebot/update-order-status")]//假設訂單狀態變了，後台通知你的 Webhook
+        public IHttpActionResult UpdateOrderStatus(int OrdersID, int newStatusValue)
+        {
+            var order = db.Orders.Include("OrderDetails").FirstOrDefault(o => o.OrdersID == OrdersID);
+            if (order == null) return NotFound();
+            var orderDetail = order.OrderDetails.FirstOrDefault();
+            if (orderDetail == null) return NotFound();
+
+            OrderStatus oldStatus = orderDetail.OrderStatus?? OrderStatus.未排定;
+            OrderStatus newStatus = (OrderStatus)newStatusValue;
+            // 更新狀態
+            orderDetail.OrderStatus = newStatus;
+            db.SaveChanges();//不管前端出包、網路斷掉、資料同步錯，Webhook這邊都會確定資料是正確的。
+
+            if (oldStatus != newStatus)
+            {
+                var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+                if (user != null && !string.IsNullOrEmpty(user.LineId))
+                {
+                    // 確定通知類型
+                    string notificationType = DetermineNotificationType(newStatus);
+
+                    // 創建請求
+                    var request = new OrderStatusUpdateRequest
+                    {
+                        UsersID = user.LineId,
+                        OrderStatus = newStatus.ToString(),
+                        OrderNumber = order.OrderNumber,
+                        NotificationType = notificationType,
+                        TotalAmount = order.TotalAmount.ToString(),
+                        ServiceDate = orderDetail.ServiceDate.ToString("yyyyy/MM/dd"),
+                        OrderImageUrl = GetOrderImageIfAvailable(orderDetail.OrderDetailID)
+                    };
+                    return OrderStatusWebhook(request);
+                }
+            }
+            return Ok(new { success = true, message = "訂單狀態已更新，但未發送通知" });
+        }
+        private string DetermineNotificationType(OrderStatus status)
+        {
+            switch (status)
+            {
+                case OrderStatus.已排定: return "訂單已結帳通知";
+                case OrderStatus.前往中: return "收運進行中通知";
+                case OrderStatus.已抵達: return "收運已抵達通知";
+                case OrderStatus.已完成: return "收運已完成通知";
+                case OrderStatus.異常: return "收運異常通知";
+                default: return "";
+            }
+        }
+        // 取圖片
+        private string GetOrderImageIfAvailable(int orderDetailID)
+        {
+            var photo = db.Photo.FirstOrDefault(p => p.PhotoID == orderDetailID);
+            if (photo != null && !string.IsNullOrEmpty(photo.OrderImageUrl))
+            {
+                return photo.OrderImageUrl;
+            }
+            return null;
+        }
         // 資料庫狀態變化 發送LINE訊息
         [Route("api/linebot/order-status-webhook")]
         [HttpPost]
@@ -217,8 +293,7 @@ namespace Dog.Controllers
         {
             try
             {
-                // 驗證請求
-                if (request == null || string.IsNullOrEmpty(request.UserId) || string.IsNullOrEmpty(request.Status))
+                if (request == null || string.IsNullOrEmpty(request.UsersID) || string.IsNullOrEmpty(request.OrderStatus))
                 {
                     return BadRequest("無效的請求資料");
                 }
@@ -226,35 +301,32 @@ namespace Dog.Controllers
                 string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
                 var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
-                //switch (request.NotificationType)
-                //{
-                //    case "加入官方帳號通知":
-                //        Welcome(linebot, request);
-                //        break;
-                //    case "訂單已結帳通知":
-                //        PaymentCompleted(linebot, request);
-                //        break;
-                //    case "收運前1小時通知":
-                //        OneHourBefore(linebot, request);
-                //        break;
-                //    case "收運進行中通知":
-                //        SendOngoing(linebot, request);
-                //        break;
-                //    case "收運已抵達通知":
-                //        SendArrived(linebot, request);
-                //        break;
-                //    case "收運已完成通知":
-                //        SendCompleted(linebot, request);
-                //        break;
-                //    case "收運異常通知":
-                //        SendAbnormal(linebot, request);
-                //        break;
-                //    case "訂閱到期通知":
-                //        SendSubscriptionExpiring(linebot, request);
-                //        break;
-                //    default:
-                //        return BadRequest("不支援的通知類型");
-                //}
+                switch (request.NotificationType)
+                {
+                    case "訂單已結帳通知":
+                        PaymentCompleted(linebot, request);
+                        break;
+                    case "收運前1小時通知":
+                        OneHourBefore(linebot, request);
+                        break;
+                    case "收運進行中通知":
+                        SendOngoing(linebot, request);
+                        break;
+                    case "收運已抵達通知":
+                        SendArrived(linebot, request);
+                        break;
+                    case "收運已完成通知"://包含下次
+                        SendCompleted(linebot, request);
+                        break;
+                    case "收運異常通知":
+                        SendAbnormal(linebot, request);
+                        break;
+                    case "訂閱到期通知":
+                        SendSubscriptionExpiring(linebot, request);
+                        break;
+                    default:
+                        return BadRequest("不支援的通知類型");
+                }
 
                 return Ok(new { success = true, message = "通知已發送" });
             }
@@ -262,21 +334,21 @@ namespace Dog.Controllers
             {
                 System.Diagnostics.Debug.WriteLine($"處理訂單狀態通知出錯: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"錯誤詳情: {ex.StackTrace}");
-                return Ok(new { success = false, message = ex.Message }); 
+                return Ok(new { success = false, message = ex.Message });
             }
         }
 
         // 收運提醒通知
         private void Welcome(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
         {
-            string message = $"♻️ 我們是全台最貼心的垃圾收運平台！\n"+
+            string message = $"♻️ 我們是全台最貼心的垃圾收運平台！\n" +
                              $"只要簡單三步驟，讓你輕鬆垃圾：\n\n" +
-                             $"① 下單預約\n"+
-                             $"② 在垃圾袋貼上 QR Code\n"+
+                             $"① 下單預約\n" +
+                             $"② 在垃圾袋貼上 QR Code\n" +
                              $"③ 等待專人到你收運\n\n" +
-                             $"✨ 還有即時 LINE 通知提醒，垃圾處理更安心！\n"+
+                             $"✨ 還有即時 LINE 通知提醒，垃圾處理更安心！\n" +
                              $"現在就點選下方按鈕開始使用吧👇" +
-                             $"【開始使用】🔗" ;
+                             $"【開始使用】🔗";
 
             var actions = new List<isRock.LineBot.TemplateActionBase>();
             actions.Add(new isRock.LineBot.UriAction()
@@ -287,86 +359,82 @@ namespace Dog.Controllers
 
             var btnTemplate = new isRock.LineBot.ButtonsTemplate()
             {
-               // thumbnailImageUrl = "https://您的GIF圖片網址.gif",
+                thumbnailImageUrl = new Uri("https://raw.githubusercontent.com/CHIAO-YA/DogPhotourl/refs/heads/main/godphoto/%E7%85%A9%E6%83%B1.png"),
                 text = message,
                 title = "🎉 歡迎加入【垃不垃多 Lebuleduo】🎉 ",
                 actions = actions
             };
 
-           // linebot.PushMessage(request.UserId, message, btnTemplate);
+            linebot.PushMessage(request.UsersID, btnTemplate);
         }
-
+        //訂單已結帳通知
+        private void PaymentCompleted(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
+        {
+            string message = $"📦 Lebu-leduo 訂單已結帳成功！ 🛍️\n" +
+                             $"感謝您的訂購！您的垃圾收運服務已成功結帳並排程。\n" +
+                             $"訂單資訊:\n" +
+                             $"您的訂單編號為：{request.OrderNumber}元\n" +
+                             $"金額：{request.TotalAmount}元\n" +
+                             $"如果有任何問題或需要更改，隨時聯繫我們的客服團隊，謝謝您的支持與配合！😊";
+            linebot.PushMessage(request.UsersID, message);
+        }
         // 提前一小時收運通知
-        private void SendUpcomingNotice(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
+        private void OneHourBefore(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
         {
-            string message = $"【收運提醒通知】(收運前1小時)\n" +
-                             $"您的代收服務即將在1小時後開始，請確認垃圾已準備完畢。";
-            linebot.PushMessage(request.UserId, message);
+            string message = $"【Lebu-leduo 小提醒】你今天的垃圾代收服務即將開始！" +
+                             $"請記得將垃圾打包好並貼上 QR 貼紙，擺放在指定位置唷 🐶♻️";
+            linebot.PushMessage(request.UsersID, message);
         }
-
         // 進行中收運通知
-        private void SendInProgressNotice(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
+        private void SendOngoing(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
         {
-            string message = $"【Lebu-leduo 收運進行中】\n" +
+            string message = $"📱【Lebu-leduo 收運進行中】\n" +
                              $"我們正在趕往你指定的地點收運垃圾 🚛\n" +
-                             $"請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙喔～🏷️";
-            linebot.PushMessage(request.UserId, message);
+                             $"請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙喔～🐾";
+            linebot.PushMessage(request.UsersID, message);
         }
-
         // 已抵達收運地點
-        private void SendArrivedNotice(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
+        private void SendArrived(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
         {
-            string message = $"【Lebu-leduo 已抵達收運地點】\n" +
+            string message = $"📱【Lebu-leduo 已抵達收運地點】🏠\n" +
                              $"我們已抵達現場，正在為你收運垃圾 🚛\n" +
                              $"請稍等片刻，服務即將完成，感謝你的耐心與配合 😊";
-            linebot.PushMessage(request.UserId, message);
+            linebot.PushMessage(request.UsersID, message);
         }
-
         // 已完成收運通知
-        private void SendCompletedNotice(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
+        private void SendCompleted(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
         {
-            string message = $"【Lebu-leduo 收運完成】今天的垃圾已成功收運完畢 ✅\n" +
+            string message = $"📋【Lebu-leduo 收運完成】📸\n" +
+                             $"今天的垃圾已成功收運完畢 ✅\n" +
                              $"感謝你的配合，以下是現場照片供你確認～\n" +
-                             $"📸 {request.ImageUrl ?? "(照片連結)"}";
-            linebot.PushMessage(request.UserId, message);
+                             $"📸 {request.OrderImageUrl ?? "(照片連結)"}";
+            linebot.PushMessage(request.UsersID, message);
         }
-
         // 異常收運通知
-        private void SendExceptionNotice(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
+        private void SendAbnormal(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
         {
             string message = $"【Lebu-leduo 通知】我們今天找不到擺放的垃圾 😢\n" +
                              $"請確認垃圾是否擺放在指定地點，如需補收，請回覆客服或重新預約！";
-            linebot.PushMessage(request.UserId, message);
+            linebot.PushMessage(request.UsersID, message);
         }
-
-        // 異常超重補款通知
-        private void SendOverweightNotice(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
+        // 訂閱到期通知
+        private void SendSubscriptionExpiring(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
         {
-            string amount = request.Amount ?? "40";
-            string message = $"【超出方案範圍】本次垃圾超重，需補款 ${amount} 元 💰\n" +
-                             $"請點擊以下連結完成補款，服務將正常進行～\n" +
-                             $"👉 {request.PaymentUrl ?? "[立即補款]"}";
-            linebot.PushMessage(request.UserId, message);
-        }
-
-        // 下次收運通知
-        private void SendNextTimeNotice(isRock.LineBot.Bot linebot, OrderStatusUpdateRequest request)
-        {
-            string nextDate = request.NextDate ?? "下週同一時間";
+            string nextDate = request.ServiceDate ?? "下週同一時間";
             string message = $"【下次收運通知】您的下次收運時間為：{nextDate}，請記得準備好垃圾喔～";
-            linebot.PushMessage(request.UserId, message);
+            linebot.PushMessage(request.UsersID, message);
         }
 
         // 接收訂單狀態更新請求的模型
         public class OrderStatusUpdateRequest
         {
-            public string UserId { get; set; }        // LINE用戶ID
-            public string Status { get; set; }         // 訂單狀態
+            public string UsersID { get; set; }
+            public string NotificationType { get; set; }
+            public string OrderStatus { get; set; }         // 訂單狀態
             public string OrderNumber { get; set; }    // 訂單編號
-            public string ImageUrl { get; set; }       // 圖片URL（如有）
-            public string Amount { get; set; }         // 金額（用於超重補款）
-            public string PaymentUrl { get; set; }     // 支付連結（用於超重補款）
-            public string NextDate { get; set; }       // 下次收運日期
+            public string OrderImageUrl { get; set; }       // 圖片URL（如有）
+            public string TotalAmount { get; set; }         // 金額（用於超重補款）
+            public string ServiceDate { get; set; }       // 下次收運日期
         }
     }
 

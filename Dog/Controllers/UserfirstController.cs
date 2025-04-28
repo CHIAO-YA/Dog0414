@@ -1023,10 +1023,9 @@ namespace Dog.Controllers
             // 設定上傳路徑
             string uploadPath = HttpContext.Current.Server.MapPath("~/Uploads/");
             Directory.CreateDirectory(uploadPath); // 確保資料夾存在
-                                                   // 讀取multipart請求內容
+            // 讀取multipart請求內容
             var provider = await Request.Content.ReadAsMultipartAsync();
            
-            // 從表單欄位建立Orders物件
             var orders = new Orders();
 
             // 讀取文字欄位
@@ -1400,32 +1399,6 @@ namespace Dog.Controllers
             return null; // 格式錯誤
         }
 
-        //private List<DateTime> GetTargetDates(List<Orders> orders, DateTime today)
-        //{
-        //    List<DateTime> targetDates = new List<DateTime>();// 建立一個清單來存放所有符合條件的日期
-        //    foreach (var order in orders)// 逐筆處理訂單
-        //    {
-        //        // 確保這筆訂單的開始日期、結束日期有值，且有指定星期幾
-        //        if (order.StartDate.HasValue && order.EndDate.HasValue && order.WeekDay != null)
-        //        {
-        //            // 把開始跟結束日期取出來（只取日期，不含時間）
-        //            DateTime startDate = order.StartDate.Value.Date;
-        //            DateTime endDate = order.EndDate.Value.Date;
-        //            // 將 WeekDay 的字串（例如 "1,3,5"）轉成整數清單 [1, 3, 5]
-        //            List<int> weekDays = order.WeekDay.Split(',').Select(s => int.Parse(s)).ToList();
-        //            // 從開始日期跑到結束日期，每天都檢查一次
-        //            for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
-        //            {
-        //                // 如果這一天的星期幾跟訂單指定的一樣，就加進清單
-        //                if (weekDays.Contains((int)date.DayOfWeek))
-        //                {
-        //                    targetDates.Add(date);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return targetDates;// 回傳所有符合條件的日期
-        //}
 
 
         private string GetOrderNumber(int OrdersID)//自動產生唯一編號不重複OrderNumber

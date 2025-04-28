@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Web.Http;
 using System.Data.Entity;
+using static Dog.Controllers.LineBotController;
 
 
 namespace Dog.Controllers
@@ -23,10 +24,10 @@ namespace Dog.Controllers
         public IHttpActionResult PaymentReturnPost()
         {
             // 可以自由更換要跳轉的網址
-            string redirectUrl = "http://localhost:5173/#/customer/subscribe-success";
+            string redirectUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success";
             // 或是用這個：
             // string redirectUrl = "https://lebuleduo.vercel.app/#/auth/line/callback";
-
+            //http://localhost:5173/#/customer/subscribe-success
             var html = $@"<html>
                     <head>
                         <meta charset='utf-8'/>
@@ -149,6 +150,24 @@ namespace Dog.Controllers
                     order.PaymentStatus = PaymentStatus.已付款;
                     order.UpdatedAt = DateTime.Now;
                     db.SaveChanges();
+
+                    // 獲取用戶LINE ID
+                    var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+                    if (user != null && !string.IsNullOrEmpty(user.LineId))
+                    {
+                        // 創建通知請求
+                        var linerequest = new OrderStatusUpdateRequest
+                        {
+                            UsersID = user.LineId,
+                            NotificationType = "訂單已結帳通知",
+                            OrderNumber = order.OrderNumber,
+                            TotalAmount = order.TotalAmount.ToString()
+                        };
+
+                        // 調用您的LineBot控制器發送通知
+                        var lineBotController = new LineBotController();
+                        lineBotController.OrderStatusWebhook(linerequest);
+                    }
                 }
                 else
                 {

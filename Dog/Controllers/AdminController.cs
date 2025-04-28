@@ -436,6 +436,7 @@ namespace Dog.Controllers
                     return new
                     {
                         od.OrderDetailID,
+                        od.OrderDetailsNumber,
                         OrderName = od.Orders?.OrderName?.Trim() ?? "",
                         od.OrderStatus,
                         od.Orders.Region,
