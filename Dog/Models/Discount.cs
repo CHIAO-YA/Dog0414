@@ -9,6 +9,7 @@ namespace Dog.Models
 {
     public class Discount
     {
+
         [Key]
         [Display(Name = "折扣ID")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

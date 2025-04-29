@@ -1232,9 +1232,9 @@ namespace Dog.Controllers
 
                 // 檢查檔案大小
                 var fileBytes = await fileData.ReadAsByteArrayAsync();
-                if (fileBytes.Length > 5 * 1024 * 1024) // 5MB
+                if (fileBytes.Length > 15 * 1024 * 1024) // 5MB
                 {
-                    return BadRequest("圖片大小不能超過 5MB");
+                    return BadRequest("圖片大小不能超過 15MB");
                 }
 
                 // 生成新檔名避免衝突
@@ -1255,6 +1255,7 @@ namespace Dog.Controllers
                     UpdatedAt = orders.UpdatedAt
                 };
                 db.Photo.Add(photo);
+                
             }
 
             db.SaveChanges();
