@@ -25,6 +25,10 @@ namespace Dog.Models
         [Display(Name = "使用者角色")]
         public Role Roles { get; set; }
 
+        [Display(Name = "MessageUserId")]
+        [MaxLength(200)]
+        public string MessageuserId { get; set; }
+
         [Display(Name = "Line名稱")]
         [MaxLength(50)]
         public string LineName { get; set; }

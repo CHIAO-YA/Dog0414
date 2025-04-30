@@ -179,7 +179,7 @@ namespace Dog.Controllers
                     {
                         DriverID,
                         Number = Driver.Number.Trim(),
-                        DriverName = Driver.LineId.Trim(),
+                        DriverName = Driver.LineName.Trim(),
                         Day = Day.ToString("yyyy/MM/dd"),
                         TodayActiveStatus,
                         TodayCompletedStatus
@@ -301,94 +301,55 @@ namespace Dog.Controllers
                     orderDetail.CompletedAt = currentTime;
                     break;
             }
-
             db.SaveChanges();
+            if (oldStatus != newStatus)
+            {
+                // 獲取訂單和用戶信息
+                var order = db.Orders.FirstOrDefault(o => o.OrdersID == orderDetail.OrdersID);
+                if (order != null)
+                {
+                    var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+                    if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"用戶 LineId: {user.MessageuserId}");
+                        // 取得 Channel Access Token
+                        string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
+                        var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
-            // 添加通知邏輯
-            //if (oldStatus != newStatus)
-            //{
-            //    try
-            //    {
-            //        // 獲取訂單和用戶信息
-            //        var order = db.Orders.FirstOrDefault(o => o.OrdersID == orderDetail.OrdersID);
-            //        if (order != null)
-            //        {
-            //            var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
-            //            if (user != null && !string.IsNullOrEmpty(user.LineId))
-            //            {
-            //                System.Diagnostics.Debug.WriteLine($"用戶 LineId: {user.LineId}");
-            //                // 取得 Channel Access Token
-            //                string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
-            //                var linebot = new isRock.LineBot.Bot(channelAccessToken);
+                        var cleanMessageuserId = user.MessageuserId
+                       .Trim()
+                       .Replace("\n", "")
+                       .Replace("\r", "")
+                       .Replace(" ", "");
+                        // 決定通知類型
+                        string notificationType = "";
+                        string messageContent = "";
+                        switch (newStatus)
+                        {
+                            case OrderStatus.前往中:
+                                notificationType = "收運進行中通知";
+                                linebot.PushMessage(cleanMessageuserId, $"📱【Lebu-leduo 收運進行中】\n我們正在趕往你指定的地點收運垃圾 🚛\n請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙喔～🐾");
+                                break;
+                            case OrderStatus.已抵達:
+                                notificationType = "收運已抵達通知";
+                                linebot.PushMessage(cleanMessageuserId, $"📱【Lebu-leduo 已抵達收運地點】🏠\n我們已抵達現場，正在為你收運垃圾 🚛\n請稍等片刻，服務即將完成，感謝你的耐心與配合 😊");
+                                break;
+                            case OrderStatus.已完成:
+                                notificationType = "收運已完成通知";
+                                // 獲取司機上傳的照片URL (如果有)
+                                var photo = db.DriverPhoto.FirstOrDefault(p => p.OrderDetailID == OrderDetailID);
+                                string imageUrl = photo != null ? photo.DriverImageUrl : "(照片連結)";
 
-            //                var cleanLineId = user.LineId
-            //               .Trim()
-            //               .Replace("\n", "")
-            //               .Replace("\r", "")
-            //               .Replace(" ", "");
-            //                // 決定通知類型
-            //                string notificationType = "";
-            //                string messageContent = "";
-            //                switch (newStatus)
-            //                {
-            //                    case OrderStatus.前往中:
-            //                        notificationType = "收運進行中通知";
-            //                        linebot.PushMessage(cleanLineId, $"📱【Lebu-leduo 收運進行中】\n我們正在趕往你指定的地點收運垃圾 🚛\n請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙喔～🐾");
-            //                        break;
-            //                    case OrderStatus.已抵達:
-            //                        notificationType = "收運已抵達通知";
-            //                        linebot.PushMessage(cleanLineId, $"📱【Lebu-leduo 已抵達收運地點】🏠\n我們已抵達現場，正在為你收運垃圾 🚛\n請稍等片刻，服務即將完成，感謝你的耐心與配合 😊");
-            //                        break;
-            //                    case OrderStatus.已完成:
-            //                        notificationType = "收運已完成通知";
-            //                        // 獲取司機上傳的照片URL (如果有)
-            //                        var photo = db.DriverPhoto.FirstOrDefault(p => p.OrderDetailID == OrderDetailID);
-            //                        string imageUrl = photo != null ? photo.DriverImageUrl : "(照片連結)";
-
-            //                        linebot.PushMessage(cleanLineId, $"📋【Lebu-leduo 收運完成】📸\n今天的垃圾已成功收運完畢 ✅\n感謝你的配合，以下是現場照片供你確認～\n📸 {imageUrl}");
-            //                        break;
-            //                    case OrderStatus.異常:
-            //                        notificationType = "收運異常通知";
-            //                        linebot.PushMessage(cleanLineId, $"【Lebu-leduo 通知】我們今天找不到擺放的垃圾 😢\n請確認垃圾是否擺放在指定地點，如需補收，請回覆客服或重新預約！");
-            //                        break;
-            //                }
-
-            //                System.Diagnostics.Debug.WriteLine($"準備發送通知類型: {notificationType}");
-            //                System.Diagnostics.Debug.WriteLine($"訊息內容: {messageContent}");
-
-            //                try
-            //                {
-            //                    linebot.PushMessage(cleanLineId, messageContent);
-            //                    System.Diagnostics.Debug.WriteLine($"LINE訊息發送成功");
-            //                }
-            //                catch (Exception innerEx)
-            //                {
-            //                    System.Diagnostics.Debug.WriteLine($"LINE訊息發送失敗: {innerEx.Message}");
-            //                    System.Diagnostics.Debug.WriteLine($"詳細錯誤: {innerEx}");
-            //                    // 即使LINE通知失敗，也繼續處理訂單狀態更新
-            //                }
-
-            //                System.Diagnostics.Debug.WriteLine($"通知類型: {notificationType} 處理完成");
-            //            }
-            //            else
-            //            {
-            //                System.Diagnostics.Debug.WriteLine("用戶不存在或没有LINE ID");
-            //            }
-            //        }
-            //        else
-            //        {
-            //            System.Diagnostics.Debug.WriteLine("找不到相關訂單");
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        // 捕獲整個通知過程中可能發生的任何錯誤
-            //        System.Diagnostics.Debug.WriteLine($"通知過程發生錯誤: {ex.Message}");
-            //        System.Diagnostics.Debug.WriteLine($"詳細錯誤: {ex}");
-            //        // 即使通知過程出錯，訂單狀態更新應該仍然成功
-            //    }
-            //}
-
+                                linebot.PushMessage(cleanMessageuserId, $"📋【Lebu-leduo 收運完成】📸\n今天的垃圾已成功收運完畢 ✅\n感謝你的配合，以下是現場照片供你確認～\n📸 {imageUrl}");
+                                break;
+                            case OrderStatus.異常:
+                                notificationType = "收運異常通知";
+                                linebot.PushMessage(cleanMessageuserId, $"【Lebu-leduo 通知】我們今天找不到擺放的垃圾 😢\n請確認垃圾是否擺放在指定地點，如需補收，請回覆客服或重新預約！");
+                                break;
+                        }
+                    }
+                }
+            }
             return Ok(new
             {
                 statusCode = 200,
@@ -541,22 +502,18 @@ namespace Dog.Controllers
 
             var order = OrderDetail.Orders; // 已經包含在查詢中
             var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
-            if (user != null && !string.IsNullOrEmpty(user.LineId))
+            if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
             {
                 // 取得 Channel Access Token
                 string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
                 var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
-                var cleanLineId = user.LineId
+                var cleanMessageuserId = user.MessageuserId
                .Trim()                       // 移除前後空格
                .Replace("\n", "")            // 移除換行符
                .Replace("\r", "")            // 移除回車符
                .Replace(" ", "")             // 移除空格
                .Replace("\t", "");           // 移除tab
-
-                // 獲取最新上傳的照片URL
-                //var photo = OrderDetail.DriverPhoto.FirstOrDefault();
-                //string imageUrl = photo != null ? photo.DriverImageUrl : "(照片連結)";
 
                 string message;
                 if (isOverWeight)
@@ -572,22 +529,13 @@ namespace Dog.Controllers
                               $"訂單編號：{order.OrderNumber}\n" +
                               $"今天的垃圾已成功收運完畢 ✅\n" +
                               $"垃圾重量：{OrderDetail.KG} KG\n" +
-                              $"感謝你的配合，以下是現場照片供你確認～\n";
-                             // $"📸 {imageUrl}";
+                              $"感謝你的配合～\n";
                 }
-                // 測試1：基本文字
-                linebot.PushMessage(cleanLineId, "📋訂單已完成📸");
-
-                // 測試2：添加表情符號
-                linebot.PushMessage(cleanLineId, "📋訂單已完成📸");
-
-                // 測試3：添加URL
-                linebot.PushMessage(cleanLineId, "訂單已完成 https://example.com/image.jpg");
-                // 直接發送訊息
-                linebot.PushMessage(cleanLineId, message);
+                linebot.PushMessage(cleanMessageuserId, "📋訂單已完成📸");
+                linebot.PushMessage(cleanMessageuserId, message);
 
                 System.Diagnostics.Debug.WriteLine($"發送通知類型: {(isOverWeight ? "收運異常通知" : "收運已完成通知")}");
-                System.Diagnostics.Debug.WriteLine($"用戶 LineId: {cleanLineId}");
+                System.Diagnostics.Debug.WriteLine($"用戶 MessageuserId: {cleanMessageuserId}");
             }
 
             return Ok(new

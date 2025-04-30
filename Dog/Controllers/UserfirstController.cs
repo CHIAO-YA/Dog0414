@@ -738,7 +738,7 @@ namespace Dog.Controllers
             var PhotoID = new List<int>();
             foreach (var content in provider.Contents)
             {
-                if (content.Headers.ContentDisposition.Name.Trim('"') == "GetPhotoID[]")
+                if (content.Headers.ContentDisposition.Name.Trim('"') == "DeletePhotos")
                 {
                     var val = await content.ReadAsStringAsync();
                     if (int.TryParse(val, out int id))

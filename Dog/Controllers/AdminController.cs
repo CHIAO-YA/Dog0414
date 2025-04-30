@@ -495,10 +495,11 @@ namespace Dog.Controllers
             var today = DateTime.Today;
             //挑出被勾選的任務
             var allTaskIds = request.Assign.SelectMany(d => d.Tasks).Distinct().ToList();
+            var targetDate = request.ServiceDate?.Date ?? DateTime.Today;
             var taskDetails = db.OrderDetails
                              .Include(od => od.Orders)
                              .Where(od => allTaskIds.Contains(od.OrderDetailID) &&
-                 DbFunctions.TruncateTime(od.ServiceDate) == today &&
+                 DbFunctions.TruncateTime(od.ServiceDate) == targetDate &&
                  (od.OrderStatus == OrderStatus.未排定 ||
                   od.OrderStatus == OrderStatus.已排定)).ToList();
 
@@ -514,7 +515,7 @@ namespace Dog.Controllers
             {
                 var TaskCount = db.OrderDetails.Count(od =>
                                 od.DriverID == Assign.DriverID &&
-                                DbFunctions.TruncateTime(od.ServiceDate) == today);
+                                DbFunctions.TruncateTime(od.ServiceDate) == targetDate);
 
                 if (TaskCount + Assign.Tasks.Count > 25)
                 {
@@ -528,7 +529,7 @@ namespace Dog.Controllers
                     .OrderBy(t => t.Orders.Region)
                     .ThenBy(t => t.Orders.CreatedAt)
                     .ToList();
-                var startTime = DateTime.Today.AddHours(9);
+                var startTime = targetDate.AddHours(9);
 
                 foreach (var task in driverTasks)
                 {
@@ -586,6 +587,7 @@ namespace Dog.Controllers
 
         public class TaskRequest// 整個任務分派的請求
         {
+            public DateTime? ServiceDate { get; set; }
             public List<AssignTask> Assign { get; set; } // 每個分派指令都表示「要將哪些任務分派給哪個司機」
         }
 

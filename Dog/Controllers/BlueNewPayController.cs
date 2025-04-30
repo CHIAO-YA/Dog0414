@@ -11,22 +11,30 @@ using System.Web.Http;
 using System.Data.Entity;
 using static Dog.Controllers.LineBotController;
 using isRock.LineBot;
+using System.Configuration;
 
 namespace Dog.Controllers
 {
     public class BlueNewPayController : ApiController
     {
+        private string channelAccessToken = ConfigurationManager.AppSettings["LineChannelAccessToken"];
+        private string channelSecret = ConfigurationManager.AppSettings["LineChannelSecret"];
         private readonly BlueNewPayService _blueNewPayService = new BlueNewPayService();
         Models.Model1 db = new Models.Model1();
 
-        [HttpPost]
+        [HttpPost, HttpGet]
         [Route("Post/bluenew/return")]
         public IHttpActionResult PaymentReturnPost()
         {
+            //bool isProductionAvailable = CheckUrlAvailable("https://lebuleduo.vercel.app/#/customer/subscribe-success");
+            //string redirectUrl = isProductionAvailable
+            //    ? "https://lebuleduo.vercel.app/#/customer/subscribe-success"
+            //    : "http://localhost:5173/#/customer/subscribe-success";
+
             // 可以自由更換要跳轉的網址
             string redirectUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success";
-            //https://lebuleduo.vercel.app/#/customer/subscribe-success
-            //http://localhost:5173/#/customer/subscribe-success
+            ////https://lebuleduo.vercel.app/#/customer/subscribe-success
+            ////http://localhost:5173/#/customer/subscribe-success
             var html = $@"<html>
                     <head>
                         <meta charset='utf-8'/>
@@ -151,48 +159,24 @@ namespace Dog.Controllers
                 db.SaveChanges();
 
                     var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
-                    if (user != null && !string.IsNullOrEmpty(user.LineId))
+                    if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
                     {
-                        string channelAccessToken = "你的 Channel Access Token";
                         string msg = $"📦 Lebu-leduo 訂單已結帳成功！ 🛍️\n" +
                                      $"感謝您的訂購！您的垃圾收運服務已成功結帳並排程。\n\n" +
                                      $"訂單資訊：\n" +
                                      $"訂單編號：{order.OrderNumber}\n" +
-                                     $"訂單ID：{order.OrdersID}\n" +
+                                     $"支付方式：{order.LinePayMethod}\n" +
                                      $"金額：{order.TotalAmount} 元\n\n" +
                                      $"如有任何問題，歡迎隨時聯繫客服 😊";
 
-                        string cleanLineId = user.LineId.Trim().Replace("\n", "") .Replace("\r", "").Replace(" ", ""); 
+                        string cleanMessageuserId = user.MessageuserId.Trim().Replace("\n", "").Replace("\r", "").Replace(" ", "");
 
-                        isRock.LineBot.Utility.PushMessage(channelAccessToken, cleanLineId, msg);
+                        // 發送 LINE 訊息
+                        var lineBot = new isRock.LineBot.Bot(channelAccessToken);
+                        lineBot.PushMessage(cleanMessageuserId, msg);
+                        System.Diagnostics.Debug.WriteLine($"發送付款成功通知");
+                        System.Diagnostics.Debug.WriteLine($"用戶 LineId: {cleanMessageuserId}");
                     }
-
-                    //// 獲取用戶LINE ID
-                    //var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
-                    //if (user != null && !string.IsNullOrEmpty(user.LineId))
-                    //{
-                    //    // 取得 Channel Access Token
-                    //    string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
-                    //    var linebot = new isRock.LineBot.Bot(channelAccessToken);
-                    //        var cleanLineId = user.LineId
-                    //       .Trim()
-                    //       .Replace("\n", "")
-                    //       .Replace("\r", "")
-                    //       .Replace(" ", "");
-                    //        // 發送付款成功通知
-                    //        string message = $"📦 Lebu-leduo 訂單已結帳成功！ 🛍️\n" +
-                    //                     $"感謝您的訂購！您的垃圾收運服務已成功結帳並排程。\n" +
-                    //                     $"訂單資訊:\n" +
-                    //                     $"訂單編號：{order.OrderNumber}\n" +
-                    //                     $"金額：{order.TotalAmount} 元\n" +
-                    //                     $"如有任何問題，歡迎聯繫客服 😊";
-
-                    //    // 直接發送訊息
-                    //    linebot.PushMessage(cleanLineId, message);
-
-                    //    System.Diagnostics.Debug.WriteLine($"發送付款成功通知");
-                    //    System.Diagnostics.Debug.WriteLine($"用戶 LineId: {cleanLineId}");
-                    //}
                 }
             else
                 {

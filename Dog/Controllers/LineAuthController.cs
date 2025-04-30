@@ -49,9 +49,14 @@ namespace Dog.Controllers
             // 從配置檔或環境設定獲取LINE的應用程式資訊
             string channelId = "2007121127";
             string channelSecret = "d7c30599e53dc2aa970728521d61d2c3";
+            bool isDev = true;
+            //string redirectUri = isDev
+            //    ? "http://localhost:5173/auth/line/callback"
+            //    : "https://lebuleduo.vercel.app/auth/line/callback";
+
             string redirectUri = "https://lebuleduo.vercel.app/#/auth/line/callback";//LINE 授權過程中使用的重定向 URL
-            //http://localhost:5173/#/auth/line/callback
-            //https://lebuleduo.vercel.app/#/auth/line/callback
+            ////http://localhost:5173/#/auth/line/callback
+            ////https://lebuleduo.vercel.app/#/auth/line/callback
             try
             {
                 //「我拿使用者從 LINE 那邊登入完後得到的授權碼 code，去跟 LINE 官方說：
