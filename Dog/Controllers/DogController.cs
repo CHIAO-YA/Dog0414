@@ -282,23 +282,23 @@ namespace Dog.Controllers
             var oldStatus = orderDetail.OrderStatus;
             var newStatus = (OrderStatus)request.OrderStatus;
             orderDetail.OrderStatus = newStatus;
-            var currentTime = DateTime.Now;
-            orderDetail.UpdatedAt = currentTime;
+            DateTime taiwanNow = GetTaiwanTime();
+            orderDetail.UpdatedAt = taiwanNow;
 
             switch (newStatus)
             {
                 case OrderStatus.已排定:
-                    orderDetail.ScheduledAt = currentTime;
+                    orderDetail.ScheduledAt = taiwanNow;
                     break;
                 case OrderStatus.前往中:
-                    orderDetail.OngoingAt = currentTime;
+                    orderDetail.OngoingAt = taiwanNow;
                     break;
                 case OrderStatus.已抵達:
-                    orderDetail.ArrivedAt = currentTime;
+                    orderDetail.ArrivedAt = taiwanNow;
                     break;
                 case OrderStatus.已完成:
                 case OrderStatus.異常:
-                    orderDetail.CompletedAt = currentTime;
+                    orderDetail.CompletedAt = taiwanNow;
                     break;
             }
             db.SaveChanges();
@@ -393,13 +393,12 @@ namespace Dog.Controllers
             var issueDescriptionContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "IssueDescription");
             string IssueDescription = issueDescriptionContent != null ? await issueDescriptionContent.ReadAsStringAsync() : null;
 
-            // 6. 【統一記錄當前時間】
-            var currentTime = DateTime.Now;
-
+            // 取得台灣時間
+            DateTime taiwanNow = GetTaiwanTime();
             // 7. 更新重量與時間
             OrderDetail.KG = kg;
-            OrderDetail.UpdatedAt = currentTime;
-            OrderDetail.CompletedAt = currentTime;
+            OrderDetail.UpdatedAt = taiwanNow;
+            OrderDetail.CompletedAt = taiwanNow;
 
             // 檢查是否超過計畫重量【KG > 計畫重量】→ 狀態改為 異常回報
             bool isOverWeight = kg > OrderDetail.Orders.Plan.PlanKG;
@@ -407,7 +406,7 @@ namespace Dog.Controllers
             {
                 // 異常回報
                 OrderDetail.OrderStatus = OrderStatus.異常;
-                OrderDetail.ReportedAt = currentTime;// 填 ReportedAt
+                OrderDetail.ReportedAt = taiwanNow;// 填 ReportedAt
                 if (!string.IsNullOrEmpty(CommonIssues))// 填 CommonIssues
                 {
                     if (Enum.TryParse<CommonIssues>(CommonIssues, out var parsedIssue))
@@ -421,7 +420,7 @@ namespace Dog.Controllers
             else//【KG ≤ 計畫重量】→ 狀態改為 CompletedAt已完成
             {
                 OrderDetail.OrderStatus = OrderStatus.已完成;
-                OrderDetail.CompletedAt = currentTime;
+                OrderDetail.CompletedAt = taiwanNow;
                 // 清除異常回報時間（如果有的話）
                 OrderDetail.ReportedAt = null;
             }
@@ -490,8 +489,8 @@ namespace Dog.Controllers
                 {
                     OrderDetailID = OrderDetailID,
                     DriverImageUrl = virtualPath,
-                    CreatedAt = currentTime,
-                    UpdatedAt = currentTime
+                    CreatedAt = taiwanNow,
+                    UpdatedAt = taiwanNow
                 });
             }
 
@@ -563,5 +562,11 @@ namespace Dog.Controllers
         {
             public OrderStatus OrderStatus { get; set; }
         }
+        private DateTime GetTaiwanTime()
+        {
+            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, taiwanTimeZone);
+        }
+
     }
 }

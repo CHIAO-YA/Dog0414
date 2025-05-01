@@ -597,5 +597,7 @@ namespace Dog.Controllers
             public List<int> Tasks { get; set; }//分派給司機的任務ID列表
         }
 
+
+
     }
 }

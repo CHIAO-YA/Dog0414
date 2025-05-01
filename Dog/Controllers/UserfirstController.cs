@@ -770,7 +770,9 @@ namespace Dog.Controllers
                 }
                 db.SaveChanges();
             }
-            var currentTime = DateTime.Now;
+            // 設定台灣時區時間
+            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            DateTime taiwanNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, taiwanTimeZone);
             var newPhotoUrls = new List<string>();
             //新增圖片
             foreach (var fileData in provider.Contents)
@@ -804,12 +806,12 @@ namespace Dog.Controllers
                 {
                     OrdersID = order.OrdersID,
                     OrderImageUrl = virtualPath,
-                    CreatedAt = currentTime,
-                    UpdatedAt = currentTime
+                    CreatedAt = taiwanNow,
+                    UpdatedAt = taiwanNow
                 });
             }
             // 更新訂單的 UpdatedAt 欄位為當前時間
-            order.UpdatedAt = currentTime;
+            order.UpdatedAt = taiwanNow;
             db.SaveChanges();
             return Ok(new
             {
@@ -1095,7 +1097,11 @@ namespace Dog.Controllers
             {
                 orders.LinePayMethod = await linePayMethodContent.ReadAsStringAsync();
             }
-
+            // 若為空或 null，預設為信用卡
+            if (string.IsNullOrEmpty(orders.LinePayMethod))
+            {
+                orders.LinePayMethod = "信用卡";
+            }
             var orderNameContent = provider.Contents.FirstOrDefault(c => c.Headers.ContentDisposition.Name.Trim('"') == "OrderName");
             if (orderNameContent != null)
             {
@@ -1156,10 +1162,11 @@ namespace Dog.Controllers
             {
                 orders.Notes = await notesContent.ReadAsStringAsync();
             }
-            //時差
-            var currentTimeUtc = DateTime.Now;
-            orders.CreatedAt = currentTimeUtc;
-            orders.UpdatedAt = currentTimeUtc;
+            // 設定台灣時區時間
+            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            DateTime taiwanNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, taiwanTimeZone);
+            orders.CreatedAt = taiwanNow;
+            orders.UpdatedAt = taiwanNow;
 
             // **計算 EndDate**
             var Months = db.Discount.FirstOrDefault(d => d.DiscountID == orders.DiscountID);
@@ -1182,8 +1189,6 @@ namespace Dog.Controllers
             // 重新獲取最新的訂單信息，確保包含最新的總金額
             orders = db.Orders.Find(orders.OrdersID);
             orders.PaymentStatus = PaymentStatus.未付款; // 設置初始付款狀態
-            orders.LinePayMethod = "信用卡";
-
 
             // **推算每個服務日期**
             var serviceDates = GetServiceDates(orders.StartDate.Value, orders.EndDate.Value, orders.WeekDay);
@@ -1196,8 +1201,8 @@ namespace Dog.Controllers
                     OrdersID = orders.OrdersID,
                     ServiceDate = serviceDate, 
                     OrderStatus = OrderStatus.未排定, 
-                    CreatedAt = orders.CreatedAt, 
-                    UpdatedAt = orders.UpdatedAt, 
+                    CreatedAt = taiwanNow, 
+                    UpdatedAt = taiwanNow, 
                                                   
                     UnScheduled = null,
                     OngoingAt = null,
@@ -1251,8 +1256,8 @@ namespace Dog.Controllers
                 {
                     OrdersID = orders.OrdersID,
                     OrderImageUrl = virtualPath,
-                    CreatedAt = orders.CreatedAt,
-                    UpdatedAt = orders.UpdatedAt
+                    CreatedAt = taiwanNow,
+                    UpdatedAt = taiwanNow
                 };
                 db.Photo.Add(photo);
                 
