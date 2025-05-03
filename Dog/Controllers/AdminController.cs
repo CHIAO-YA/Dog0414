@@ -443,6 +443,8 @@ namespace Dog.Controllers
                         od.Orders.Plan.PlanName,
                         od.DriverTimeStart,
                         od.DriverTimeEnd,
+                        od.ServiceDate,
+                        od.Orders.OrderPhone,
                         ResponsibleDriver = EveryDriver
                     };
                 }).ToList();
@@ -522,6 +524,28 @@ namespace Dog.Controllers
                     return BadRequest($"司機 {IsOnlineDrivers[Assign.DriverID].LineName} 分配後將超過每日上限(25筆)");
                 }
             }
+            //檢查司機時間不重疊
+            var driverExistingSchedules = new Dictionary<int, List<Tuple<DateTime, DateTime>>>();
+
+            foreach (var driverId in Driver)
+            {
+                var existingTasks = db.OrderDetails
+                    .Where(od => od.DriverID == driverId &&
+                           DbFunctions.TruncateTime(od.ServiceDate) == targetDate &&
+                           od.OrderStatus == OrderStatus.已排定 &&
+                           od.DriverTimeStart != null &&
+                           od.DriverTimeEnd != null)
+                    .Select(t => new {
+                        Start = t.DriverTimeStart.Value,
+                        End = t.DriverTimeEnd.Value
+                    })
+                    .ToList();
+
+                driverExistingSchedules[driverId] = existingTasks
+                    .Select(t => new Tuple<DateTime, DateTime>(t.Start, t.End))
+                    .ToList();
+            }
+
             foreach (var Assign in request.Assign)
             {
                 var driverTasks = taskDetails
@@ -531,9 +555,37 @@ namespace Dog.Controllers
                     .ToList();
                 var startTime = targetDate.AddHours(9);
 
+                var existingSchedules = driverExistingSchedules.ContainsKey(Assign.DriverID)
+            ? driverExistingSchedules[Assign.DriverID]
+            : new List<Tuple<DateTime, DateTime>>();
+
                 foreach (var task in driverTasks)
                 {
                     var endTime = startTime.AddMinutes(30);
+                    bool timeConflict = true;
+
+                    // 尋找無衝突的時間段
+                    while (timeConflict)
+                    {
+                        timeConflict = false;
+
+                        // 檢查是否與現有排程衝突
+                        foreach (var schedule in existingSchedules)
+                        {
+                            // 檢查重疊：新任務的開始時間在已有任務的時間範圍內，或新任務的結束時間在已有任務的時間範圍內
+                            if ((startTime >= schedule.Item1 && startTime < schedule.Item2) ||
+                                (endTime > schedule.Item1 && endTime <= schedule.Item2) ||
+                                (startTime <= schedule.Item1 && endTime >= schedule.Item2))
+                            {
+                                timeConflict = true;
+                                // 嘗試從已有任務的結束時間開始
+                                startTime = schedule.Item2;
+                                endTime = startTime.AddMinutes(30);
+                                break;
+                            }
+                        }
+                    }
+
                     task.DriverID = Assign.DriverID;
                     task.OrderStatus = OrderStatus.已排定;
                     task.DriverTimeStart = startTime;
@@ -541,11 +593,13 @@ namespace Dog.Controllers
                     task.ScheduledAt = DateTime.Now;
                     task.UpdatedAt = DateTime.Now;
 
-                    // 下一個時間段
+                    // 添加到司機的現有排程中，以便後續任務檢查
+                    existingSchedules.Add(new Tuple<DateTime, DateTime>(startTime, endTime));
+
+                    // 下一個任務從當前任務結束時間開始
                     startTime = endTime;
                 }
-            }
-            // 5. 保存變更
+            }           
             db.SaveChanges();
 
             // 6. 準備返回結果

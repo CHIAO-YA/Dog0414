@@ -66,8 +66,8 @@ namespace Dog.Controllers
                     // 7. 設定付款結果回調URL
                     request.redirectUrls = new RedirectUrlsDto
                     {
-                        confirmUrl = "https://run.mocky.io/v3/e2ccb83f-18a9-4902-a7b6-618face4390e",
-                        cancelUrl = "https://run.mocky.io/v3/e2ccb83f-18a9-4902-a7b6-618face4390e"
+                        confirmUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success",
+                        cancelUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success"
                     };
 
                     // 8. 呼叫 Line Pay 服務預約交易

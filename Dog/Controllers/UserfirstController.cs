@@ -29,7 +29,7 @@ namespace Dog.Controllers
             var user = db.Users.FirstOrDefault(u => u.UsersID == UsersID);
             if (user == null) { return NotFound(); }
 
-            var today = DateTime.Today;
+            var today = DateTime.Today.AddDays(1);
             var basicResult = new
             {
                 usersID = user.UsersID,
@@ -39,7 +39,10 @@ namespace Dog.Controllers
             };
             //查詢當天訂單
             var todayOrderDetails = db.OrderDetails// 查詢該用戶當天的訂單
-           .Where(od => od.Orders.UsersID == UsersID && DbFunctions.TruncateTime(od.ServiceDate) == today.Date).ToList();//找出所有UsersID的訂單中，日期是今天的訂單詳情記錄，並將結果轉換成列表形式
+           .Where(od => od.Orders.UsersID == UsersID && DbFunctions.TruncateTime(od.ServiceDate) == today.Date)
+           .OrderBy(od => od.DriverTimeStart.HasValue ? 0 : 1)
+           .ThenBy(od => od.DriverTimeStart)
+           .ToList();//找出所有UsersID的訂單中，日期是今天的訂單詳情記錄，並將結果轉換成列表形式
 
             //如果沒有訂單，返回基本信息
             if (!todayOrderDetails.Any())

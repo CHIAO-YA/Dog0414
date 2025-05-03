@@ -32,7 +32,7 @@ namespace Dog.Controllers
             //    : "http://localhost:5173/#/customer/subscribe-success";
 
             // 可以自由更換要跳轉的網址
-            string redirectUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success";
+            string redirectUrl = "http://localhost:5173/#/customer/subscribe-success";
             ////https://lebuleduo.vercel.app/#/customer/subscribe-success
             ////http://localhost:5173/#/customer/subscribe-success
             var html = $@"<html>
@@ -154,16 +154,23 @@ namespace Dog.Controllers
                 // 更新訂單支付狀態
                 if (tradeData.Status == "SUCCESS")
                 {
-                order.PaymentStatus = PaymentStatus.已付款;
+                    //// 只針對ATM轉帳特別處理
+                    //if (tradeData.Result.PaymentType == "VACC") // ATM 虛擬帳號
+                    //{
+                    //    order.LinePayMethod = "ATM轉帳";
+                    //    System.Diagnostics.Debug.WriteLine("設置支付方式為ATM轉帳");
+                    //}
+
+                    order.PaymentStatus = PaymentStatus.已付款;
                 order.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
 
                     var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
                     if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
                     {
-                        string msg = $"📦 Lebu-leduo 訂單已結帳成功！ 🛍️\n" +
-                                     $"感謝您的訂購！您的垃圾收運服務已成功結帳並排程。\n\n" +
-                                     $"訂單資訊：\n" +
+                        string msg = $"📦 Lebu-leduo 訂單已結帳成功！\n" +
+                                     $"🛍️感謝您的訂購！您的垃圾收運服務已成功結帳並排程。\n\n" +
+                                     $"【訂單資訊】\n" +
                                      $"訂單編號：{order.OrderNumber}\n" +
                                      $"支付方式：{order.LinePayMethod}\n" +
                                      $"金額：{order.TotalAmount} 元\n\n" +

@@ -191,7 +191,7 @@ namespace Dog.Controllers
             {
                 DriverID,
                 Number = Driver.Number.Trim(),
-                DriverName = Driver.LineId.Trim(),
+                DriverName = Driver.LineName.Trim(),
                 Day = Day.ToString("yyyy/MM/dd"),
                 TodayActiveStatus,
                 TodayCompletedStatus,
@@ -203,6 +203,8 @@ namespace Dog.Controllers
                     od.Orders.Addresses,
                     CustomerNumber = od.Orders.Users.Number.Trim(),
                     CustomerName = od.Orders.OrderName,
+                    od.DriverTimeStart,
+                    od.DriverTimeEnd,
                     od.Orders.Notes,
                     od.CommonIssues,
                     od.IssueDescription,
@@ -323,16 +325,16 @@ namespace Dog.Controllers
                        .Replace(" ", "");
                         // 決定通知類型
                         string notificationType = "";
-                        string messageContent = "";
+                        //string messageContent = "";
                         switch (newStatus)
                         {
                             case OrderStatus.前往中:
                                 notificationType = "收運進行中通知";
-                                linebot.PushMessage(cleanMessageuserId, $"📱【Lebu-leduo 收運進行中】\n我們正在趕往你指定的地點收運垃圾 🚛\n請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙喔～🐾");
+                                linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運進行中\n\n🚛我們正在趕往你指定的地點收運垃圾\n📍請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙喔～");
                                 break;
                             case OrderStatus.已抵達:
                                 notificationType = "收運已抵達通知";
-                                linebot.PushMessage(cleanMessageuserId, $"📱【Lebu-leduo 已抵達收運地點】🏠\n我們已抵達現場，正在為你收運垃圾 🚛\n請稍等片刻，服務即將完成，感謝你的耐心與配合 😊");
+                                linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運進行中\n\n🏠我們已抵達現場，正在為你收運垃圾 🚛\n請稍等片刻，服務即將完成，感謝你的耐心與配合 😊");
                                 break;
                             case OrderStatus.已完成:
                                 notificationType = "收運已完成通知";
@@ -344,7 +346,7 @@ namespace Dog.Controllers
                                 break;
                             case OrderStatus.異常:
                                 notificationType = "收運異常通知";
-                                linebot.PushMessage(cleanMessageuserId, $"【Lebu-leduo 通知】我們今天找不到擺放的垃圾 😢\n請確認垃圾是否擺放在指定地點，如需補收，請回覆客服或重新預約！");
+                                linebot.PushMessage(cleanMessageuserId, $"【Lebu-leduo 通知】\n\n我們今天找不到擺放的垃圾 😢\n請確認垃圾是否擺放在指定地點，如需補收，請回覆客服或重新預約！");
                                 break;
                         }
                     }
@@ -362,7 +364,6 @@ namespace Dog.Controllers
                 }
             });
         }
-
 
         [HttpPut]
         [Route("PUT/driver/orders/{OrderDetailID}/weight")]//垃圾收運量
