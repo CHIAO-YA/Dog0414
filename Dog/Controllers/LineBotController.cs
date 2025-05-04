@@ -73,7 +73,7 @@ namespace Dog.Controllers
                             {
                                 ProcessMessage(userMsg, replyToken);
                             }
-                            else if (userMsg.Contains("通知") || userMsg.Contains("1"))
+                            else if (userMsg.Contains("綁定") || userMsg.Contains("1"))
                             {
                                 int usersId = user.UsersID;
                                 var buttonTemplate = new isRock.LineBot.ButtonsTemplate()
@@ -91,7 +91,7 @@ namespace Dog.Controllers
                                 // 發送按鈕模板
                                 linebot.ReplyMessage(replyToken, new isRock.LineBot.TemplateMessage(buttonTemplate));
                             }
-                            else if (userMsg.Contains("提醒") || userMsg.Contains("2"))
+                            else if (userMsg.Contains("通知") || userMsg.Contains("2"))
                             {
                                 // 創建一個最簡單的按鈕模板
                                 var simpleButtonTemplate = new isRock.LineBot.ButtonsTemplate()
@@ -112,6 +112,25 @@ namespace Dog.Controllers
                                 };
 
                                 linebot.ReplyMessage(replyToken, new isRock.LineBot.TemplateMessage(simpleButtonTemplate));
+                            }
+                            else if (userMsg.Contains("你好") || userMsg.Contains("3"))
+                            {
+                                // 創建一個文字訊息
+                                var welcomeMessage ="您好！\n" +
+                                                    "感謝您加入好友\n" +
+                                                    "此官方帳號將定期發放最新資訊給您📩\n" +
+                                                    "敬請期待🎁🌟\n\n" +
+                                                    "【垃不垃多Lebu-leduo】\n" +
+                                                    "♻️全台最貼心的垃圾收運平台！\n\n" +
+                                                    "只要簡單三步驟，讓你輕鬆垃圾：\n" +
+                                                    "① 下單預約\n" +
+                                                    "② 在垃圾袋貼上 QR Code\n" +
+                                                    "③ 等待專人到府收運\n" +
+                                                    "✨還有 LINE 即時通知提醒\n" +
+                                                    "✅垃圾處理更安心、更便利！\n" +
+                                                    "🔔為了收到即時通知與收運提醒，請先輸入【通知】或【1】完成帳號連結👇";
+
+                                linebot.ReplyMessage(replyToken, new isRock.LineBot.TextMessage(welcomeMessage));
                             }
                             else if (userMsg.Contains("方案"))
                             {
@@ -152,46 +171,7 @@ namespace Dog.Controllers
                                 linebot.ReplyMessage(replyToken, defaultMessage);
                             }
                         }
-                        // 處理 Postback 事件 - 處理所有問題按鈕點擊
-                        //else if (lineEvent.type == "postback")
-                        //{
-                        //    var postbackData = lineEvent.postback.data;
-                        //    string replyToken = lineEvent.replyToken;
-
-                        //    var query = System.Web.HttpUtility.ParseQueryString(postbackData);
-                        //    string action = query["ACTION"];
-                        //    string id = query["ID"];
-
-                        //    if (action == "FAQ")
-                        //    {
-                        //        string answer = "";
-                        //        switch (id)
-                        //        {
-                        //            case "1":
-                        //                answer = "Q.第一次使用開怎麼操作介面?\n\n" +
-                        //                            "傳說明圖上去";
-                        //                break;
-                        //            case "2":
-                        //                answer = "Q.我可以修改收運時間嗎?\n\n" +
-                        //                            "你可以在「我的訂單」中點選「修改預約」來變更收運日期喔❗\n" +
-                        //                            "如有困難也可以聯繫客服幫你操作 😊";
-                        //                break;
-                        //            case "3":
-                        //                answer = "Q.貼紙不見了怎麼辦?\n\n" +
-                        //                            "可以點選「補發 QR 貼紙」選項，我們會重新寄送📬，\n" +
-                        //                            "或你也可以「自行列印 ibon 版 QR」喔!";
-                        //                break;
-                        //            case "4":
-                        //                answer = "Q.收運地點要怎麼改❓\n\n" +
-                        //                            "請到訂單詳情點選👉「修改收運資料」，更新地址、聯絡人或照片即可!";
-                        //                break;
-                        //            default:
-                        //                answer = "抱歉，找不到相關的問題答案。";
-                        //                break;
-                        //        }
-                        //        linebot.ReplyMessage(replyToken, answer);
-                        //    }
-                        //}
+                       
                         else if (lineEvent.type == "postback")
                         {
                             var postbackData = lineEvent.postback.data;

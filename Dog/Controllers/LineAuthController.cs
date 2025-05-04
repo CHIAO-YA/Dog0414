@@ -58,7 +58,7 @@ namespace Dog.Controllers
             }
             string channelId = "2007121127";
             string channelSecret = "d7c30599e53dc2aa970728521d61d2c3";
-            string redirectUri = "http://localhost:5173/#/auth/line/callback";
+            string redirectUri = "https://lebuleduo.vercel.app/#/auth/line/callback";
             ////http://localhost:5173/#/auth/line/callback
             ////https://lebuleduo.vercel.app/#/auth/line/callback
             try
@@ -174,34 +174,76 @@ namespace Dog.Controllers
                             var existUsersID = await db.Users.FirstOrDefaultAsync(u => u.UsersID == UsersID);
                             if (existUsersID != null)
                             {
-                                // 用戶已存在，更新 LINE 相關資訊
-                                existUsersID.LineId = lineId;
-                                existUsersID.LineName = lineName;
-                                existUsersID.LinePicUrl = linePicUrl;
-
-                                // 如果是客人且有 msgId，則更新 msgId
-                                if (userRole == 1 && !string.IsNullOrEmpty(msgId))
+                                if (existUsersID.Roles != (Role)userRole)
                                 {
-                                    existUsersID.MessageuserId = msgId;
+                                    // 角色不同，不做任何事，讓程式繼續執行到下一個判斷
                                 }
-
-                                // 如果沒有編號，則生成一個
-                                if (string.IsNullOrEmpty(existUsersID.Number))
+                                else
                                 {
-                                    existUsersID.Number = GetUserNumber(userRole);
+                                    // 用戶已存在，更新 LINE 相關資訊
+                                    existUsersID.LineId = lineId;
+                                    existUsersID.LineName = lineName;
+                                    existUsersID.LinePicUrl = linePicUrl;
+
+                                    // 如果是客人且有 msgId，則更新 msgId
+                                    if (userRole == 1 && !string.IsNullOrEmpty(msgId))
+                                    {
+                                        existUsersID.MessageuserId = msgId;
+                                    }
+
+                                    // 如果沒有編號，則生成一個
+                                    if (string.IsNullOrEmpty(existUsersID.Number))
+                                    {
+                                        existUsersID.Number = GetUserNumber(userRole);
+                                    }
+
+                                    await db.SaveChangesAsync();
+                                    usersId = existUsersID.UsersID;
+                                    return new UserProcessResult
+                                    {
+                                        usersId = usersId,
+                                        MsgId = existUsersID.MessageuserId,
+                                        Number = existUsersID.Number
+                                    };
                                 }
-
-                                await db.SaveChangesAsync();
-                                usersId = existUsersID.UsersID;
-                                return new UserProcessResult
-                                {
-                                    usersId = usersId,
-                                    MsgId = existUsersID.MessageuserId,
-                                    Number = existUsersID.Number
-                                };
                             }
                         }
                     }
+                    var existingUser = await db.Users
+                    .Where(u => u.LineId == lineId && u.Roles != (Role)userRole)
+                    .FirstOrDefaultAsync();
+
+                    if (existingUser != null)
+                    {
+                        // 發現相同 LINE ID 但不同角色的用戶
+                        // 創建新記錄，讓一個 LINE 帳號可以有多種角色
+                        var newRoleUser = new Users
+                        {
+                            LineId = lineId,
+                            LineName = lineName,
+                            LinePicUrl = linePicUrl,
+                            CreatedAt = DateTime.Now,
+                            Roles = (Role)userRole,
+                            Number = GetUserNumber(userRole),
+                            IsOnline = userRole == 2, // 接單員預設為在線
+                            MessageuserId = userRole == 1 ? msgId : null // 只有客人才綁定 msgId
+                        };
+
+                        db.Users.Add(newRoleUser);
+                        await db.SaveChangesAsync();
+                        usersId = newRoleUser.UsersID;
+                        number = newRoleUser.Number;
+
+                        return new UserProcessResult
+                        {
+                            usersId = usersId,
+                            MsgId = newRoleUser.MessageuserId,
+                            Number = number
+                        };
+                    }
+
+
+
 
                     // 情境2: 檢查該 LINE ID 是否已有相同角色的記錄
                     var existUserRole = await db.Users
@@ -242,7 +284,7 @@ namespace Dog.Controllers
                             Roles = (Role)userRole,
                             Number = GetUserNumber(userRole),
                             IsOnline = userRole == 2, // 接單員預設為在線
-                           // MessageuserId = userRole == 1 ? msgId : null // 只有客人才綁定 msgId
+                                                      // MessageuserId = userRole == 1 ? msgId : null // 只有客人才綁定 msgId
                         };
 
                         db.Users.Add(newUser);
@@ -267,8 +309,8 @@ namespace Dog.Controllers
         public class UserProcessResult//封裝
         {
             public int usersId { get; set; }
-            public string Number { get; set; } 
-            public string MsgId { get; set; } 
+            public string Number { get; set; }
+            public string MsgId { get; set; }
         }
         public class LineLoginRequest
         {
@@ -296,130 +338,3 @@ namespace Dog.Controllers
 
     }
 }
-//[HttpGet]
-//[Route("auth/line-login")]//獲取 LINE 用戶資料
-//public async Task<IHttpActionResult> Callback(string code, string state)
-//{
-//    string aa = "";
-//    string channelId = "2007121127";
-//    string channelSecret = "d7c30599e53dc2aa970728521d61d2c3";
-//    string redirectUri = ConfigurationManager.AppSettings["redirect"];
-//    // Step 1: 使用授權碼換取 access token
-//    string tokenUrl = "https://api.line.me/oauth2/v2.1/token";
-//    var client = new HttpClient();
-//    var postData = new Dictionary<string, string>
-//    {
-//    { "grant_type", "authorization_code" },
-//    { "code", code },//左邊LINE API 規定的參數名稱，右邊是從URL取得的參數
-//    { "redirect_uri", redirectUri },
-//    { "client_id", channelId },
-//    { "client_secret", channelSecret }
-//    };
-//    //向 LINE API 發送 HTTP POST 請求取得回應內容
-//    var content = new FormUrlEncodedContent(postData);
-//    var response = await client.PostAsync(tokenUrl, content);//非同步請求，等待 response（回應物件）回來再繼續執行
-//    aa += "01, ";
-//    var responseBody = await response.Content.ReadAsStringAsync();//LINE 回傳的 JSON 資料
-//    aa += "02, ";
-//    if (response.IsSuccessStatusCode)
-//    {
-//        // Step 2: 解析 access token
-//        var tokenData = JsonConvert.DeserializeObject<dynamic>(responseBody);
-//        string accessToken = tokenData.access_token;
-//        aa += "03, ";
-//        // Step 3: 使用 access token 請求用戶資料
-//        string userProfileUrl = "https://api.line.me/v2/profile";
-//        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-//        var profileResponse = await client.GetAsync(userProfileUrl);
-//        var profileData = await profileResponse.Content.ReadAsStringAsync();
-//        aa += "04, ";
-//        // Step 4: 解析用戶資料
-//        var userData = JObject.Parse(profileData);
-//        string lineId = (string)userData["userId"];
-//        string lineName = (string)userData["displayName"];
-//        string linePicUrl = (string)userData["pictureUrl"];
-
-//        // 解析 state，決定角色 (1 = 使用者, 2 = 接單員)
-//        int userRole = int.TryParse(state, out int role) && role == 2 ? 2 : 1;
-//        aa += "05, ";
-//        using (var dbContext = new Model1())
-//        {
-//            try
-//            {
-//                // 檢查該 LINE ID 是否已存在於資料庫
-//                var existingRoles = dbContext.Users.Where(u => u.LineId == lineId).Select(u => (int)u.Roles).ToList();
-//                // 如果用戶資料不存在，則新增資料
-//                if (!existingRoles.Any())
-//                {
-//                    var newUser = new Users
-//                    {
-//                        LineId = lineId,
-//                        LineName = lineName,
-//                        LinePicUrl = linePicUrl,
-//                        CreatedAt = DateTime.Now,
-//                        Roles = (Role)userRole, // 直接存入當前角色
-//                        Number = GetUserNumber(userRole)
-//                    };
-//                    dbContext.Users.Add(newUser);
-//                    await dbContext.SaveChangesAsync();
-//                    Console.WriteLine("新增用戶：" + userRole);
-//                }
-//                else if (!existingRoles.Contains(userRole))
-//                {
-//                    // 如果該用戶已有其他角色，但沒有這個角色，則新增一筆資料
-//                    var newRoleEntry = new Users
-//                    {
-//                        LineId = lineId,
-//                        LineName = lineName,
-//                        LinePicUrl = linePicUrl,
-//                        CreatedAt = DateTime.Now,
-//                        Roles = (Role)userRole,
-//                        Number = GetUserNumber(userRole)
-//                    };
-//                    dbContext.Users.Add(newRoleEntry);
-//                    await dbContext.SaveChangesAsync();
-//                    Console.WriteLine("新增：" + userRole);
-//                }
-//                else
-//                {
-//                    Console.WriteLine("用戶已擁有：" + userRole);
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                Console.WriteLine("❌ 資料庫儲存失敗：" + ex.Message);
-//                return InternalServerError(ex);
-//            }
-//        }
-
-//        // ✅ 產生 JWT Token
-//        LineJwtAuthUtil jwtAuthUtil = new LineJwtAuthUtil();
-//        string jwtToken = jwtAuthUtil.GetToken(lineId, userRole.ToString());
-//        // 根據 userRole 決定角色名稱
-//        string roleName = userRole == 1 ? "customer" : "deliver";
-//        string redirectUrl = userRole == 1 ? "https://localhost:5173/customer" : "https://localhost:5173/deliver";
-//        // Step 6: 返回成功的訊息
-//        return Ok(new
-//        {
-//            statusCode = 200,
-//            status = true,
-//            message = "成功取得並儲存用戶資料",
-//            profileData,
-//            token = jwtToken,
-//            role = userRole,       // 保留數字值
-//            roleName = roleName,    // 添加文字表示給前端使用
-//            redirectUrl = redirectUrl
-//        });
-//    }
-//    else
-//    {
-//        return Ok(new
-//        {
-//            aa,
-//            responseBody,
-//            x = "交換 access token 失敗",
-//        });
-
-//        //return BadRequest("交換 access token 失敗");
-//    }
-//}

@@ -334,15 +334,15 @@ namespace Dog.Controllers
                                 break;
                             case OrderStatus.已抵達:
                                 notificationType = "收運已抵達通知";
-                                linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運進行中\n\n🏠我們已抵達現場，正在為你收運垃圾 🚛\n請稍等片刻，服務即將完成，感謝你的耐心與配合 😊");
+                                linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運已抵達\n\n🏠我們已抵達現場，正在為你收運垃圾 🚛\n請稍等片刻，服務即將完成，感謝你的耐心與配合 😊");
                                 break;
                             case OrderStatus.已完成:
                                 notificationType = "收運已完成通知";
                                 // 獲取司機上傳的照片URL (如果有)
-                                var photo = db.DriverPhoto.FirstOrDefault(p => p.OrderDetailID == OrderDetailID);
-                                string imageUrl = photo != null ? photo.DriverImageUrl : "(照片連結)";
+                                //var photo = db.DriverPhoto.FirstOrDefault(p => p.OrderDetailID == OrderDetailID);
+                                //string imageUrl = photo != null ? photo.DriverImageUrl : "(照片連結)";
 
-                                linebot.PushMessage(cleanMessageuserId, $"📋【Lebu-leduo 收運完成】📸\n今天的垃圾已成功收運完畢 ✅\n感謝你的配合，以下是現場照片供你確認～\n📸 {imageUrl}");
+                                linebot.PushMessage(cleanMessageuserId, $"📋【Lebu-leduo 收運完成】📸\n今天的垃圾已成功收運完畢 ✅\n感謝你的配合～");
                                 break;
                             case OrderStatus.異常:
                                 notificationType = "收運異常通知";

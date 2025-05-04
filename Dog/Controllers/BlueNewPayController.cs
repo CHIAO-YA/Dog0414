@@ -32,7 +32,7 @@ namespace Dog.Controllers
             //    : "http://localhost:5173/#/customer/subscribe-success";
 
             // 可以自由更換要跳轉的網址
-            string redirectUrl = "http://localhost:5173/#/customer/subscribe-success";
+            string redirectUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success";
             ////https://lebuleduo.vercel.app/#/customer/subscribe-success
             ////http://localhost:5173/#/customer/subscribe-success
             var html = $@"<html>
