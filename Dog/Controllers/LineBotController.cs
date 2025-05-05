@@ -128,7 +128,7 @@ namespace Dog.Controllers
                                                     "③ 等待專人到府收運\n" +
                                                     "✨還有 LINE 即時通知提醒\n" +
                                                     "✅垃圾處理更安心、更便利！\n" +
-                                                    "🔔為了收到即時通知與收運提醒，請先輸入【通知】或【1】完成帳號連結👇";
+                                                    "🔔為了收到即時通知與收運提醒，請先輸入【綁定】或【1】完成帳號連結👇";
 
                                 linebot.ReplyMessage(replyToken, new isRock.LineBot.TextMessage(welcomeMessage));
                             }

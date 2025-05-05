@@ -151,8 +151,6 @@ namespace Dog.Controllers
                 return InternalServerError(ex);
             }
         }
-
-        // 處理用戶資料儲存和綁定
         private async Task<UserProcessResult> ProcessUserData(string lineId, string lineName, string linePicUrl, int userRole, string msgId = null, string userId = null)
         {
             int usersId = 0;
@@ -165,7 +163,93 @@ namespace Dog.Controllers
             {
                 try
                 {
-                    // 情境1: 如果有提供 userId 參數 (通常是客人 role=1)，先根據 userId 檢查
+                    // ==================== 情境：角色為接單員且已有相同 LineId ====================
+                    if (userRole == 2)
+                    {
+                        // 優先查找相同LineId且角色為接單員的用戶
+                        var existingDeliveryman = await db.Users
+                            .FirstOrDefaultAsync(u => u.LineId == lineId && u.Roles == (Role)userRole);
+
+                        if (existingDeliveryman != null)
+                        {
+                            // 已有相同LineId的接單員，更新資料並使用此帳號
+                            existingDeliveryman.LineName = lineName;
+                            existingDeliveryman.LinePicUrl = linePicUrl;
+                            existingDeliveryman.IsOnline = true; // 接單員登入後設為在線
+
+                            await db.SaveChangesAsync();
+
+                            return new UserProcessResult
+                            {
+                                usersId = existingDeliveryman.UsersID,
+                                MsgId = existingDeliveryman.MessageuserId,
+                                Number = existingDeliveryman.Number
+                            };
+                        }
+                    }
+
+                    // ==================== 情境3：LINE 登入後再綁定帳號 → 合併資料、刪除臨時帳號 ====================
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        int bindedUserId;
+                        if (int.TryParse(userId, out bindedUserId))
+                        {
+                            // 找到主帳號（綁定後取得的 userId）
+                            var targetUser = await db.Users.FirstOrDefaultAsync(u => u.UsersID == bindedUserId && u.Roles == (Role)userRole);
+                            if (targetUser != null)
+                            {
+                                // 找到 LINE 登入時產生的臨時帳號（同 LineId + 同角色 + 不是同一個 UsersID）
+                                var tempUser = await db.Users.FirstOrDefaultAsync(u =>
+                                    u.LineId == lineId && u.Roles == (Role)userRole && u.UsersID != targetUser.UsersID);
+                                if (tempUser != null)
+                                {
+                                    targetUser.LineId = lineId;
+                                    targetUser.LineName = tempUser.LineName;
+                                    targetUser.LinePicUrl = tempUser.LinePicUrl;
+                                    // 只有角色為 1 才處理 msgId
+                                    if (userRole == 1)
+                                    {
+                                        if (string.IsNullOrEmpty(targetUser.MessageuserId) && !string.IsNullOrEmpty(tempUser.MessageuserId))
+                                        {
+                                            targetUser.MessageuserId = tempUser.MessageuserId;
+                                        }
+                                        if (!string.IsNullOrEmpty(msgId))
+                                        {
+                                            targetUser.MessageuserId = msgId;
+                                        }
+                                    }
+                                    if (string.IsNullOrEmpty(targetUser.Number))
+                                    {
+                                        targetUser.Number = GetUserNumber(userRole);
+                                    }
+                                    db.Users.Remove(tempUser);
+                                }
+                                else
+                                {
+                                    targetUser.LineId = lineId;
+                                    targetUser.LineName = lineName;
+                                    targetUser.LinePicUrl = linePicUrl;
+                                    if (userRole == 1 && !string.IsNullOrEmpty(msgId))
+                                    {
+                                        targetUser.MessageuserId = msgId;
+                                    }
+                                    if (string.IsNullOrEmpty(targetUser.Number))
+                                    {
+                                        targetUser.Number = GetUserNumber(userRole);
+                                    }
+                                }
+                                await db.SaveChangesAsync();
+                                return new UserProcessResult
+                                {
+                                    usersId = targetUser.UsersID,
+                                    MsgId = targetUser.MessageuserId,
+                                    Number = targetUser.Number
+                                };
+                            }
+                        }
+                    }
+
+                    // ==================== 情境1: 如果有提供 userId 參數 (通常是客人 role=1)，先根據 userId 檢查 ====================
                     if (!string.IsNullOrEmpty(userId))
                     {
                         int UsersID;
@@ -209,9 +293,39 @@ namespace Dog.Controllers
                             }
                         }
                     }
+
+                    // ==================== 情境2: 檢查該 LINE ID 是否已有相同角色的記錄 ====================
+                    var existUserRole = await db.Users
+                        .Where(u => u.LineId == lineId && u.Roles == (Role)userRole)
+                        .FirstOrDefaultAsync();
+
+                    if (existUserRole != null)
+                    {
+                        // 已存在相同 LineId 和角色的用戶，更新資料
+                        existUserRole.LineName = lineName;
+                        existUserRole.LinePicUrl = linePicUrl;
+
+                        // 如果是客人角色且有 msgId，則更新 msgId
+                        if (userRole == 1 && !string.IsNullOrEmpty(msgId))
+                        {
+                            existUserRole.MessageuserId = msgId;
+                        }
+
+                        await db.SaveChangesAsync();
+                        usersId = existUserRole.UsersID;
+                        number = existUserRole.Number;
+                        return new UserProcessResult
+                        {
+                            usersId = usersId,
+                            MsgId = existUserRole.MessageuserId,
+                            Number = number
+                        };
+                    }
+
+                    // ==================== 檢查是否存在不同角色但相同 LineId 的用戶 ====================
                     var existingUser = await db.Users
-                    .Where(u => u.LineId == lineId && u.Roles != (Role)userRole)
-                    .FirstOrDefaultAsync();
+                        .Where(u => u.LineId == lineId && u.Roles != (Role)userRole)
+                        .FirstOrDefaultAsync();
 
                     if (existingUser != null)
                     {
@@ -241,40 +355,9 @@ namespace Dog.Controllers
                             Number = number
                         };
                     }
-
-
-
-
-                    // 情境2: 檢查該 LINE ID 是否已有相同角色的記錄
-                    var existUserRole = await db.Users
-                        .Where(u => u.LineId == lineId && u.Roles == (Role)userRole)
-                        .FirstOrDefaultAsync();
-
-                    if (existUserRole != null)
-                    {
-                        // 已存在相同 LineId 和角色的用戶，更新資料
-                        existUserRole.LineName = lineName;
-                        existUserRole.LinePicUrl = linePicUrl;
-
-                        // 如果是客人角色且有 msgId，則更新 msgId
-                        if (userRole == 1 && !string.IsNullOrEmpty(msgId))
-                        {
-                            existUserRole.MessageuserId = msgId;
-                        }
-
-                        await db.SaveChangesAsync();
-                        usersId = existUserRole.UsersID;
-                        number = existUserRole.Number;
-                        return new UserProcessResult
-                        {
-                            usersId = usersId,
-                            MsgId = existUserRole.MessageuserId,
-                            Number = number
-                        };
-                    }
                     else
                     {
-                        // 情境3: 創建新用戶
+                        // ==================== 創建全新用戶 ====================
                         var newUser = new Users
                         {
                             LineId = lineId,
@@ -284,7 +367,7 @@ namespace Dog.Controllers
                             Roles = (Role)userRole,
                             Number = GetUserNumber(userRole),
                             IsOnline = userRole == 2, // 接單員預設為在線
-                                                      // MessageuserId = userRole == 1 ? msgId : null // 只有客人才綁定 msgId
+                            MessageuserId = userRole == 1 ? msgId : null // 只有客人才綁定 msgId
                         };
 
                         db.Users.Add(newUser);
@@ -306,6 +389,185 @@ namespace Dog.Controllers
                 }
             }
         }
+        //// 處理用戶資料儲存和綁定
+        //private async Task<UserProcessResult> ProcessUserData(string lineId, string lineName, string linePicUrl, int userRole, string msgId = null, string userId = null)
+        //{
+        //    int usersId = 0;
+        //    string number = "";
+        //    if (!Enum.IsDefined(typeof(Role), userRole))
+        //    {
+        //        userRole = 1; // 默認為使用者
+        //    }
+        //    using (var db = new Model1())
+        //    {
+        //        try
+        //        {
+        //            // 新增的邏輯：如果是接單員(角色=2)，檢查LineId是否存在於系統中
+        //            if (userRole == 2)
+        //            {
+        //                // 優先查找相同LineId且角色為接單員的用戶
+        //                var existingDeliveryman = await db.Users
+        //                    .FirstOrDefaultAsync(u => u.LineId == lineId && u.Roles == (Role)userRole);
+
+        //                if (existingDeliveryman != null)
+        //                {
+        //                    // 已有相同LineId的接單員，更新資料並使用此帳號
+        //                    existingDeliveryman.LineName = lineName;
+        //                    existingDeliveryman.LinePicUrl = linePicUrl;
+        //                    existingDeliveryman.IsOnline = true; // 接單員登入後設為在線
+
+        //                    await db.SaveChangesAsync();
+
+        //                    return new UserProcessResult
+        //                    {
+        //                        usersId = existingDeliveryman.UsersID,
+        //                        MsgId = existingDeliveryman.MessageuserId,
+        //                        Number = existingDeliveryman.Number
+        //                    };
+        //                }
+        //            }
+        //            // 情境1: 如果有提供 userId 參數 (通常是客人 role=1)，先根據 userId 檢查
+        //            if (!string.IsNullOrEmpty(userId))
+        //            {
+        //                int UsersID;
+        //                if (int.TryParse(userId, out UsersID))
+        //                {
+        //                    var existUsersID = await db.Users.FirstOrDefaultAsync(u => u.UsersID == UsersID);
+        //                    if (existUsersID != null)
+        //                    {
+        //                        if (existUsersID.Roles != (Role)userRole)
+        //                        {
+        //                            // 角色不同，不做任何事，讓程式繼續執行到下一個判斷
+        //                        }
+        //                        else
+        //                        {
+        //                            // 用戶已存在，更新 LINE 相關資訊
+        //                            existUsersID.LineId = lineId;
+        //                            existUsersID.LineName = lineName;
+        //                            existUsersID.LinePicUrl = linePicUrl;
+
+        //                            // 如果是客人且有 msgId，則更新 msgId
+        //                            if (userRole == 1 && !string.IsNullOrEmpty(msgId))
+        //                            {
+        //                                existUsersID.MessageuserId = msgId;
+        //                            }
+
+        //                            // 如果沒有編號，則生成一個
+        //                            if (string.IsNullOrEmpty(existUsersID.Number))
+        //                            {
+        //                                existUsersID.Number = GetUserNumber(userRole);
+        //                            }
+
+        //                            await db.SaveChangesAsync();
+        //                            usersId = existUsersID.UsersID;
+        //                            return new UserProcessResult
+        //                            {
+        //                                usersId = usersId,
+        //                                MsgId = existUsersID.MessageuserId,
+        //                                Number = existUsersID.Number
+        //                            };
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //            var existingUser = await db.Users
+        //            .Where(u => u.LineId == lineId && u.Roles != (Role)userRole)
+        //            .FirstOrDefaultAsync();
+
+        //            if (existingUser != null)
+        //            {
+        //                // 發現相同 LINE ID 但不同角色的用戶
+        //                // 創建新記錄，讓一個 LINE 帳號可以有多種角色
+        //                var newRoleUser = new Users
+        //                {
+        //                    LineId = lineId,
+        //                    LineName = lineName,
+        //                    LinePicUrl = linePicUrl,
+        //                    CreatedAt = DateTime.Now,
+        //                    Roles = (Role)userRole,
+        //                    Number = GetUserNumber(userRole),
+        //                    IsOnline = userRole == 2, // 接單員預設為在線
+        //                    MessageuserId = userRole == 1 ? msgId : null // 只有客人才綁定 msgId
+        //                };
+
+        //                db.Users.Add(newRoleUser);
+        //                await db.SaveChangesAsync();
+        //                usersId = newRoleUser.UsersID;
+        //                number = newRoleUser.Number;
+
+        //                return new UserProcessResult
+        //                {
+        //                    usersId = usersId,
+        //                    MsgId = newRoleUser.MessageuserId,
+        //                    Number = number
+        //                };
+        //            }
+
+
+
+
+        //            // 情境2: 檢查該 LINE ID 是否已有相同角色的記錄
+        //            var existUserRole = await db.Users
+        //                .Where(u => u.LineId == lineId && u.Roles == (Role)userRole)
+        //                .FirstOrDefaultAsync();
+
+        //            if (existUserRole != null)
+        //            {
+        //                // 已存在相同 LineId 和角色的用戶，更新資料
+        //                existUserRole.LineName = lineName;
+        //                existUserRole.LinePicUrl = linePicUrl;
+
+        //                // 如果是客人角色且有 msgId，則更新 msgId
+        //                if (userRole == 1 && !string.IsNullOrEmpty(msgId))
+        //                {
+        //                    existUserRole.MessageuserId = msgId;
+        //                }
+
+        //                await db.SaveChangesAsync();
+        //                usersId = existUserRole.UsersID;
+        //                number = existUserRole.Number;
+        //                return new UserProcessResult
+        //                {
+        //                    usersId = usersId,
+        //                    MsgId = existUserRole.MessageuserId,
+        //                    Number = number
+        //                };
+        //            }
+        //            else
+        //            {
+        //                // 情境3: 創建新用戶
+        //                var newUser = new Users
+        //                {
+        //                    LineId = lineId,
+        //                    LineName = lineName,
+        //                    LinePicUrl = linePicUrl,
+        //                    CreatedAt = DateTime.Now,
+        //                    Roles = (Role)userRole,
+        //                    Number = GetUserNumber(userRole),
+        //                    IsOnline = userRole == 2, // 接單員預設為在線
+        //                                              // MessageuserId = userRole == 1 ? msgId : null // 只有客人才綁定 msgId
+        //                };
+
+        //                db.Users.Add(newUser);
+        //                await db.SaveChangesAsync();
+        //                usersId = newUser.UsersID;
+        //                number = newUser.Number;
+        //                return new UserProcessResult
+        //                {
+        //                    usersId = usersId,
+        //                    MsgId = newUser.MessageuserId,
+        //                    Number = number
+        //                };
+        //            }
+
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // 處理例外
+        //            throw ex;
+        //        }
+        //    }
+        //}
         public class UserProcessResult//封裝
         {
             public int usersId { get; set; }

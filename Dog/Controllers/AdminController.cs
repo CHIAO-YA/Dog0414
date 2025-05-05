@@ -371,7 +371,7 @@ namespace Dog.Controllers
                 var query = db.OrderDetails
                .Include(od => od.Orders)
                .Include(od => od.Orders.Plan)
-               .Where(od => DbFunctions.TruncateTime(od.ServiceDate) == Today.Date);
+               .Where(od => DbFunctions.TruncateTime(od.ServiceDate) == Today.Date && od.Orders.PaymentStatus == PaymentStatus.已付款);
 
                 var allDrivers = db.Users.Where(u => u.Roles == Role.接單員).ToDictionary(d => d.UsersID);
                 //ToDictionary 將集合轉換為字典(Dictionary)找特定司機可以通過 ID 直接找，不需要歷遍整個列表

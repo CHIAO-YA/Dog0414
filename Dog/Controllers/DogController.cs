@@ -502,41 +502,41 @@ namespace Dog.Controllers
 
             var order = OrderDetail.Orders; // 已經包含在查詢中
             var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
-            if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
-            {
-                // 取得 Channel Access Token
-                string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
-                var linebot = new isRock.LineBot.Bot(channelAccessToken);
+            //if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
+            //{
+            //    // 取得 Channel Access Token
+            //    string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
+            //    var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
-                var cleanMessageuserId = user.MessageuserId
-               .Trim()                       // 移除前後空格
-               .Replace("\n", "")            // 移除換行符
-               .Replace("\r", "")            // 移除回車符
-               .Replace(" ", "")             // 移除空格
-               .Replace("\t", "");           // 移除tab
+            //    var cleanMessageuserId = user.MessageuserId
+            //   .Trim()                       // 移除前後空格
+            //   .Replace("\n", "")            // 移除換行符
+            //   .Replace("\r", "")            // 移除回車符
+            //   .Replace(" ", "")             // 移除空格
+            //   .Replace("\t", "");           // 移除tab
 
-                string message;
-                if (isOverWeight)
-                {
-                    message = $"【Lebu-leduo 通知】我們今天找到垃圾重量超出預期 😢\n" +
-                              $"訂單編號：{order.OrderNumber}\n" +
-                              $"重量：{OrderDetail.KG} KG（超過 {OrderDetail.Orders.Plan.PlanKG} KG）\n" +
-                              $"請確認垃圾是否符合計畫重量，如需詳細說明，請回覆客服！";
-                }
-                else
-                {
-                    message = $"📋【Lebu-leduo 收運完成】📸\n" +
-                              $"訂單編號：{order.OrderNumber}\n" +
-                              $"今天的垃圾已成功收運完畢 ✅\n" +
-                              $"垃圾重量：{OrderDetail.KG} KG\n" +
-                              $"感謝你的配合～\n";
-                }
-                linebot.PushMessage(cleanMessageuserId, "📋訂單已完成📸");
-                linebot.PushMessage(cleanMessageuserId, message);
+            //    string message;
+            //    if (isOverWeight)
+            //    {
+            //        message = $"【Lebu-leduo 通知】我們今天找到垃圾重量超出預期 😢\n" +
+            //                  $"訂單編號：{order.OrderNumber}\n" +
+            //                  $"重量：{OrderDetail.KG} KG（超過 {OrderDetail.Orders.Plan.PlanKG} KG）\n" +
+            //                  $"請確認垃圾是否符合計畫重量，如需詳細說明，請回覆客服！";
+            //    }
+            //    else
+            //    {
+            //        message = $"📋【Lebu-leduo 收運完成】📸\n" +
+            //                  $"訂單編號：{order.OrderNumber}\n" +
+            //                  $"今天的垃圾已成功收運完畢 ✅\n" +
+            //                  $"垃圾重量：{OrderDetail.KG} KG\n" +
+            //                  $"感謝你的配合～\n";
+            //    }
+            //    linebot.PushMessage(cleanMessageuserId, "📋訂單已完成📸");
+            //    linebot.PushMessage(cleanMessageuserId, message);
 
-                System.Diagnostics.Debug.WriteLine($"發送通知類型: {(isOverWeight ? "收運異常通知" : "收運已完成通知")}");
-                System.Diagnostics.Debug.WriteLine($"用戶 MessageuserId: {cleanMessageuserId}");
-            }
+            //    System.Diagnostics.Debug.WriteLine($"發送通知類型: {(isOverWeight ? "收運異常通知" : "收運已完成通知")}");
+            //    System.Diagnostics.Debug.WriteLine($"用戶 MessageuserId: {cleanMessageuserId}");
+            //}
 
             return Ok(new
             {
