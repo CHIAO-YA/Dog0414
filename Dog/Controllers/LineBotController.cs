@@ -45,13 +45,13 @@ namespace Dog.Controllers
             try
             {
                 string postData = await Request.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine($"收到的LINE Webhook數據: {postData}");
+                //System.Diagnostics.Debug.WriteLine($"收到的LINE Webhook數據: {postData}");
 
                 if (!string.IsNullOrEmpty(postData))// && postData.Contains("\"type\":\"message\"")
                 {
                     // 解析收到的 JSON 格式資料
                     var receivedMsg = isRock.LineBot.Utility.Parsing(postData);
-                    System.Diagnostics.Debug.WriteLine("JSON解析成功");
+                    //System.Diagnostics.Debug.WriteLine("JSON解析成功");
                     var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
                     // 確保事件不為空
@@ -116,19 +116,15 @@ namespace Dog.Controllers
                             else if (userMsg.Contains("你好") || userMsg.Contains("3"))
                             {
                                 // 創建一個文字訊息
-                                var welcomeMessage ="您好！\n" +
-                                                    "感謝您加入好友\n" +
-                                                    "此官方帳號將定期發放最新資訊給您📩\n" +
-                                                    "敬請期待🎁🌟\n\n" +
+                                var welcomeMessage =
+                                                    "您好！" +
+                                                    "感謝您加入好友\n\n" +
                                                     "【垃不垃多Lebu-leduo】\n" +
-                                                    "♻️全台最貼心的垃圾收運平台！\n\n" +
                                                     "只要簡單三步驟，讓你輕鬆垃圾：\n" +
                                                     "① 下單預約\n" +
                                                     "② 在垃圾袋貼上 QR Code\n" +
-                                                    "③ 等待專人到府收運\n" +
-                                                    "✨還有 LINE 即時通知提醒\n" +
-                                                    "✅垃圾處理更安心、更便利！\n" +
-                                                    "🔔為了收到即時通知與收運提醒，請先輸入【綁定】或【1】完成帳號連結👇";
+                                                    "③ 等待專人到府收運\n\n" +
+                                                    "🔔為了收到即時通知與收運提醒，請先輸入【綁定】或【1】完成帳號連結";
 
                                 linebot.ReplyMessage(replyToken, new isRock.LineBot.TextMessage(welcomeMessage));
                             }
@@ -310,7 +306,7 @@ namespace Dog.Controllers
                 //"☑️專屬QR碼追蹤任務\n" +
                 //"☑️彈性調整預約時間\n"
 
-                thumbnailImageUrl = new Uri("https://github.com/CHIAO-YA/DogPhotourl/blob/main/godphoto/%E8%B7%91%E8%B7%91%E7%8B%97%E7%8B%97.gif?raw=true"),
+                thumbnailImageUrl = new Uri("https://github.com/CHIAO-YA/DogPhotourl/blob/main/godphoto/%E5%B0%8F.PNG?raw=true"),
                 actions = new List<isRock.LineBot.TemplateActionBase>()
                 {
                     new isRock.LineBot.UriAction()
@@ -320,7 +316,6 @@ namespace Dog.Controllers
                     }
                 }
             });
-
             // 標準方案
             columns.Add(new isRock.LineBot.Column()
             {
@@ -332,7 +327,7 @@ namespace Dog.Controllers
                        //"☑️每週收運自由選\n" +
                        //"☑️專屬QR碼追蹤任務\n" +
                        //"☑️彈性調整預約時間",
-                thumbnailImageUrl = new Uri("https://github.com/CHIAO-YA/DogPhotourl/blob/main/godphoto/0502.PNG?raw=true"),
+                thumbnailImageUrl = new Uri("https://github.com/CHIAO-YA/DogPhotourl/blob/main/godphoto/%E4%B8%AD.PNG?raw=true"),
                 actions = new List<isRock.LineBot.TemplateActionBase>()
                 {
                     new isRock.LineBot.UriAction()
@@ -355,7 +350,7 @@ namespace Dog.Controllers
                         //"☑️專屬QR碼追蹤任務\n" +
                         //"☑️彈性調整預約時間",
 
-                thumbnailImageUrl = new Uri("https://github.com/CHIAO-YA/DogPhotourl/blob/main/godphoto/0502.PNG?raw=true"),
+                thumbnailImageUrl = new Uri("https://github.com/CHIAO-YA/DogPhotourl/blob/main/godphoto/%E5%A4%A7.PNG?raw=true"),
                 actions = new List<isRock.LineBot.TemplateActionBase>()
                 {
                     new isRock.LineBot.UriAction()
@@ -365,16 +360,11 @@ namespace Dog.Controllers
                     }
                 }
             });
-
             // 創建輪播訊息
             var carouselTemplate = new isRock.LineBot.CarouselTemplate() { columns = columns };
-
             // 發送輪播訊息
             isRock.LineBot.Bot bot = new isRock.LineBot.Bot(channelAccessToken);
             bot.ReplyMessage(replyToken, new isRock.LineBot.TemplateMessage(carouselTemplate));
         }
-
-
     }
-
 }

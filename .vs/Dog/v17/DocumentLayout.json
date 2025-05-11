@@ -3,24 +3,36 @@
   "WorkspaceRootPath": "D:\\SQL Server\\Dog-0421\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\bluenewpaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0421\\dog\\controllers\\bluenewpaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\bluenewpaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\dogcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\dogcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0421\\dog\\controllers\\linebotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\linebotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\linebotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\lineauthcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0421\\dog\\controllers\\dogcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\dogcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0421\\dog\\controllers\\lineauthcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\lineauthcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\controllers\\linepaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\linepaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|D:\\SQL Server\\Dog-0421\\dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\security\\linepay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\linepay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|d:\\sql server\\dog-0421\\dog\\security\\linepayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E995D8EE-E29C-4539-B917-80A2762809AF}|Dog\\Dog.csproj|solutionrelative:dog\\security\\linepayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +42,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 411,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,39 +58,91 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
+              "Title": "LineBotController.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LineBotController.cs",
+              "RelativeDocumentMoniker": "Dog\\Controllers\\LineBotController.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LineBotController.cs",
+              "RelativeToolTip": "Dog\\Controllers\\LineBotController.cs",
+              "ViewState": "AgIAAN8AAAAAAAAAAAAmwHoAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T13:41:01.351Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "LinePayController.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LinePayController.cs",
+              "RelativeDocumentMoniker": "Dog\\Controllers\\LinePayController.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LinePayController.cs",
+              "RelativeToolTip": "Dog\\Controllers\\LinePayController.cs",
+              "ViewState": "AgIAADUAAAAAAAAAAAAiwEUAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-06T06:24:07.048Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "LinePayService.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\LinePayService.cs",
+              "RelativeDocumentMoniker": "Dog\\Security\\LinePayService.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\LinePayService.cs",
+              "RelativeToolTip": "Dog\\Security\\LinePayService.cs",
+              "ViewState": "AgIAAIsAAAAAAAAAAAAswAoBAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-06T06:24:14.169Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LinePay.cs",
+              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\LinePay.cs",
+              "RelativeDocumentMoniker": "Dog\\Security\\LinePay.cs",
+              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Security\\LinePay.cs",
+              "RelativeToolTip": "Dog\\Security\\LinePay.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-06T06:24:13.45Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "AdminController.cs",
               "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\AdminController.cs",
               "RelativeDocumentMoniker": "Dog\\Controllers\\AdminController.cs",
               "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\AdminController.cs",
               "RelativeToolTip": "Dog\\Controllers\\AdminController.cs",
-              "ViewState": "AgIAABQBAAAAAAAAAAAgwHUBAACEAAAAAAAAAA==",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAmwHUBAACEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-05T01:28:29.83Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "BlueNewPayController.cs",
               "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\BlueNewPayController.cs",
               "RelativeDocumentMoniker": "Dog\\Controllers\\BlueNewPayController.cs",
               "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\BlueNewPayController.cs",
               "RelativeToolTip": "Dog\\Controllers\\BlueNewPayController.cs",
-              "ViewState": "AgIAAD0AAAAAAAAAAAAuwAUBAAA4AAAAAAAAAA==",
+              "ViewState": "AgIAADEAAAAAAAAAAAAqwEYAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-05T01:28:07.048Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "LineAuthController.cs",
               "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LineAuthController.cs",
               "RelativeDocumentMoniker": "Dog\\Controllers\\LineAuthController.cs",
               "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LineAuthController.cs",
               "RelativeToolTip": "Dog\\Controllers\\LineAuthController.cs",
-              "ViewState": "AgIAAFoBAAAAAAAAAAAUwIYBAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAHMAAAAAAAAAAAAAwKYAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-04T05:51:12.536Z",
               "EditorCaption": ""
@@ -91,22 +155,9 @@
               "RelativeDocumentMoniker": "Dog\\Controllers\\DogController.cs",
               "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\DogController.cs",
               "RelativeToolTip": "Dog\\Controllers\\DogController.cs",
-              "ViewState": "AgIAAAACAAAAAAAAAAAQwBsCAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAwBAAAAAAAAAAAIwNwBAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-04T14:23:01.236Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "LineBotController.cs",
-              "DocumentMoniker": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LineBotController.cs",
-              "RelativeDocumentMoniker": "Dog\\Controllers\\LineBotController.cs",
-              "ToolTip": "D:\\SQL Server\\Dog-0421\\Dog\\Controllers\\LineBotController.cs",
-              "RelativeToolTip": "Dog\\Controllers\\LineBotController.cs",
-              "ViewState": "AgIAAGgAAAAAAAAAAAAIwIIAAABMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-03T13:41:01.351Z",
               "EditorCaption": ""
             }
           ]

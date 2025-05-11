@@ -154,12 +154,6 @@ namespace Dog.Controllers
                 // 更新訂單支付狀態
                 if (tradeData.Status == "SUCCESS")
                 {
-                    //// 只針對ATM轉帳特別處理
-                    //if (tradeData.Result.PaymentType == "VACC") // ATM 虛擬帳號
-                    //{
-                    //    order.LinePayMethod = "ATM轉帳";
-                    //    System.Diagnostics.Debug.WriteLine("設置支付方式為ATM轉帳");
-                    //}
 
                     order.PaymentStatus = PaymentStatus.已付款;
                 order.UpdatedAt = DateTime.Now;
@@ -168,17 +162,15 @@ namespace Dog.Controllers
                     var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
                     if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
                     {
-                        string msg = $"📦 Lebu-leduo 訂單已結帳成功！\n" +
+                        string msg = $"【Lebu-leduo 通知】訂單已結帳成功！\n" +
                                      $"🛍️感謝您的訂購！您的垃圾收運服務已成功結帳並排程。\n\n" +
                                      $"【訂單資訊】\n" +
                                      $"訂單編號：{order.OrderNumber}\n" +
                                      $"支付方式：{order.LinePayMethod}\n" +
                                      $"金額：{order.TotalAmount} 元\n\n" +
-                                     $"如有任何問題，歡迎隨時聯繫客服 😊";
+                                     $"如有任何問題，歡迎隨時聯繫客服😊";
 
                         string cleanMessageuserId = user.MessageuserId.Trim().Replace("\n", "").Replace("\r", "").Replace(" ", "");
-
-                        // 發送 LINE 訊息
                         var lineBot = new isRock.LineBot.Bot(channelAccessToken);
                         lineBot.PushMessage(cleanMessageuserId, msg);
                         System.Diagnostics.Debug.WriteLine($"發送付款成功通知");
