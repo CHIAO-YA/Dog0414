@@ -32,13 +32,14 @@ namespace Dog.Security
         public BlueNewPaymentData CreatePaymentData(Orders order)
         {
             // 產生訂單編號 (若已有訂單編號可直接使用)
-            string merchantOrderNo = $"DOG{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+            string merchantOrderNo = "ORD-" + DateTime.Now.ToString("yyyyMMdd-");
+
 
             // 產生交易時間 (藍新金流規定格式)
             string tradeDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
 
             // 設定項目名稱
-            string itemDesc = order.Plan?.PlanName ?? "寵物照顧服務";
+            string itemDesc = order.Plan?.PlanName ?? "收垃圾服務";
 
             // 建立交易資料物件
             var paymentData = new BlueNewPaymentData

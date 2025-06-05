@@ -870,3 +870,4 @@ D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.pdb
 D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.Migrations.qr.resources
 D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.Migrations._0426.resources
 D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.Migrations._0430.resources
+D:\SQL Server\Dog-0421\Dog\obj\Release\Dog.Migrations._0605.resources

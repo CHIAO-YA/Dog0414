@@ -22,30 +22,85 @@ namespace Dog.Controllers
         private readonly BlueNewPayService _blueNewPayService = new BlueNewPayService();
         Models.Model1 db = new Models.Model1();
 
-        [HttpPost, HttpGet]
-        [Route("Post/bluenew/return")]
-        public IHttpActionResult PaymentReturnPost()
-        {
-            //bool isProductionAvailable = CheckUrlAvailable("https://lebuleduo.vercel.app/#/customer/subscribe-success");
-            //string redirectUrl = isProductionAvailable
-            //    ? "https://lebuleduo.vercel.app/#/customer/subscribe-success"
-            //    : "http://localhost:5173/#/customer/subscribe-success";
+        //[HttpPost, HttpGet]
+        //[Route("Post/bluenew/return")]
+        //public IHttpActionResult PaymentReturnPost()
+        //{
+        //    //bool isProductionAvailable = CheckUrlAvailable("https://lebuleduo.vercel.app/#/customer/subscribe-success");
+        //    //string redirectUrl = isProductionAvailable
+        //    //    ? "https://lebuleduo.vercel.app/#/customer/subscribe-success"
+        //    //    : "http://localhost:5173/#/customer/subscribe-success";
+        //    // 可以自由更換要跳轉的網址
+        //    string redirectUrl = "http://localhost:5173/#/customer/subscribe-success";
+        //    ////https://lebuleduo.vercel.app/#/customer/subscribe-success
+        //    ////http://localhost:5173/#/customer/subscribe-success
+        //    var html = $@"<html>
+        //            <head>
+        //                <meta charset='utf-8'/>
+        //                <script>
+        //                    window.location.href = '{redirectUrl}';
+        //                </script>
+        //            </head>
+        //            <body>
+        //                正在導向中，請稍後...
+        //            </body>
+        //        </html>";
+        //    var response = new HttpResponseMessage
+        //    {
+        //        Content = new StringContent(html, Encoding.UTF8, "text/html")
+        //    };
+        //    return ResponseMessage(response);
+        //}
 
-            // 可以自由更換要跳轉的網址
-            string redirectUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success";
-            ////https://lebuleduo.vercel.app/#/customer/subscribe-success
-            ////http://localhost:5173/#/customer/subscribe-success
+
+        // 產生付款表單資料
+        //[HttpPost, HttpGet]
+        //[Route("Post/bluenew/return")]
+        //public IHttpActionResult PaymentReturnPost(string env = "production")
+        //{
+        //    // 根據環境參數判斷要導向哪裡
+        //    bool isLocalEnvironment = env == "local";
+
+        //    string redirectUrl = isLocalEnvironment
+        //        ? "http://localhost:5173/#/customer/subscribe-success"
+        //        : "https://lebuleduo.vercel.app/#/customer/subscribe-success";
+
+        //    var html = $@"<html>
+        //    <head>
+        //        <meta charset='utf-8'/>
+        //        <script>
+        //            window.location.href = '{redirectUrl}';
+        //        </script>
+        //    </head>
+        //    <body>
+        //        正在導向中，請稍後...
+        //    </body>
+        //</html>";
+
+        //    var response = new HttpResponseMessage
+        //    {
+        //        Content = new StringContent(html, Encoding.UTF8, "text/html")
+        //    };
+
+        //    return ResponseMessage(response);
+        //}
+
+        [HttpPost, HttpGet]
+        [Route("Post/bluenew/return/local")]
+        public IHttpActionResult PaymentReturnLocal()
+        {
+            string redirectUrl = "http://localhost:5173/#/customer/subscribe-success";
             var html = $@"<html>
-                    <head>
-                        <meta charset='utf-8'/>
-                        <script>
-                            window.location.href = '{redirectUrl}';
-                        </script>
-                    </head>
-                    <body>
-                        正在導向中，請稍後...
-                    </body>
-                </html>";
+            <head>
+                <meta charset='utf-8'/>
+                <script>
+                    window.location.href = '{redirectUrl}';
+                </script>
+            </head>
+            <body>
+                正在導向中，請稍後...
+            </body>
+        </html>";
 
             var response = new HttpResponseMessage
             {
@@ -55,8 +110,31 @@ namespace Dog.Controllers
             return ResponseMessage(response);
         }
 
+        [HttpPost, HttpGet]
+        [Route("Post/bluenew/return/production")]
+        public IHttpActionResult PaymentReturnProduction()
+        {
+            string redirectUrl = "https://lebuleduo.vercel.app/#/customer/subscribe-success";
+            var html = $@"<html>
+            <head>
+                <meta charset='utf-8'/>
+                <script>
+                    window.location.href = '{redirectUrl}';
+                </script>
+            </head>
+            <body>
+                正在導向中，請稍後...
+            </body>
+        </html>";
 
-        // 產生付款表單資料
+            var response = new HttpResponseMessage
+            {
+                Content = new StringContent(html, Encoding.UTF8, "text/html")
+            };
+
+            return ResponseMessage(response);
+        }
+
         [HttpPost]
         [Route("Post/bluenew/createPayment")]
         public IHttpActionResult CreatePayment(BlueNewPaymentRequest request)
@@ -78,6 +156,16 @@ namespace Dog.Controllers
                 // 4. 建立藍新金流交易資料
                 var paymentData = _blueNewPayService.CreatePaymentData(order);
 
+
+                // 5. 用三元運算直接判斷環境，設定正確的 ReturnURL
+                string origin = System.Web.HttpContext.Current.Request.Headers["Origin"];
+                bool isLocalEnvironment = origin != null && origin.Contains("localhost:5173");
+
+                string returnUrl = isLocalEnvironment
+                    ? "http://lebuleduo.rocket-coding.com/Post/bluenew/return/local"    // 本地版
+                    : "https://lebuleduo.rocket-coding.com/Post/bluenew/return/production"; // 線上版
+
+
                 // 5. 將交易資料轉為 List<KeyValuePair<string, string>>
                 List<KeyValuePair<string, string>> tradeData = new List<KeyValuePair<string, string>>() {
                     new KeyValuePair<string, string>("MerchantID", paymentData.MerchantID),
@@ -89,7 +177,8 @@ namespace Dog.Controllers
                     new KeyValuePair<string, string>("ItemDesc", paymentData.ItemDesc),
                     new KeyValuePair<string, string>("TradeLimit", paymentData.TradeLimit.ToString()),
                     new KeyValuePair<string, string>("NotifyURL", paymentData.NotifyURL),
-                    new KeyValuePair<string, string>("ReturnURL", paymentData.ReturnURL),
+                    new KeyValuePair<string, string>("ReturnURL", returnUrl),
+                    //new KeyValuePair<string, string>("ReturnURL", paymentData.ReturnURL),
                     new KeyValuePair<string, string>("ClientBackURL", paymentData.ClientBackURL),
                     new KeyValuePair<string, string>("Email", "customer@example.com"),
                     new KeyValuePair<string, string>("LoginType", "0")
@@ -156,8 +245,8 @@ namespace Dog.Controllers
                 {
 
                     order.PaymentStatus = PaymentStatus.已付款;
-                order.UpdatedAt = DateTime.Now;
-                db.SaveChanges();
+                    order.UpdatedAt = DateTime.Now;
+                    db.SaveChanges();
 
                     var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
                     if (user != null && !string.IsNullOrEmpty(user.MessageuserId))

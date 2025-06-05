@@ -57,9 +57,16 @@ namespace Dog.Controllers
             }
             string channelId = "2007121127";
             string channelSecret = "d7c30599e53dc2aa970728521d61d2c3";
-            string redirectUri = "https://lebuleduo.vercel.app/#/auth/line/callback";//登入頁面
-            //http://localhost:5173/#/auth/line/callback
-            //https://lebuleduo.vercel.app/#/auth/line/callback
+            string origin = HttpContext.Current.Request.Headers["Origin"];
+            bool isLocalEnvironment = origin != null && origin.Contains("localhost:5173");
+            string redirectUri = isLocalEnvironment
+                ? "http://localhost:5173/#/auth/line/callback"
+                : "https://lebuleduo.vercel.app/#/auth/line/callback";
+
+            //bool isLocalEnvironment = HttpContext.Current.Request.IsLocal;
+            //string redirectUri = isLocalEnvironment
+            //    ? "http://localhost:5173/#/auth/line/callback"
+            //    : "https://lebuleduo.vercel.app/#/auth/line/callback";
             try
             {
                 //拿到授權碼 code，去跟 LINE 官方換 access token取得使用者資料

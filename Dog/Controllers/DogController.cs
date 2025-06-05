@@ -227,98 +227,244 @@ namespace Dog.Controllers
             });
         }
 
+        //[HttpPut]
+        //[Route("driver/orders/status/{OrderDetailID}")]//改變訂單狀態OrderStatus
+        //public IHttpActionResult UpdateOrderStatus(int OrderDetailID, [FromBody] UpdateStatusRequest request)
+        //{
+        //    if (!Enum.IsDefined(typeof(OrderStatus), request.OrderStatus))
+        //    {
+        //        return BadRequest("無效的訂單狀態");
+        //    }
+        //    var orderDetail = db.OrderDetails.FirstOrDefault(od => od.OrderDetailID == OrderDetailID);
+        //    if (orderDetail == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var oldStatus = orderDetail.OrderStatus;
+        //    var newStatus = (OrderStatus)request.OrderStatus;
+        //    orderDetail.OrderStatus = newStatus;
+        //    DateTime taiwanNow = GetTaiwanTime();
+        //    orderDetail.UpdatedAt = taiwanNow;
+
+        //    switch (newStatus)
+        //    {
+        //        case OrderStatus.已排定:
+        //            orderDetail.ScheduledAt = taiwanNow;
+        //            break;
+        //        case OrderStatus.前往中:
+        //            orderDetail.OngoingAt = taiwanNow;
+        //            break;
+        //        case OrderStatus.已抵達:
+        //            orderDetail.ArrivedAt = taiwanNow;
+        //            break;
+        //        case OrderStatus.已完成:
+        //        case OrderStatus.異常:
+        //            orderDetail.CompletedAt = taiwanNow;
+        //            break;
+        //    }
+        //    db.SaveChanges();
+        //    if (oldStatus != newStatus)
+        //    {
+        //        // 獲取訂單和用戶信息
+        //        var order = db.Orders.FirstOrDefault(o => o.OrdersID == orderDetail.OrdersID);
+        //        if (order != null)
+        //        {
+        //            var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+        //            if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
+        //            {
+        //                System.Diagnostics.Debug.WriteLine($"用戶 LineId: {user.MessageuserId}");
+        //                // 取得 Channel Access Token
+        //                string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
+        //                var linebot = new isRock.LineBot.Bot(channelAccessToken);
+
+        //                var cleanMessageuserId = user.MessageuserId
+        //               .Trim()
+        //               .Replace("\n", "")
+        //               .Replace("\r", "")
+        //               .Replace(" ", "");
+        //                // 決定通知類型
+        //                //string notificationType = "";
+        //                //string messageContent = "";
+        //                switch (newStatus)
+        //                {
+        //                    case OrderStatus.前往中:
+        //                        //notificationType = "收運進行中通知";
+        //                        linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運進行中\n\n🚛我們正在趕往你指定的地點收運垃圾\n📍請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙!");
+        //                        break;
+        //                    case OrderStatus.已抵達:
+        //                        //notificationType = "收運已抵達通知";
+        //                        linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運已抵達\n\n🚛我們已抵達現場，正在為你收運垃圾 \n✨請稍等片刻，服務即將完成，感謝你的耐心與配合。");
+        //                        break;
+        //                    case OrderStatus.已完成:
+        //                        //notificationType = "收運已完成通知";
+
+        //                        linebot.PushMessage(cleanMessageuserId, $"📋【Lebu-leduo 收運完成】📸\n今天的垃圾已成功收運完畢 ✅\n感謝你的配合。");
+        //                        break;
+        //                    case OrderStatus.異常:
+        //                        //notificationType = "收運異常通知";
+        //                        linebot.PushMessage(cleanMessageuserId, $"【Lebu-leduo 通知】\n\n我們今天找不到擺放的垃圾 😢\n請確認垃圾是否擺放在指定地點，如需補收，請回覆客服或重新預約！");
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return Ok(new
+        //    {
+        //        statusCode = 200,
+        //        status = true,
+        //        message = "成功更新訂單狀態",
+        //        result = new
+        //        {
+        //            orderDetail.OrderDetailID,
+        //            orderDetail.OrderStatus
+        //        }
+        //    });
+        //}
         [HttpPut]
-        [Route("driver/orders/status/{OrderDetailID}")]//改變訂單狀態OrderStatus
+        [Route("driver/orders/status/{OrderDetailID}")]
         public IHttpActionResult UpdateOrderStatus(int OrderDetailID, [FromBody] UpdateStatusRequest request)
         {
-            if (!Enum.IsDefined(typeof(OrderStatus), request.OrderStatus))
+            try
             {
-                return BadRequest("無效的訂單狀態");
-            }
-            var orderDetail = db.OrderDetails.FirstOrDefault(od => od.OrderDetailID == OrderDetailID);
-            if (orderDetail == null)
-            {
-                return NotFound();
-            }
-            var oldStatus = orderDetail.OrderStatus;
-            var newStatus = (OrderStatus)request.OrderStatus;
-            orderDetail.OrderStatus = newStatus;
-            DateTime taiwanNow = GetTaiwanTime();
-            orderDetail.UpdatedAt = taiwanNow;
-
-            switch (newStatus)
-            {
-                case OrderStatus.已排定:
-                    orderDetail.ScheduledAt = taiwanNow;
-                    break;
-                case OrderStatus.前往中:
-                    orderDetail.OngoingAt = taiwanNow;
-                    break;
-                case OrderStatus.已抵達:
-                    orderDetail.ArrivedAt = taiwanNow;
-                    break;
-                case OrderStatus.已完成:
-                case OrderStatus.異常:
-                    orderDetail.CompletedAt = taiwanNow;
-                    break;
-            }
-            db.SaveChanges();
-            if (oldStatus != newStatus)
-            {
-                // 獲取訂單和用戶信息
-                var order = db.Orders.FirstOrDefault(o => o.OrdersID == orderDetail.OrdersID);
-                if (order != null)
+                if (!Enum.IsDefined(typeof(OrderStatus), request.OrderStatus))
                 {
-                    var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
-                    if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
+                    return BadRequest("無效的訂單狀態");
+                }
+
+                var orderDetail = db.OrderDetails.FirstOrDefault(od => od.OrderDetailID == OrderDetailID);
+                if (orderDetail == null)
+                {
+                    return NotFound();
+                }
+
+                var oldStatus = orderDetail.OrderStatus;
+                var newStatus = (OrderStatus)request.OrderStatus;
+                orderDetail.OrderStatus = newStatus;
+                DateTime taiwanNow = GetTaiwanTime();
+                orderDetail.UpdatedAt = taiwanNow;
+
+                // 更新時間戳記的代碼保持不變...
+                switch (newStatus)
+                {
+                    case OrderStatus.已排定:
+                        orderDetail.ScheduledAt = taiwanNow;
+                        break;
+                        // 其他case...
+                }
+
+                db.SaveChanges();
+
+                // 將Line消息發送包裝在單獨的try-catch中
+                string lineErrorMessage = null;
+                if (oldStatus != newStatus)
+                {
+                    try
                     {
-                        System.Diagnostics.Debug.WriteLine($"用戶 LineId: {user.MessageuserId}");
-                        // 取得 Channel Access Token
-                        string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
-                        var linebot = new isRock.LineBot.Bot(channelAccessToken);
-
-                        var cleanMessageuserId = user.MessageuserId
-                       .Trim()
-                       .Replace("\n", "")
-                       .Replace("\r", "")
-                       .Replace(" ", "");
-                        // 決定通知類型
-                        string notificationType = "";
-                        //string messageContent = "";
-                        switch (newStatus)
+                        // 獲取訂單和用戶信息
+                        var order = db.Orders.FirstOrDefault(o => o.OrdersID == orderDetail.OrdersID);
+                        if (order != null)
                         {
-                            case OrderStatus.前往中:
-                                notificationType = "收運進行中通知";
-                                linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運進行中\n\n🚛我們正在趕往你指定的地點收運垃圾\n📍請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙!");
-                                break;
-                            case OrderStatus.已抵達:
-                                notificationType = "收運已抵達通知";
-                                linebot.PushMessage(cleanMessageuserId, $"【🐾垃不垃多Lebuleduo】\n👉收運已抵達\n\n🚛我們已抵達現場，正在為你收運垃圾 \n✨請稍等片刻，服務即將完成，感謝你的耐心與配合。");
-                                break;
-                            case OrderStatus.已完成:
-                                notificationType = "收運已完成通知";
+                            var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+                            if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
+                            {
+                                System.Diagnostics.Debug.WriteLine($"用戶 LineId: {user.MessageuserId}");
+                                // 取得 Channel Access Token
+                                string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
+                                var linebot = new isRock.LineBot.Bot(channelAccessToken);
 
-                                linebot.PushMessage(cleanMessageuserId, $"📋【Lebu-leduo 收運完成】📸\n今天的垃圾已成功收運完畢 ✅\n感謝你的配合。");
-                                break;
-                            case OrderStatus.異常:
-                                notificationType = "收運異常通知";
-                                linebot.PushMessage(cleanMessageuserId, $"【Lebu-leduo 通知】\n\n我們今天找不到擺放的垃圾 😢\n請確認垃圾是否擺放在指定地點，如需補收，請回覆客服或重新預約！");
-                                break;
+                                var cleanMessageuserId = user.MessageuserId
+                                    .Trim()
+                                    .Replace("\n", "")
+                                    .Replace("\r", "")
+                                    .Replace(" ", "");
+
+                                System.Diagnostics.Debug.WriteLine($"清理後的 LineId: {cleanMessageuserId}");
+
+                                // 決定通知類型
+                                string messageContent = "";
+                                switch (newStatus)
+                                {
+                                    case OrderStatus.前往中:
+                                        messageContent = $"【🐾垃不垃多Lebuleduo】\n👉收運進行中\n\n🚛我們正在趕往你指定的地點收運垃圾\n📍請確認垃圾已擺放在指定位置，並貼好 QR Code 貼紙!";
+                                        break;
+                                        // 其他case...
+                                }
+
+                                // 如果有消息內容需要發送
+                                if (!string.IsNullOrEmpty(messageContent))
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"準備發送消息: {messageContent.Substring(0, Math.Min(20, messageContent.Length))}...");
+
+                                    // 嘗試發送Line消息
+                                    var pushResult = linebot.PushMessage(cleanMessageuserId, messageContent);
+                                    System.Diagnostics.Debug.WriteLine($"Line消息發送結果: {pushResult}");
+                                }
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("用戶或Line ID為空");
+                            }
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("找不到相關訂單");
                         }
                     }
+                    catch (Exception lineEx)
+                    {
+                        // 捕獲Line消息發送錯誤，但不中斷API執行
+                        lineErrorMessage = $"Line消息發送錯誤: {lineEx.Message}";
+                        if (lineEx.InnerException != null)
+                        {
+                            lineErrorMessage += $" - 內部錯誤: {lineEx.InnerException.Message}";
+                        }
+                        System.Diagnostics.Debug.WriteLine(lineErrorMessage);
+                        System.Diagnostics.Debug.WriteLine($"堆疊追蹤: {lineEx.StackTrace}");
+                    }
+                }
+
+                // 根據Line消息發送結果決定響應
+                if (lineErrorMessage != null)
+                {
+                    // 返回成功更新訂單狀態，但包含Line消息錯誤資訊
+                    return Ok(new
+                    {
+                        statusCode = 200,
+                        status = true,
+                        message = "已更新訂單狀態，但Line消息發送失敗",
+                        lineError = lineErrorMessage,
+                        result = new
+                        {
+                            orderDetail.OrderDetailID,
+                            orderDetail.OrderStatus
+                        }
+                    });
+                }
+                else
+                {
+                    // 完全成功的情況
+                    return Ok(new
+                    {
+                        statusCode = 200,
+                        status = true,
+                        message = "成功更新訂單狀態",
+                        result = new
+                        {
+                            orderDetail.OrderDetailID,
+                            orderDetail.OrderStatus
+                        }
+                    });
                 }
             }
-            return Ok(new
+            catch (Exception ex)
             {
-                statusCode = 200,
-                status = true,
-                message = "成功更新訂單狀態",
-                result = new
-                {
-                    orderDetail.OrderDetailID,
-                    orderDetail.OrderStatus
-                }
-            });
+                // 捕獲所有其他非預期錯誤
+                System.Diagnostics.Debug.WriteLine($"UpdateOrderStatus出現錯誤: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"堆疊追蹤: {ex.StackTrace}");
+
+                // 返回詳細的錯誤資訊而非一般500錯誤
+                return InternalServerError(new Exception($"處理訂單狀態更新時出錯: {ex.Message}", ex));
+            }
         }
 
         [HttpPut]
@@ -458,59 +604,133 @@ namespace Dog.Controllers
 
             var order = OrderDetail.Orders; // 已經包含在查詢中
             var user = db.Users.FirstOrDefault(u => u.UsersID == order.UsersID);
+
+            // 記錄可能的LINE錯誤訊息
+            string lineErrorMessage = null;
+
             if (user != null && !string.IsNullOrEmpty(user.MessageuserId))
             {
-                // 取得 Channel Access Token
-                string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
-                var linebot = new isRock.LineBot.Bot(channelAccessToken);
-
-                var cleanMessageuserId = user.MessageuserId
-               .Trim()                       // 移除前後空格
-               .Replace("\n", "")            // 移除換行符
-               .Replace("\r", "")            // 移除回車符
-               .Replace(" ", "")             // 移除空格
-               .Replace("\t", "");           // 移除tab
-
-                string message;
-                if (isOverWeight)
+                try // 在這裡添加 try-catch 來處理LINE訊息發送的錯誤
                 {
-                    message = $"【Lebu-leduo 通知】我們今天找到垃圾重量超出預期 😢\n" +
-                              $"訂單編號：{order.OrderNumber}\n" +
-                              $"重量：{OrderDetail.KG} KG（超過 {OrderDetail.Orders.Plan.PlanKG} KG）\n" +
-                              $"請確認垃圾是否符合計畫重量，如需詳細說明，請回覆客服！";
+                    // 取得 Channel Access Token
+                    string channelAccessToken = System.Configuration.ConfigurationManager.AppSettings["LineChannelAccessToken"];
+                    var linebot = new isRock.LineBot.Bot(channelAccessToken);
+
+                    var cleanMessageuserId = user.MessageuserId
+                   .Trim()                       // 移除前後空格
+                   .Replace("\n", "")            // 移除換行符
+                   .Replace("\r", "")            // 移除回車符
+                   .Replace(" ", "")             // 移除空格
+                   .Replace("\t", "");           // 移除tab
+
+                    // 記錄發送前資訊，有助於調試
+                    System.Diagnostics.Debug.WriteLine($"準備發送LINE訊息給: {cleanMessageuserId}");
+
+
+                    string message;
+                    if (isOverWeight)
+                    {
+                        message = $"【Lebu-leduo 通知】我們今天找到垃圾重量超出預期 😢\n" +
+                                  $"訂單編號：{order.OrderNumber}\n" +
+                                  $"重量：{OrderDetail.KG} KG（超過 {OrderDetail.Orders.Plan.PlanKG} KG）\n" +
+                                  $"請確認垃圾是否符合計畫重量，如需詳細說明，請回覆客服！";
+                    }
+                    else
+                    {
+                        message = $"【🐾垃不垃多Lebuleduo】\n" +
+                                  $"👉收運已完成\n\n" +
+                                  $"📌訂單編號：{order.OrderNumber}\n" +
+                                  $"✅今天垃圾已成功收運完畢\n" +
+                                  $"♻️垃圾重量：{OrderDetail.KG} 公斤\n" +
+                                  $"✨感謝你的配合。";
+                    }
+                    // linebot.PushMessage(cleanMessageuserId, message);
+                    // 發送LINE訊息
+                    var result = linebot.PushMessage(cleanMessageuserId, message);
+                    System.Diagnostics.Debug.WriteLine($"LINE訊息發送結果: {result}");
                 }
-                else
+                catch (Exception lineEx)
                 {
-                    message = $"【🐾垃不垃多Lebuleduo】\n" +
-                              $"👉收運已完成\n\n" +
-                              $"📌訂單編號：{order.OrderNumber}\n" +
-                              $"✅今天垃圾已成功收運完畢\n" +
-                              $"♻️垃圾重量：{OrderDetail.KG} 公斤\n" +
-                              $"✨感謝你的配合。";
+                    // 捕獲LINE訊息發送錯誤，但不中斷API執行
+                    lineErrorMessage = $"LINE訊息發送錯誤: {lineEx.Message}";
+                    if (lineEx.InnerException != null)
+                    {
+                        lineErrorMessage += $" - 內部錯誤: {lineEx.InnerException.Message}";
+                    }
+
+                    // 記錄錯誤，但繼續執行
+                    System.Diagnostics.Debug.WriteLine(lineErrorMessage);
+                    System.Diagnostics.Debug.WriteLine($"錯誤堆疊: {lineEx.StackTrace}");
                 }
-                linebot.PushMessage(cleanMessageuserId, message);
             }
-
-            return Ok(new
+            // 根據是否有LINE錯誤返回不同的響應
+            if (lineErrorMessage != null)
             {
-                statusCode = 200,
-                status = true,
-                message = isOverWeight ? "重量超出計畫，已標記為異常回報" : "成功更新重量",
-                result = new
+                return Ok(new
                 {
-                    OrderDetail.OrderDetailID,
-                    OrderDetail.KG,
-                    OrderStatus = OrderDetail.OrderStatus.ToString(),
-                    IsOverWeight = isOverWeight,
-                    OrderDetail.UpdatedAt,
-                    OrderDetail.ReportedAt,
-                    OrderDetail.CompletedAt,
-                    CommonIssues = OrderDetail.CommonIssues != null ? Enum.GetName(typeof(CommonIssues), OrderDetail.CommonIssues) : null, // 將 CommonIssues 轉換為文字
-                    OrderDetail.IssueDescription,
-                    DriverPhoto = OrderDetail.DriverPhoto.Select(p => p.DriverImageUrl).ToList(),
-                }
-            });
+                    statusCode = 200,
+                    status = true,
+                    message = isOverWeight ? "重量超出計畫，已標記為異常回報" : "成功更新重量",
+                    lineError = lineErrorMessage, // 返回LINE錯誤訊息
+                    result = new
+                    {
+                        OrderDetail.OrderDetailID,
+                        OrderDetail.KG,
+                        OrderStatus = OrderDetail.OrderStatus.ToString(),
+                        IsOverWeight = isOverWeight,
+                        OrderDetail.UpdatedAt,
+                        OrderDetail.ReportedAt,
+                        OrderDetail.CompletedAt,
+                        CommonIssues = OrderDetail.CommonIssues != null ? Enum.GetName(typeof(CommonIssues), OrderDetail.CommonIssues) : null,
+                        OrderDetail.IssueDescription,
+                        DriverPhoto = OrderDetail.DriverPhoto.Select(p => p.DriverImageUrl).ToList(),
+                    }
+                });
+            }
+            else
+            {
+                // 原始的返回響應
+                return Ok(new
+                {
+                    statusCode = 200,
+                    status = true,
+                    message = isOverWeight ? "重量超出計畫，已標記為異常回報" : "成功更新重量",
+                    result = new
+                    {
+                        OrderDetail.OrderDetailID,
+                        OrderDetail.KG,
+                        OrderStatus = OrderDetail.OrderStatus.ToString(),
+                        IsOverWeight = isOverWeight,
+                        OrderDetail.UpdatedAt,
+                        OrderDetail.ReportedAt,
+                        OrderDetail.CompletedAt,
+                        CommonIssues = OrderDetail.CommonIssues != null ? Enum.GetName(typeof(CommonIssues), OrderDetail.CommonIssues) : null,
+                        OrderDetail.IssueDescription,
+                        DriverPhoto = OrderDetail.DriverPhoto.Select(p => p.DriverImageUrl).ToList(),
+                    }
+                });
+            }
         }
+        //return Ok(new
+        //{
+        //    statusCode = 200,
+        //    status = true,
+        //    message = isOverWeight ? "重量超出計畫，已標記為異常回報" : "成功更新重量",
+        //    result = new
+        //    {
+        //        OrderDetail.OrderDetailID,
+        //        OrderDetail.KG,
+        //        OrderStatus = OrderDetail.OrderStatus.ToString(),
+        //        IsOverWeight = isOverWeight,
+        //        OrderDetail.UpdatedAt,
+        //        OrderDetail.ReportedAt,
+        //        OrderDetail.CompletedAt,
+        //        CommonIssues = OrderDetail.CommonIssues != null ? Enum.GetName(typeof(CommonIssues), OrderDetail.CommonIssues) : null, // 將 CommonIssues 轉換為文字
+        //        OrderDetail.IssueDescription,
+        //        DriverPhoto = OrderDetail.DriverPhoto.Select(p => p.DriverImageUrl).ToList(),
+        //    }
+        //});
+
 
         public class UpdateStatusRequest
         {

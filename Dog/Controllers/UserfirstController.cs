@@ -254,9 +254,11 @@ namespace Dog.Controllers
             var ordersQuery = db.Orders
                 .Include(o => o.Plan)
                 .Include(o => o.OrderDetails)
-            .Where(o => o.UsersID == UsersID && o.PaymentStatus != PaymentStatus.未付款 &&
-            o.OrderDetails.Any(od => od.OrderStatus == OrderStatus.未排定 || 
-            od.OrderStatus == OrderStatus.已排定 || od.OrderStatus == OrderStatus.前往中));
+                .Where(o => o.UsersID == UsersID &&
+                o.PaymentStatus == PaymentStatus.已付款 &&  // 明確只要狀態 = 1
+                o.OrderDetails.Any(od => od.OrderStatus == OrderStatus.未排定 ||
+                                        od.OrderStatus == OrderStatus.已排定 ||
+                                        od.OrderStatus == OrderStatus.前往中));
             if (OrdersID.HasValue)
             {
                 ordersQuery = ordersQuery.Where(o => o.OrdersID == OrdersID.Value);
@@ -562,7 +564,8 @@ namespace Dog.Controllers
                 statusCode = 200,
                 status = true,
                 message = "成功取得",
-                allOrderDates = orderDatesData.Select(od => new {
+                allOrderDates = orderDatesData.Select(od => new
+                {
                     ServiceDate = od.ServiceDate.ToString("yyyy/MM/dd"),
                 }),
                 result = new
@@ -651,8 +654,8 @@ namespace Dog.Controllers
                 o.Addresses,
                 OrderImages = o.Photo.Select(p => new
                 {
-                     p.PhotoID,
-                     p.OrderImageUrl
+                    p.PhotoID,
+                    p.OrderImageUrl
                 }).ToList(),
                 o.Notes
             }).ToList();
@@ -676,7 +679,7 @@ namespace Dog.Controllers
 
             // 設上傳路徑
             string uploadPath = HttpContext.Current.Server.MapPath("~/Uploads/");
-            Directory.CreateDirectory(uploadPath); 
+            Directory.CreateDirectory(uploadPath);
 
             // OrdersID / UsersID 查詢訂單
             var order = db.Orders.Include(o => o.Photo).FirstOrDefault(o => o.OrdersID == OrdersID);
@@ -714,7 +717,7 @@ namespace Dog.Controllers
             if (addressContent != null)
             {
                 string address = await addressContent.ReadAsStringAsync();
-                
+
                 if (!string.IsNullOrEmpty(address))
                 {
                     if (address.Length < 5)
@@ -723,7 +726,7 @@ namespace Dog.Controllers
                     }
                     order.Addresses = address;
                     string region = GetRegionFromAddress(order.Addresses);
-                    if(!string.IsNullOrEmpty(region))
+                    if (!string.IsNullOrEmpty(region))
                     {
                         order.Region = region;
                     }
@@ -1030,7 +1033,7 @@ namespace Dog.Controllers
             Directory.CreateDirectory(uploadPath); // 確保資料夾存在
             // 讀取multipart請求內容
             var provider = await Request.Content.ReadAsMultipartAsync();
-           
+
             var orders = new Orders();
 
             // 讀取文字欄位
@@ -1202,11 +1205,11 @@ namespace Dog.Controllers
                 var orderDetail = new OrderDetails
                 {
                     OrdersID = orders.OrdersID,
-                    ServiceDate = serviceDate, 
-                    OrderStatus = OrderStatus.未排定, 
-                    CreatedAt = taiwanNow, 
-                    UpdatedAt = taiwanNow, 
-                                                  
+                    ServiceDate = serviceDate,
+                    OrderStatus = OrderStatus.未排定,
+                    CreatedAt = taiwanNow,
+                    UpdatedAt = taiwanNow,
+
                     UnScheduled = null,
                     OngoingAt = null,
                     ArrivedAt = null,
@@ -1221,7 +1224,7 @@ namespace Dog.Controllers
 
             // 建立一個陣列來存儲所有圖片的路徑
             List<string> uploadedPaths = new List<string>();
-           
+
 
             // 處理圖片上傳
             foreach (var fileData in provider.Contents)
@@ -1263,7 +1266,7 @@ namespace Dog.Controllers
                     UpdatedAt = taiwanNow
                 };
                 db.Photo.Add(photo);
-                
+
             }
 
             db.SaveChanges();
@@ -1412,7 +1415,7 @@ namespace Dog.Controllers
 
         private string GetOrderNumber(int OrdersID)//自動產生唯一編號不重複OrderNumber
         {
-            string prefix = "ORD-"+DateTime.Now.ToString("yyyyMMdd-");
+            string prefix = "ORD-" + DateTime.Now.ToString("yyyyMMdd-");
             string number;
             Random rand = new Random();
             do

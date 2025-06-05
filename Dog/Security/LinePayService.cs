@@ -115,7 +115,12 @@ namespace Dog.Security
         {
             string confirmUrl = $"/v3/payments/{confirm.transactionId}/confirm";
             string nonce = Guid.NewGuid().ToString();
-            string jsonConfirm = JsonConvert.SerializeObject(confirm);
+            var requestBody = new
+            {
+                amount = confirm.amount,
+                currency = "TWD"
+            };
+            string jsonConfirm = JsonConvert.SerializeObject(requestBody);
             string fullPath = $"{_baseUrl}{confirmUrl}";
 
             // 組合成簽章所需要的message
@@ -161,6 +166,7 @@ namespace Dog.Security
                 };
             }
         }
+
     }
 }
 //public class LinePayService

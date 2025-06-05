@@ -52,7 +52,7 @@ namespace Dog.Models
 
     public class LinePayResponseInfoDto
     {
-        public long transactionId { get; set; }
+        public string transactionId { get; set; }
         public PaymentUrlDto paymentUrl { get; set; }
     }
 
@@ -65,9 +65,9 @@ namespace Dog.Models
     // 送出請求格式以及必要屬性
     public class ConfirmRequestDto
     {
-        public long transactionId { get; set; }
+        public string transactionId { get; set; }
         public int amount { get; set; }
-        public string currency { get; } = "TWD";
+        public string currency { get; set; } = "TWD";
     }
 
     // 接收LinePay的回應
@@ -78,6 +78,7 @@ namespace Dog.Models
         // 新增 status 和 message 屬性
         public string status { get; set; }
         public string message { get; set; }
+        
     }
 }
 //public class LinePayRequest

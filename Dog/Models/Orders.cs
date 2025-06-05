@@ -108,7 +108,7 @@ namespace Dog.Models
 
         // Line Pay 相關欄位
         [Display(Name = "LinePay交易ID")]
-        public long? LinePayTransactionId { get; set; }  // 由 Line Pay 回傳
+        public string LinePayTransactionId { get; set; }  // 由 Line Pay 回傳
 
         [Display(Name = "LinePay付款方式")]
         [MaxLength(50)]
